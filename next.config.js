@@ -1,4 +1,10 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {}
+const config = require("./config");
 
-module.exports = nextConfig
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    DB_URI: config.DBI_URI,
+  },
+};
+
+module.exports = nextConfig;
