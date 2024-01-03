@@ -4,9 +4,10 @@ import Image from "next/image";
 import logo from "../../public/logo.svg";
 import NavLink from "@/components/NavLink";
 
-import { LiaShoppingBagSolid as CartIcon } from "react-icons/lia";
-import { RxHeart as FavIcon } from "react-icons/rx";
-import { FiSearch as SearchIcon } from "react-icons/fi";
+import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import { UserIcon } from "@heroicons/react/24/outline";
+import { HeartIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const links = [
   { label: "Home", path: "/", targetSegment: null },
@@ -17,25 +18,25 @@ const links = [
 
 export default function Navbar() {
   return (
-    <div className="absolute w-full flex items-center justify-between">
-      <div className="flex flex-row items-center gap-x-16">
+    <div className="sticky top-0 w-full px-[32px] border-b border-[#eee] flex items-center justify-between min-h-[75px]">
+      <div className="flex flex-row items-center gap-x-11">
         <Link href="/">
-          <Image src={logo} width={170} alt="Pento Logo" />
+          <Image src={logo} width={150} alt="Pento Logo" />
         </Link>
-        <div className="flex gap-x-10">
+        <div className="flex gap-x-6">
           {links.map((link, index) => (
             <NavLink key={index} {...link} />
           ))}
         </div>
       </div>
-      <div className="flex gap-x-3">
-        <SearchIcon size={25} className="cursor-pointer" />
-        <FavIcon size={25} className="cursor-pointer" />
+      <div className="flex gap-x-4">
+        <MagnifyingGlassIcon className="h-6 w-6 text-black cursor-pointer" />
+        <HeartIcon className="h-6 w-6 text-black cursor-pointer" />
+        <Link href="/account/register">
+          <UserIcon className="h-6 w-6 text-black" />
+        </Link>
         <div className="relative cursor-pointer">
-          <CartIcon size={25} />
-          {/* <div className="text-sm">
-            My bag <span>(0)</span>
-          </div> */}
+          <ShoppingBagIcon className="h-6 w-6 text-black" />
           <span className="flex justify-center min-w-[20px] bg-primary text-white items-baseline rounded-[50px] absolute left-[16px] -top-[5px] p-0 h-[20px] text-xs leading-5">
             0
           </span>

@@ -16,8 +16,8 @@ export default function NavLink({ label, path, targetSegment }: NavLinkProps) {
       className={`tracking-wider uppercase text-sm font-medium relative
         ${
           activeSegment === targetSegment
-            ? "underline decoration-2 underline-offset-8 text-primary font-semibold"
-            : "transition-all duration-500 before:content-[''] before:absolute before:-bottom-1.5 before:left-0 before:w-0 before:h-0.5 before:rounded-full before:opacity-0 before:transition-all before:duration-500 before:bg-black hover:before:w-full hover:before:opacity-100"
+            ? "underline decoration-2 underline-offset-4 text-primary font-semibold"
+            : "transition-all duration-500 before:content-[''] before:absolute before:-bottom-[0.8px] before:left-0 before:w-0 before:h-[1.3px] before:rounded-full before:opacity-0 before:transition-all before:duration-500 before:bg-black hover:before:w-full hover:before:opacity-100"
         }`}
       href={path}
     >
