@@ -4,7 +4,10 @@ import Link from "next/link";
 import { registerSchema } from "@/schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useState } from "react";
+import { ClipLoader } from "react-spinners";
+import toast from "react-hot-toast";
 
 interface IFormInput {
   name: string;
@@ -14,6 +17,7 @@ interface IFormInput {
 
 export default function RegisterForm() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -21,14 +25,36 @@ export default function RegisterForm() {
     formState: { errors },
   } = useForm<IFormInput>({ resolver: yupResolver(registerSchema) });
 
-  async function onSubmit(data: IFormInput) {
-    console.log(data);
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    const { name, email, password } = data;
 
-    // TODO: fetch API to handle authentication
-    // ...
+    try {
+      setIsLoading(true);
 
-    router.push("/");
-  }
+      const response = await fetch(`${process.env.API}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.error);
+        setIsLoading(false);
+      } else {
+        toast.success(data.message);
+        setIsLoading(false);
+        router.push("/");
+      }
+    } catch (e: unknown) {
+      setIsLoading(false);
+    }
+
+    //router.push("/");
+  };
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center">
@@ -82,18 +108,31 @@ export default function RegisterForm() {
             id="password"
             name="password"
             type="password"
-            className="h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900 focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none"
+            className={[
+              "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
+              "focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
+            ].join(" ")}
             autoComplete="off"
           />
           {errors.password && (
             <p className="text-red-500 mt-2">{errors.password.message}</p>
           )}
         </div>
-        <input
+        <button
           type="submit"
-          value="Sign up"
-          className="rounded-full bg-primary w-[250px] m-auto block h-11 text-white cursor-pointer ease-out duration-300 border-2 border-primary hover:bg-white hover:text-primary hover:font-semibold"
-        />
+          className={[
+            "rounded-full bg-primary w-[250px] m-auto block h-11 text-white cursor-pointer ease-out duration-300 border-2 border-primary",
+            "hover:bg-white hover:text-primary hover:font-semibold",
+            "disabled:opacity-50 disabled:hover:bg-primary disabled:cursor-default",
+          ].join(" ")}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ClipLoader size="20" color="#FFFFFF" className="mt-2" />
+          ) : (
+            "Sign up"
+          )}
+        </button>
         <p className="mt-6 text-center">
           Already have an account ?{" "}
           <Link href="/account/login" className="font-semibold underline">
