@@ -18,7 +18,7 @@ const links = [
 
 export default function Navbar() {
   return (
-    <div className="sticky top-0 w-full px-[32px] border-b border-[#eee] flex items-center justify-between min-h-[75px]">
+    <div className="sticky top-0 w-full px-[32px] border-b border-gray-300 flex items-center justify-between min-h-[75px] bg-white">
       <div className="flex flex-row items-center gap-x-11">
         <Link href="/">
           <Image src={logo} width={150} alt="Pento Logo" />
