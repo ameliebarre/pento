@@ -16,8 +16,8 @@ interface IFormInput {
 }
 
 export default function RegisterForm() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -52,8 +52,6 @@ export default function RegisterForm() {
     } catch (e: unknown) {
       setIsLoading(false);
     }
-
-    //router.push("/");
   };
 
   return (
@@ -76,7 +74,10 @@ export default function RegisterForm() {
             id="name"
             name="name"
             type="text"
-            className="h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900 focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none"
+            className={[
+              "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
+              "focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
+            ].join(" ")}
             autoComplete="off"
           />
           {errors.name && (
@@ -92,7 +93,10 @@ export default function RegisterForm() {
             id="email"
             name="email"
             type="text"
-            className="h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900 focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none"
+            className={[
+              "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
+              "focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
+            ].join(" ")}
             autoComplete="off"
           />
           {errors.email && (
