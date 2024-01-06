@@ -4,7 +4,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { loginSchema } from "@/schemas";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useState } from "react";
 import { ClipLoader } from "react-spinners";
@@ -18,6 +18,8 @@ interface IFormInput {
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
 
   const {
     register,
@@ -43,7 +45,7 @@ export default function LoginForm() {
       } else {
         toast.success("Welcome back !");
         setIsLoading(false);
-        router.push("/");
+        router.push(callbackUrl);
       }
     } catch (e: unknown) {
       setIsLoading(false);
