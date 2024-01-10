@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk } from "next/font/google";
-import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { Toaster } from "react-hot-toast";
+import { NextAuthProvider } from "@/providers/NextAuthProvider";
+
+import "./globals.css";
 
 const hk_grotesk = Hanken_Grotesk({ subsets: ["latin"] });
 
@@ -17,10 +20,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={hk_grotesk.className}>
-        <Navbar />
-        {children}
-      </body>
+      <NextAuthProvider>
+        <body className={hk_grotesk.className}>
+          <Navbar />
+          <Toaster />
+          {children}
+        </body>
+      </NextAuthProvider>
     </html>
   );
 }

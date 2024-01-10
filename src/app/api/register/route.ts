@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         key: "USER_CREATED",
-        message: "User has been successfully created",
+        message: `Welcome in Pento ${newUser.name} !`,
         status: 201,
       },
       {
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           key: "USER_ERROR",
-          message: error.message,
+          error: error.message,
           status: 500,
         },
         { status: 500 },
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         key: "USER_ERROR",
-        message: "Internal Server Error",
+        error: "Internal Server Error",
         status: 500,
       },
       { status: 500 },
