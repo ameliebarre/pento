@@ -1,14 +1,7 @@
-"use client";
-
 import { signOut, useSession } from "next-auth/react";
 import { RiLogoutCircleRLine as LogoutIcon } from "react-icons/ri";
 
 export default function Profile() {
-  const { data, status } = useSession();
-
-  console.log("STATUS : ", status);
-  console.log("SESSION : ", data);
-
   return (
     <div className="flex flex-row gap-y-24 px-[92px] pt-10">
       <div className="sticky top-0 basis-72">

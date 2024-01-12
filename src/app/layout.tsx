@@ -3,6 +3,7 @@ import { Hanken_Grotesk } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
+import { CategoryProvider } from "@/context/categoryContext";
 
 import "./globals.css";
 
@@ -21,11 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <NextAuthProvider>
-        <body className={hk_grotesk.className}>
-          <Navbar />
-          <Toaster />
-          {children}
-        </body>
+        <CategoryProvider>
+          <body className={hk_grotesk.className}>
+            <Navbar />
+            <Toaster />
+            {children}
+          </body>
+        </CategoryProvider>
       </NextAuthProvider>
     </html>
   );
