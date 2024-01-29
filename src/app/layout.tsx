@@ -3,7 +3,7 @@ import { Hanken_Grotesk } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
-import { CategoryProvider } from "@/context/categoryContext";
+import { CategoryProvider } from "@/context/category";
 
 import "./globals.css";
 
