@@ -75,7 +75,7 @@ export default function LoginForm() {
             type="text"
             className={[
               "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-              "focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
+              "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
             ].join(" ")}
             autoComplete="off"
           />

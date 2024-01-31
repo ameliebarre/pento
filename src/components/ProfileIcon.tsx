@@ -10,7 +10,11 @@ export default function ProfileIcon() {
   return (
     <Link
       href={`${
-        status === "authenticated" ? "/account/profile" : "/account/login"
+        status === "authenticated"
+          ? session?.user?.role === "admin"
+            ? "/account/admin"
+            : "/account/profile"
+          : "/account/login"
       }`}
     >
       <UserIcon className="h-6 w-6 text-black" />
