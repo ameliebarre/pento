@@ -67,7 +67,7 @@ export default function LoginForm() {
       >
         <div className="flex flex-col mb-4">
           {/* Email Input */}
-          <label htmlFor="name">Email</label>
+          <label htmlFor="email">Email</label>
           <input
             {...register("email", { required: true })}
             id="email"
