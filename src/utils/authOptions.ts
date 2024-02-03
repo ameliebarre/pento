@@ -51,6 +51,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // We can pass in additional information from the user document MongoDB returns
     async jwt({ token, user }: any) {
+      await dbConnect();
+
       const userByEmail = await User.findOne({ email: token.email });
       userByEmail.password = undefined;
       userByEmail.resetCode = undefined;
