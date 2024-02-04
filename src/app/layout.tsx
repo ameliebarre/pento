@@ -6,6 +6,7 @@ import { NextAuthProvider } from "@/providers/NextAuthProvider";
 import { CategoryProvider } from "@/context/category";
 
 import "./globals.css";
+import { ProductProvider } from "@/context/product";
 
 const hk_grotesk = Hanken_Grotesk({ subsets: ["latin"] });
 
@@ -23,11 +24,13 @@ export default function RootLayout({
     <html lang="en">
       <NextAuthProvider>
         <CategoryProvider>
-          <body className={hk_grotesk.className}>
-            <Navbar />
-            <Toaster />
-            {children}
-          </body>
+          <ProductProvider>
+            <body className={hk_grotesk.className}>
+              <Navbar />
+              <Toaster />
+              {children}
+            </body>
+          </ProductProvider>
         </CategoryProvider>
       </NextAuthProvider>
     </html>

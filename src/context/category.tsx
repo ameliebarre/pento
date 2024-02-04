@@ -122,5 +122,3 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
     </CategoryContext.Provider>
   );
 };
-
-export const useCategory = () => useContext(CategoryContext);
