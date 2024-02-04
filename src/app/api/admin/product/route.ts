@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       slug: slugify(body.title),
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json(product, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(error.message, { status: 500 });
   }

@@ -24,7 +24,7 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
     try {
       const response = await fetch(`${process.env.API}/admin/product`, {
         method: "POST",
-        body: JSON.stringify(product),
+        body: JSON.stringify({ product }),
       });
 
       const data = await response.json();
