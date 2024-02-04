@@ -9,9 +9,9 @@ export default withAuth(
     const url = req.nextUrl.pathname;
     const userRole = req?.nextauth?.token?.role;
 
-    if (url?.includes("/admin") && userRole !== "admin") {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
+    // if (url?.includes("/admin") && userRole !== "admin") {
+    //   return NextResponse.redirect(new URL("/", req.url));
+    // }
   },
   {
     callbacks: {
