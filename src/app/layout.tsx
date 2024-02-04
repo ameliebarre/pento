@@ -29,6 +29,7 @@ export default function RootLayout({
               <Navbar />
               <Toaster />
               {children}
+              <div id="portal-root" />
             </body>
           </ProductProvider>
         </CategoryProvider>
