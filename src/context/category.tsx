@@ -7,30 +7,28 @@ import { CategoryContextType, ICategory } from "@/@types/category";
 export const CategoryContext = createContext<CategoryContextType | null>(null);
 
 export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [name, setName] = useState("");
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [updatedCategory, setUpdatedCategory] = useState<ICategory | null>(
     null,
   );
 
-  const createCategory = async () => {
+  const createCategory = async (categoryName: string) => {
     try {
       const response = await fetch(`${process.env.API}/admin/category`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name: categoryName }),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error);
+        toast.error(responseData);
       } else {
         toast.success("Category was successfully created.");
-        setName("");
-        setCategories([data.category, ...categories]);
+        setCategories([responseData.category, ...categories]);
       }
     } catch (err) {
       toast.error("An error occured. Try again.");
@@ -52,7 +50,7 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
     }
   };
 
-  const updateCategory = async () => {
+  const updateCategory = async (name: string) => {
     try {
       const response = await fetch(
         `${process.env.API}/admin/category/${updatedCategory?._id}`,
@@ -74,7 +72,6 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
         toast.error(data.error);
       } else {
         toast.success("The category was successfully updated");
-        setName("");
         setCategories(updatedCategoryData);
       }
     } catch (err) {
@@ -111,8 +108,6 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
   return (
     <CategoryContext.Provider
       value={{
-        name,
-        setName,
         categories,
         setCategories,
         updatedCategory,

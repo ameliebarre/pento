@@ -5,14 +5,12 @@ export interface ICategory {
 }
 
 export type CategoryContextType = {
-  name: string;
-  setName: Dispatch<SetStateAction<string>>;
   categories: ICategory[];
   setCategories: Dispatch<SetStateAction<ICategory[]>>;
   updatedCategory: ICategory | null;
   setUpdatedCategory: Dispatch<SetStateAction<ICategory>>;
-  createCategory: () => void;
+  createCategory: (name: string) => void;
   fetchCategories: () => void;
-  updateCategory: () => void;
+  updateCategory: (name: string) => void;
   deleteCategory: () => void;
 };
