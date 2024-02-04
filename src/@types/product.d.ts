@@ -20,5 +20,20 @@ export interface IProduct {
 }
 
 export type ProductContextType = {
-  product: IProduct;
+  products: IProduct[];
+  setProducts: Dispatch<SetStateAction<IProduct[]>>;
+  currentPage: number;
+  setCurrentPage: Dispatch<SetStateAction<number>>;
+  totalPages: number;
+  setTotalPages: Dispatch<SetStateAction<number>>;
+  updatedProduct: IProduct | null;
+  setUpdatedProduct: Dispatch<SetStateAction<IProduct>>;
+  uploading: boolean;
+  setUploading: Dispatch<SetStateAction<boolean>>;
+  uploadImages: (e: any) => void;
+  deleteImage: (public_id: string) => void;
+  createProduct: (product: IProduct) => void;
+  fetchProducts: () => void;
+  updateProduct: (product: IProduct) => void;
+  deleteProduct: () => void;
 };
