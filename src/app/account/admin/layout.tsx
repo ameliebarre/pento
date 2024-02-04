@@ -5,6 +5,7 @@ import { IconType } from "react-icons";
 import { IoHome as HomeIcon } from "react-icons/io5";
 import { MdCategory as CategoryIcon } from "react-icons/md";
 import { ImUsers as UsersIcon } from "react-icons/im";
+import { RiShoppingCart2Fill as ProductsIcon } from "react-icons/ri";
 
 type Link = {
   id: number;
@@ -35,6 +36,13 @@ const links: Link[] = [
     path: "/account/admin/users",
     targetSegment: "users",
     icon: UsersIcon,
+  },
+  {
+    id: 4,
+    label: "Products",
+    path: "/account/admin/products",
+    targetSegment: "products",
+    icon: ProductsIcon,
   },
 ];
 
