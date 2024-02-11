@@ -1,12 +1,10 @@
-"use client";
-
 import { FaPlus as PlusIcon } from "react-icons/fa";
-import Modal from "@/components/Modal";
-import { useState } from "react";
 
-export default function AddProductButton() {
-  const [isOpen, setIsOpen] = useState(false);
+type AddProductButtonProps = {
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
+export default function AddProductButton({ setIsOpen }: AddProductButtonProps) {
   return (
     <>
       <button
@@ -22,9 +20,6 @@ export default function AddProductButton() {
         <PlusIcon size={12} />
         Add new
       </button>
-      <Modal handleClose={() => setIsOpen(false)} isOpen={isOpen}>
-        This is Modal Content!
-      </Modal>
     </>
   );
 }

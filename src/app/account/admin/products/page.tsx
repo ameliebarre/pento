@@ -1,8 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { RiShoppingCart2Fill as ProductsIcon } from "react-icons/ri";
 
 import AddProductButton from "@/components/buttons/AddProductButton";
+import Modal from "@/components/Modal";
+import CreateProductForm from "@/components/forms/CreateProductForm";
 
 export default function AdminUsers() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
       <section className="flex items-center gap-8 mb-4">
@@ -13,8 +20,11 @@ export default function AdminUsers() {
             <h5>Create and manage the products</h5>
           </div>
         </div>
-        <AddProductButton />
+        <AddProductButton setIsOpen={setIsOpen} />
       </section>
+      <Modal handleClose={() => setIsOpen(false)} isOpen={isOpen}>
+        <CreateProductForm />
+      </Modal>
     </>
   );
 }
