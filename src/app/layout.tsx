@@ -4,9 +4,9 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "react-hot-toast";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
 import { CategoryProvider } from "@/context/category";
+import { ProductProvider } from "@/context/product";
 
 import "./globals.css";
-import { ProductProvider } from "@/context/product";
 
 const hk_grotesk = Hanken_Grotesk({ subsets: ["latin"] });
 

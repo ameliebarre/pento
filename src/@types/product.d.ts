@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 import { ICategory } from "./category";
 import { ILike } from "./like";
 import { IRating } from "./rating";
@@ -20,6 +22,8 @@ export interface IProduct {
 }
 
 export type ProductContextType = {
+  product: IProduct;
+  setProduct: Dispatch<SetStateAction<IProduct>>;
   products: IProduct[];
   setProducts: Dispatch<SetStateAction<IProduct[]>>;
   currentPage: number;
@@ -30,7 +34,7 @@ export type ProductContextType = {
   setUpdatedProduct: Dispatch<SetStateAction<IProduct>>;
   uploading: boolean;
   setUploading: Dispatch<SetStateAction<boolean>>;
-  uploadImages: (e: any) => void;
+  uploadImages: (e: ChangeEvent<HTMLInputElement>) => void;
   deleteImage: (public_id: string) => void;
   createProduct: (product: IProduct) => void;
   fetchProducts: () => void;

@@ -5,12 +5,19 @@ import useProductContext from "@/hooks/useProductContext";
 import createProductSchema from "@/schemas/createProductSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState, KeyboardEvent } from "react";
-import { BlockPicker } from "react-color";
-import Select, { StylesConfig } from "react-select";
-import Switch from "react-switch";
+import { StylesConfig } from "react-select";
 
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { ClipLoader } from "react-spinners";
+import {
+  ColorPicker,
+  InputForm,
+  Options,
+  SelectForm,
+  SwitchForm,
+  TextareaForm,
+} from "@/ui";
+import { ColorResult } from "react-color";
 
 interface IFormInput {
   title: string;
@@ -54,19 +61,8 @@ const colourStyles: StylesConfig = {
 };
 
 export default function CreateProductForm() {
-  const [showColorPicker, setShowColorPicker] = useState(false);
   const [hasShipping, setHasShipping] = useState(true);
   const [currentColor, setCurrentColor] = useState("");
-  const {
-    updatedProduct,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    uploading,
-    setUploading,
-    uploadImages,
-    deleteImage,
-  } = useProductContext();
 
   const { categories, fetchCategories } = useCategoryContext();
 
@@ -78,22 +74,18 @@ export default function CreateProductForm() {
     register,
     control,
     handleSubmit,
-    formState: { isSubmitting, isValid, errors },
-    reset,
+    formState: { isSubmitting, errors },
   } = useForm<IFormInput>({
     mode: "onChange",
     resolver: yupResolver(createProductSchema),
   });
 
-  const handleChangeColor = (color: any) => {
-    // setShowColorPicker(false);
-    setCurrentColor(color.hex);
-  };
+  const handleChangeColor = (color: ColorResult) => setCurrentColor(color.hex);
 
-  const handleChangeShippingStatus = (status: boolean) => {
+  const handleChangeShippingStatus = (status: boolean) =>
     setHasShipping(status);
-  };
 
+  // Allow only numbers, backpspace and arrow keys
   const handlePriceChange = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key == "Backspace" || e.key == "ArrowRight" || e.key == "ArrowLeft") {
       return true;
@@ -110,211 +102,100 @@ export default function CreateProductForm() {
     });
   };
 
-  const categoriesOptions = categories.map((category) => {
+  const categoriesOptions: Options[] = categories.map((category) => {
     return {
       value: category._id,
       label: category.name,
     };
   });
 
-  // TODO: refacto form with UI components
   return (
-    <div className="w-[60%] overflow-auto mx-auto mb-8 px-4">
+    <div className="w-[60%] mx-auto mb-8 px-4">
       <h2 className="text-2xl font-semibold pb-2 mb-5 border-b border-b-black">
         Add a new product
       </h2>
       <form action="" method="POST" onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col mb-4 w-full">
-          {/* Title */}
-          <label htmlFor="title">Title</label>
-          <input
-            {...register("title", { required: true })}
-            id="title"
-            name="title"
-            type="text"
-            className={[
-              "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-              "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-            ].join(" ")}
+        {/* Title */}
+        <InputForm
+          register={register}
+          name="title"
+          label="Title"
+          error={errors.title}
+          required
+        />
+
+        {/* Description */}
+        <TextareaForm
+          register={register}
+          label="Description"
+          name="description"
+          error={errors.description}
+          required
+        />
+
+        {/* Categories */}
+        <SelectForm
+          options={categoriesOptions}
+          control={control}
+          name="category"
+          colourStyles={colourStyles}
+        />
+
+        <div className="flex flex-row gap-4">
+          {/* Price */}
+          <InputForm
+            register={register}
+            name="price"
+            label="Price"
+            onKeyDown={handlePriceChange}
+            error={errors.price}
           />
-          {errors.title && (
-            <p className="text-red-500 mt-1">{errors.title.message}</p>
-          )}
-        </div>
-        <div className="flex flex-col mb-4 w-full">
-          {/* Description */}
-          <label htmlFor="description">Description</label>
-          <textarea
-            {...register("description", { required: true })}
-            id="description"
-            name="description"
-            className={[
-              "h-32 max-h-52 mt-1 bg-neutral-100 rounded-md p-2 text-gray-900 resize-y",
-              "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-            ].join(" ")}
+
+          {/* Previous price */}
+          <InputForm
+            register={register}
+            name="previousPrice"
+            label="Previous price"
+            onKeyDown={handlePriceChange}
+            error={errors.previousPrice}
           />
-          {errors.description && (
-            <p className="text-red-500 mt-1">{errors.description.message}</p>
-          )}
         </div>
-        <div className="flex flex-col mb-4 w-full">
-          <label htmlFor="category" className="mb-1">
-            Category
-          </label>
-          <Controller
+        <div className="flex flex-row gap-4">
+          <ColorPicker
             control={control}
-            name="category"
-            render={({ field: { onChange, value } }) => (
-              <Select
-                options={categoriesOptions}
-                id="category"
-                styles={colourStyles}
-                value={categoriesOptions.find(
-                  (option) => option.value === value,
-                )}
-                onChange={(value) => onChange(value)}
-              />
-            )}
+            name="color"
+            label="Select product color"
+            currentColor={currentColor}
+            handleChangeColor={handleChangeColor}
+            error={errors.color}
+          />
+
+          {/* Description */}
+          <InputForm
+            register={register}
+            label="Brand"
+            name="brand"
+            error={errors.brand}
+            required={false}
           />
         </div>
         <div className="flex flex-row gap-4">
-          <div className="flex flex-col mb-4 w-full">
-            {/* Price */}
-            <label htmlFor="price">Price</label>
-            <input
-              {...register("price", { required: true })}
-              id="price"
-              name="price"
-              className={[
-                "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-                "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-              ].join(" ")}
-              onKeyDown={handlePriceChange}
-            />
-            {errors.price && (
-              <p className="text-red-500 mt-1">{errors.price.message}</p>
-            )}
-          </div>
-          <div className="flex flex-col mb-4 w-full">
-            {/* Previous price */}
-            <label htmlFor="previousPrice">Previous price</label>
-            <input
-              type="text"
-              {...register("previousPrice", { required: false })}
-              id="previousPrice"
-              className={[
-                "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-                "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-              ].join(" ")}
-              onKeyDown={handlePriceChange}
-            />
-            {errors.previousPrice && (
-              <p className="text-red-500 mt-1">
-                {errors.previousPrice.message}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-row gap-4">
-          <div className="flex flex-col mb-4 w-full relative">
-            {/* Color */}
-            <label htmlFor="color">Color</label>
-            <Controller
-              control={control}
-              name="color"
-              render={({ field: { onChange } }) => (
-                <input
-                  id="color"
-                  name="color"
-                  value={currentColor}
-                  className={[
-                    "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-                    "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-                    currentColor ? "pl-[58px]" : "",
-                  ].join(" ")}
-                  onChange={() => onChange(currentColor)}
-                  onFocus={() => setShowColorPicker(true)}
-                  onBlur={() => setShowColorPicker(false)}
-                />
-              )}
-            />
-            {/* <input
-              {...register("color")}
-              id="color"
-              name="color"
-              value={currentColor}
-              className={[
-                "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-                "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-                currentColor ? "pl-[58px]" : "",
-              ].join(" ")}
-              onFocus={() => setShowColorPicker(true)}
-              onBlur={() => setShowColorPicker(false)}
-            /> */}
-            {currentColor ? (
-              <span
-                style={{ backgroundColor: currentColor }}
-                className={`absolute inset-y-0 top-[42px] left-[10px] flex items-center px-2 w-[40px] h-[20px]`}
-              />
-            ) : null}
-            {errors.color && (
-              <p className="text-red-500 mt-1">{errors.color.message}</p>
-            )}
-            {showColorPicker ? (
-              <BlockPicker
-                color={currentColor}
-                onSwatchHover={handleChangeColor}
-              />
-            ) : null}
-          </div>
-          <div className="flex flex-col mb-4 w-full">
-            {/* Brand */}
-            <label htmlFor="brand">Brand</label>
-            <input
-              {...register("brand", { required: true })}
-              id="brand"
-              name="brand"
-              className={[
-                "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-                "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-              ].join(" ")}
-            />
-            {errors.brand && (
-              <p className="text-red-500 mt-1">{errors.brand.message}</p>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-row gap-4">
-          <div className="flex flex-col mb-4 w-full">
-            {/* Stock */}
-            <label htmlFor="stock">Stock</label>
-            <input
-              {...register("stock", { required: true })}
-              id="stock"
-              name="stock"
-              className={[
-                "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-                "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
-              ].join(" ")}
-            />
-            {errors.stock && (
-              <p className="text-red-500 mt-1">{errors.stock.message}</p>
-            )}
-          </div>
-          <label className="flex gap-4 py-2 items-center">
-            <span>Shipping</span>
-            <Switch
-              onChange={handleChangeShippingStatus}
-              checked={hasShipping}
-              checkedIcon={false}
-              uncheckedIcon={false}
-              onColor="#C8B2A4"
-              onHandleColor="#A27A60"
-              handleDiameter={20}
-              height={30}
-              width={55}
-            />
-          </label>
+          {/* Stock */}
+          <InputForm
+            register={register}
+            name="stock"
+            label="Stock"
+            error={errors.stock}
+            required
+          />
+          {/* Shipping */}
+          <SwitchForm
+            label="Shipping"
+            onColor="#C8B2A4"
+            onHandleColor="#A27A60"
+            onChange={handleChangeShippingStatus}
+            checked={hasShipping}
+          />
         </div>
         <button
           type="submit"

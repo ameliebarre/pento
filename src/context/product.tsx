@@ -1,13 +1,16 @@
 "use client";
 
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import { ChangeEvent, PropsWithChildren, createContext, useState } from "react";
+import Resizer from "react-image-file-resizer";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+
 import { IProduct, ProductContextType } from "@/@types/product";
 
 export const ProductContext = createContext<ProductContextType | null>(null);
 
 export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
+  const [product, setProduct] = useState<IProduct | null>(null);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -16,7 +19,59 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
 
   const router = useRouter();
 
-  const uploadImages = (e: any) => {};
+  const uploadImages = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    const allUploadingFiles: any[] = [];
+
+    if (files) {
+      if (files?.length > 5) {
+        toast.error("Maximum 5 images allowed");
+        return;
+      }
+
+      setUploading(true);
+
+      const uploadPromises = [];
+
+      for (let i = 0; i < files?.length; i++) {
+        const file = files[i];
+
+        // Resize images
+        const promise = new Promise((resolve) => {
+          Resizer.imageFileResizer(
+            file,
+            1280,
+            720,
+            "JPEG",
+            100,
+            0,
+            (uri) => {
+              fetch(`${process.env.API}/admin/upload/image`, {
+                method: "POST",
+                body: JSON.stringify({ image: uri }),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  allUploadingFiles.unshift(data);
+                  resolve(data);
+                })
+                .catch((err: any) => {
+                  console.log("Image upload error", err);
+                  resolve(err);
+                });
+            },
+            "base64",
+          );
+        });
+
+        uploadPromises.push(promise);
+      }
+
+      Promise.all(uploadPromises).then(() => {
+        setProduct({ ...product, images: allUploadingFiles } as IProduct);
+      });
+    }
+  };
 
   const deleteImage = (public_id: string) => {};
 
@@ -93,9 +148,7 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
       );
 
       const data = await response.json();
-      const deletedProductData = products.filter(
-        (product) => product._id !== updatedProduct?._id,
-      );
+      products.filter((product) => product._id !== updatedProduct?._id);
 
       if (!response.ok) {
         toast.error(data.error);
@@ -111,6 +164,8 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
   return (
     <ProductContext.Provider
       value={{
+        product,
+        setProduct,
         products,
         setProducts,
         currentPage,
