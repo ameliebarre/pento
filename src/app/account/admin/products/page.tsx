@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { RiShoppingCart2Fill as ProductsIcon } from "react-icons/ri";
+import { FaPlus as PlusIcon } from "react-icons/fa";
 
-import AddProductButton from "@/components/buttons/AddProductButton";
 import Modal from "@/components/Modal";
 import CreateProductForm from "@/components/forms/CreateProductForm";
+import { Button } from "@/ui";
 
 export default function AdminUsers() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +21,13 @@ export default function AdminUsers() {
             <h5>Create and manage the products</h5>
           </div>
         </div>
-        <AddProductButton setIsOpen={setIsOpen} />
+        <Button
+          label="Add new"
+          Icon={PlusIcon}
+          iconSize={12}
+          iconFill="#FFFFFF"
+          handleOnClick={() => setIsOpen(true)}
+        />
       </section>
       <Modal handleClose={() => setIsOpen(false)} isOpen={isOpen}>
         <CreateProductForm />
