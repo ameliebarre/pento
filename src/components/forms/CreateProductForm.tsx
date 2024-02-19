@@ -1,15 +1,26 @@
 "use client";
 
 import useCategoryContext from "@/hooks/useCategoryContext";
-import useProductContext from "@/hooks/useProductContext";
 import createProductSchema from "@/schemas/createProductSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useState, KeyboardEvent } from "react";
+import {
+  useEffect,
+  useState,
+  KeyboardEvent,
+  useMemo,
+  useCallback,
+} from "react";
 import { StylesConfig } from "react-select";
-
+import { ColorResult } from "react-color";
+import { useDropzone } from "react-dropzone";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ClipLoader } from "react-spinners";
+import { FaFileUpload as FileUploadIcon } from "react-icons/fa";
+
+const PRODUCT_FOLDER = "pento/products";
+
 import {
+  Button,
   ColorPicker,
   InputForm,
   Options,
@@ -17,7 +28,8 @@ import {
   SwitchForm,
   TextareaForm,
 } from "@/ui";
-import { ColorResult } from "react-color";
+import useProductContext from "@/hooks/useProductContext";
+import { ProductImage } from "@/@types/product";
 
 interface IFormInput {
   title: string;
@@ -61,8 +73,79 @@ const colourStyles: StylesConfig = {
 };
 
 export default function CreateProductForm() {
+  const [displayImages, setDisplayImages] = useState<ProductImage[]>([]);
   const [hasShipping, setHasShipping] = useState(true);
   const [currentColor, setCurrentColor] = useState("");
+  const { uploadImages, uploading, deleteImage, uploadedImages } =
+    useProductContext();
+
+  useEffect(() => {
+    setDisplayImages(uploadedImages);
+  }, [uploadedImages]);
+
+  const baseStyle = {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column" as "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px",
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: "#8E8E8E",
+    borderStyle: "dashed",
+    backgroundColor: "#fafafa",
+    color: "#8E8E8E",
+    outline: "none",
+    transition: "border .24s ease-in-out",
+    height: 250,
+  };
+
+  const focusedStyle = {
+    borderColor: "#A27A60",
+  };
+
+  const acceptStyle = {
+    backgroundColor: "#EFEBE9",
+    borderColor: "#A27A60",
+  };
+
+  const rejectStyle = {
+    borderColor: "#ff1744",
+  };
+
+  const onDrop = (files: File[]) => {
+    uploadImages(files, PRODUCT_FOLDER);
+  };
+
+  const {
+    getRootProps,
+    getInputProps,
+    isFocused,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+    open,
+  } = useDropzone({
+    accept: {
+      "image/jpeg": [],
+      "image/jpg": [],
+      "image/png": [],
+    },
+    noKeyboard: true,
+    noClick: true,
+    onDrop,
+  });
+
+  const style = useMemo(
+    () => ({
+      ...baseStyle,
+      ...(isFocused ? focusedStyle : {}),
+      ...(isDragAccept ? acceptStyle : {}),
+      ...(isDragReject ? rejectStyle : {}),
+    }),
+    [isFocused, isDragAccept, isDragReject],
+  );
 
   const { categories, fetchCategories } = useCategoryContext();
 
@@ -85,20 +168,12 @@ export default function CreateProductForm() {
   const handleChangeShippingStatus = (status: boolean) =>
     setHasShipping(status);
 
-  // Allow only numbers, backpspace and arrow keys
-  const handlePriceChange = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key == "Backspace" || e.key == "ArrowRight" || e.key == "ArrowLeft") {
-      return true;
-    } else if (e.key < "0" || e.key > "9") {
-      e.preventDefault();
-    }
-  };
-
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     console.log("DATA : ", {
       ...data,
       color: currentColor ? currentColor : "",
       shipping: hasShipping,
+      images: uploadedImages,
     });
   };
 
@@ -144,19 +219,19 @@ export default function CreateProductForm() {
         <div className="flex flex-row gap-4">
           {/* Price */}
           <InputForm
+            type="number"
             register={register}
             name="price"
             label="Price"
-            onKeyDown={handlePriceChange}
             error={errors.price}
           />
 
           {/* Previous price */}
           <InputForm
+            type="number"
             register={register}
             name="previousPrice"
             label="Previous price"
-            onKeyDown={handlePriceChange}
             error={errors.previousPrice}
           />
         </div>
@@ -197,10 +272,48 @@ export default function CreateProductForm() {
             checked={hasShipping}
           />
         </div>
+        <div className="flex flex-col mb-4 w-full">
+          <label>Upload product images</label>
+          <div className="mt-2">
+            <div {...getRootProps({ style })}>
+              <input {...getInputProps()} />
+              <FileUploadIcon size={35} />
+              {isDragActive ? (
+                <p className="mt-3 mb-2 text-xl">Drop images here</p>
+              ) : (
+                <p className="mt-3 mb-2 text-xl">
+                  Drag and drop images here or click to select
+                </p>
+              )}
+
+              <Button
+                label="Open file dialog"
+                handleOnClick={open}
+                className="text-md"
+              />
+            </div>
+          </div>
+          {uploading ? (
+            <ClipLoader size="20px" color="#A2A2A2" className="mt-2" />
+          ) : (
+            <aside className="flex flex-row flex-wrap mt-4">
+              {displayImages?.map((img) => (
+                <div
+                  className="inline-flex p-2 border border-black mb-2 mr-2 w-[100px] h-[100px] box-border"
+                  key={img.public_id}
+                >
+                  <div className="flex min-w-0 overflow-hidden">
+                    <img src={img.secure_url} className="block w-auto h-full" />
+                  </div>
+                </div>
+              ))}
+            </aside>
+          )}
+        </div>
         <button
           type="submit"
           className={[
-            "rounded-lg bg-primary w-[250px] block h-12 text-white cursor-pointer ease-out duration-300",
+            "rounded-lg bg-primary w-[250px] block h-12 text-white cursor-pointer ease-out duration-300 mt-5",
             "hover:bg-primary-800 active:bg-primary-900",
             "disabled:opacity-50 disabled:hover:bg-primary disabled:cursor-default",
           ].join(" ")}

@@ -9,7 +9,7 @@ const createProductSchema = Yup.object()
         value ? value > 1 : false,
       )
       .required("The price is required"),
-    previousPrice: Yup.mixed(),
+    previousPrice: Yup.number(),
     color: Yup.string(),
     brand: Yup.string(),
     stock: Yup.number().required("The stock is required"),
