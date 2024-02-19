@@ -29,6 +29,7 @@ export default function AdminNavLink({
         isActive ? "bg-primary-100 rounded-xl" : "bg-transparent",
       ].join(" ")}
       href={path}
+      shallow
     >
       {icon ? (
         <span

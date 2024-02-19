@@ -5,7 +5,7 @@ import Resizer from "react-image-file-resizer";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-import { IProduct, ProductContextType } from "@/@types/product";
+import { IProduct, ProductContextType, ProductImage } from "@/@types/product";
 
 export const ProductContext = createContext<ProductContextType | null>(null);
 
@@ -16,64 +16,111 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
   const [totalPages, setTotalPages] = useState(1);
   const [updatedProduct, setUpdatedProduct] = useState<IProduct | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<ProductImage[]>([]);
 
   const router = useRouter();
 
-  const uploadImages = (e: ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    const allUploadingFiles: any[] = [];
+  const uploadImages = (files: File[], folder: string) => {
+    const uploadingData: ProductImage[] = [];
+    const allUploadedFiles: any[] = [];
 
     if (files) {
-      if (files?.length > 5) {
-        toast.error("Maximum 5 images allowed");
-        return;
-      }
-
       setUploading(true);
-
       const uploadPromises = [];
 
-      for (let i = 0; i < files?.length; i++) {
+      for (let i = 0; i < files.length; i++) {
         const file = files[i];
 
-        // Resize images
         const promise = new Promise((resolve) => {
           Resizer.imageFileResizer(
             file,
             1280,
-            720,
+            1280,
             "JPEG",
             100,
             0,
             (uri) => {
               fetch(`${process.env.API}/admin/upload/image`, {
                 method: "POST",
-                body: JSON.stringify({ image: uri }),
+                body: JSON.stringify({ image: uri, folder }),
               })
-                .then((response) => response.json())
+                .then((response) => {
+                  return response.json();
+                })
                 .then((data) => {
-                  allUploadingFiles.unshift(data);
+                  allUploadedFiles.unshift(data);
                   resolve(data);
                 })
-                .catch((err: any) => {
-                  console.log("Image upload error", err);
+                .catch((err) => {
+                  toast.error(
+                    "An error occured during image uplad. Try later.",
+                  );
                   resolve(err);
                 });
             },
             "base64",
           );
         });
-
         uploadPromises.push(promise);
       }
 
-      Promise.all(uploadPromises).then(() => {
-        setProduct({ ...product, images: allUploadingFiles } as IProduct);
-      });
+      Promise.all(uploadPromises)
+        .then(() => {
+          setUploadedImages(allUploadedFiles);
+          setUploading(false);
+        })
+        .catch(() => {
+          toast.error("An error occured during image uplad. Try later.");
+          setUploading(false);
+        });
     }
+
+    // for (let i = 0; i < files?.length; i++) {
+    //   const imageFile = files[i];
+    //   const reader = new FileReader();
+
+    //   reader.onload = async (e) => {
+    //     const uri = e.target?.result;
+
+    //     return fetch(`${process.env.API}/admin/upload/image`, {
+    //       method: "POST",
+    //       body: JSON.stringify({ image: uri, folder }),
+    //     })
+    //       .then((response) => response.json())
+    //       .then((data) => {
+    //         uploadingData.push(data);
+    //       })
+    //       .catch(() => {
+    //         toast.error("An error occured during image uplad. Try later.");
+    //       })
+    //       .finally(() => setUploading(false));
+    //   };
+
+    //   reader.readAsDataURL(imageFile);
+    // }
   };
 
-  const deleteImage = (public_id: string) => {};
+  const deleteImage = (public_id: string) => {
+    setUploading(true);
+    fetch(`${process.env.API}/admin/upload/image`, {
+      method: "PUT",
+      body: JSON.stringify({ public_id }),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        const filteredImages = uploadedImages?.filter(
+          (image) => image?.public_id !== public_id,
+        );
+
+        setUploadedImages(
+          (prev) => [...prev, filteredImages] as ProductImage[],
+        );
+      })
+      .catch((err) => {
+        toast.error("An error occured during image deletion. Try later.");
+      })
+      .finally(() => setUploading(false));
+  };
 
   const createProduct = async (product: IProduct) => {
     try {
@@ -182,6 +229,8 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
         fetchProducts,
         updateProduct,
         deleteProduct,
+        uploadedImages,
+        setUploadedImages,
       }}
     >
       {children}

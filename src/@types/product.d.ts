@@ -15,14 +15,19 @@ export interface IProduct {
   brand: string;
   shipping: boolean;
   category: ICategory;
-  images: Array<{ secure_url: string; public_id: string }>;
+  images: Array<ProductImage>;
   sold: number;
-  likes: [ILike];
-  ratings: [IRating];
+  likes: Array<ILike>;
+  ratings: Array<IRating>;
+}
+
+export interface ProductImage {
+  secure_url: string;
+  public_id: string;
 }
 
 export type ProductContextType = {
-  product: IProduct;
+  product: IProduct | null;
   setProduct: Dispatch<SetStateAction<IProduct>>;
   products: IProduct[];
   setProducts: Dispatch<SetStateAction<IProduct[]>>;
@@ -34,7 +39,9 @@ export type ProductContextType = {
   setUpdatedProduct: Dispatch<SetStateAction<IProduct>>;
   uploading: boolean;
   setUploading: Dispatch<SetStateAction<boolean>>;
-  uploadImages: (e: ChangeEvent<HTMLInputElement>) => void;
+  uploadedImages: ProductImage[];
+  setUploadedImages: Dispatch<SetStateAction<ProductImage[]>>;
+  uploadImages: (files: File[], folder: string) => void;
   deleteImage: (public_id: string) => void;
   createProduct: (product: IProduct) => void;
   fetchProducts: () => void;
