@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, PropsWithChildren, createContext, useState } from "react";
+import { PropsWithChildren, createContext, useState } from "react";
 import Resizer from "react-image-file-resizer";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -21,7 +21,6 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter();
 
   const uploadImages = (files: File[], folder: string) => {
-    const uploadingData: ProductImage[] = [];
     const allUploadedFiles: any[] = [];
 
     if (files) {
@@ -74,34 +73,9 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
           setUploading(false);
         });
     }
-
-    // for (let i = 0; i < files?.length; i++) {
-    //   const imageFile = files[i];
-    //   const reader = new FileReader();
-
-    //   reader.onload = async (e) => {
-    //     const uri = e.target?.result;
-
-    //     return fetch(`${process.env.API}/admin/upload/image`, {
-    //       method: "POST",
-    //       body: JSON.stringify({ image: uri, folder }),
-    //     })
-    //       .then((response) => response.json())
-    //       .then((data) => {
-    //         uploadingData.push(data);
-    //       })
-    //       .catch(() => {
-    //         toast.error("An error occured during image uplad. Try later.");
-    //       })
-    //       .finally(() => setUploading(false));
-    //   };
-
-    //   reader.readAsDataURL(imageFile);
-    // }
   };
 
   const deleteImage = (public_id: string) => {
-    setUploading(true);
     fetch(`${process.env.API}/admin/upload/image`, {
       method: "PUT",
       body: JSON.stringify({ public_id }),
@@ -112,14 +86,11 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
           (image) => image?.public_id !== public_id,
         );
 
-        setUploadedImages(
-          (prev) => [...prev, filteredImages] as ProductImage[],
-        );
+        setUploadedImages(filteredImages);
       })
       .catch((err) => {
         toast.error("An error occured during image deletion. Try later.");
-      })
-      .finally(() => setUploading(false));
+      });
   };
 
   const createProduct = async (product: IProduct) => {
