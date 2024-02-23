@@ -3,13 +3,7 @@
 import useCategoryContext from "@/hooks/useCategoryContext";
 import createProductSchema from "@/schemas/createProductSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  useEffect,
-  useState,
-  KeyboardEvent,
-  useMemo,
-  useCallback,
-} from "react";
+import { useEffect, useState, useMemo } from "react";
 import { StylesConfig } from "react-select";
 import { ColorResult } from "react-color";
 import { useDropzone } from "react-dropzone";
@@ -22,6 +16,7 @@ const PRODUCT_FOLDER = "pento/products";
 import {
   Button,
   ColorPicker,
+  FileUploader,
   InputForm,
   Options,
   SelectForm,
@@ -49,7 +44,7 @@ interface IFormInput {
   };
 }
 
-const colourStyles: StylesConfig = {
+const selectColourStyles: StylesConfig = {
   control: (baseStyles, state) => ({
     ...baseStyles,
     borderWidth: "1px",
@@ -76,7 +71,7 @@ export default function CreateProductForm() {
   const [displayImages, setDisplayImages] = useState<ProductImage[]>([]);
   const [hasShipping, setHasShipping] = useState(true);
   const [currentColor, setCurrentColor] = useState("");
-  const { uploadImages, uploading, deleteImage, uploadedImages } =
+  const { uploadImages, uploading, uploadedImages, deleteImage } =
     useProductContext();
 
   useEffect(() => {
@@ -114,38 +109,13 @@ export default function CreateProductForm() {
     borderColor: "#ff1744",
   };
 
-  const onDrop = (files: File[]) => {
+  const handleUploadFiles = (files: File[]) => {
     uploadImages(files, PRODUCT_FOLDER);
   };
 
-  const {
-    getRootProps,
-    getInputProps,
-    isFocused,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-    open,
-  } = useDropzone({
-    accept: {
-      "image/jpeg": [],
-      "image/jpg": [],
-      "image/png": [],
-    },
-    noKeyboard: true,
-    noClick: true,
-    onDrop,
-  });
-
-  const style = useMemo(
-    () => ({
-      ...baseStyle,
-      ...(isFocused ? focusedStyle : {}),
-      ...(isDragAccept ? acceptStyle : {}),
-      ...(isDragReject ? rejectStyle : {}),
-    }),
-    [isFocused, isDragAccept, isDragReject],
-  );
+  const handleDeleteFile = (public_id: string) => {
+    deleteImage(public_id);
+  };
 
   const { categories, fetchCategories } = useCategoryContext();
 
@@ -213,7 +183,7 @@ export default function CreateProductForm() {
           options={categoriesOptions}
           control={control}
           name="category"
-          colourStyles={colourStyles}
+          colourStyles={selectColourStyles}
         />
 
         <div className="flex flex-row gap-4">
@@ -272,59 +242,22 @@ export default function CreateProductForm() {
             checked={hasShipping}
           />
         </div>
-        <div className="flex flex-col mb-4 w-full">
-          <label>Upload product images</label>
-          <div className="mt-2">
-            <div {...getRootProps({ style })}>
-              <input {...getInputProps()} />
-              <FileUploadIcon size={35} />
-              {isDragActive ? (
-                <p className="mt-3 mb-2 text-xl">Drop images here</p>
-              ) : (
-                <p className="mt-3 mb-2 text-xl">
-                  Drag and drop images here or click to select
-                </p>
-              )}
-
-              <Button
-                label="Open file dialog"
-                handleOnClick={open}
-                className="text-md"
-              />
-            </div>
-          </div>
-          {uploading ? (
-            <ClipLoader size="20px" color="#A2A2A2" className="mt-2" />
-          ) : (
-            <aside className="flex flex-row flex-wrap mt-4">
-              {displayImages?.map((img) => (
-                <div
-                  className="inline-flex p-2 border border-black mb-2 mr-2 w-[100px] h-[100px] box-border"
-                  key={img.public_id}
-                >
-                  <div className="flex min-w-0 overflow-hidden">
-                    <img src={img.secure_url} className="block w-auto h-full" />
-                  </div>
-                </div>
-              ))}
-            </aside>
-          )}
-        </div>
-        <button
-          type="submit"
-          className={[
-            "rounded-lg bg-primary w-[250px] block h-12 text-white cursor-pointer ease-out duration-300 mt-5",
-            "hover:bg-primary-800 active:bg-primary-900",
-            "disabled:opacity-50 disabled:hover:bg-primary disabled:cursor-default",
-          ].join(" ")}
-          //disabled={!isValid}
-        >
-          {isSubmitting ? (
-            <ClipLoader size="20px" color="#FFFFFF" className="mt-2" />
-          ) : (
-            "Create"
-          )}
-        </button>
+        <FileUploader
+          displayImages={displayImages}
+          uploading={uploading}
+          onUploadFiles={handleUploadFiles}
+          onDeleteFile={handleDeleteFile}
+          baseStyle={baseStyle}
+          acceptStyle={acceptStyle}
+          rejectStyle={rejectStyle}
+          focusedStyle={focusedStyle}
+        />
+        <Button
+          label="Create product"
+          handleOnClick={open}
+          className="text-md"
+          isSubmitting={isSubmitting}
+        />
       </form>
     </div>
   );

@@ -1,4 +1,5 @@
 import { IconType } from "react-icons";
+import { ClipLoader } from "react-spinners";
 
 type ButtonProps = {
   label: string;
@@ -8,6 +9,8 @@ type ButtonProps = {
   iconFill?: string;
   className?: string;
   handleOnClick?: () => void;
+  isSubmitting?: boolean;
+  isDisabled?: boolean;
 };
 
 export default function Button({
@@ -18,6 +21,8 @@ export default function Button({
   iconFill = "#000000",
   className,
   handleOnClick,
+  isSubmitting,
+  isDisabled,
 }: ButtonProps) {
   return (
     <button
@@ -30,9 +35,16 @@ export default function Button({
         className,
       ].join(" ")}
       onClick={handleOnClick}
+      disabled={isDisabled}
     >
-      {Icon && <Icon size={iconSize} fill={iconFill} />}
-      {label}
+      {isSubmitting ? (
+        <ClipLoader size={20} color="#FFFFFF" className="mt-2" />
+      ) : (
+        <>
+          {Icon && <Icon size={iconSize} fill={iconFill} />}
+          {label}
+        </>
+      )}
     </button>
   );
 }
