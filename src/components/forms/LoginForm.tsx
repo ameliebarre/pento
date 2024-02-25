@@ -67,7 +67,7 @@ export default function LoginForm() {
       >
         <div className="flex flex-col mb-4">
           {/* Email Input */}
-          <label htmlFor="name">Email</label>
+          <label htmlFor="email">Email</label>
           <input
             {...register("email", { required: true })}
             id="email"
@@ -75,9 +75,9 @@ export default function LoginForm() {
             type="text"
             className={[
               "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
-              "focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
+              "focus:ring-1 focus:ring-primary-600 focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
             ].join(" ")}
-            autoComplete="off"
+            autoComplete="email"
           />
           {errors.email && (
             <p className="text-red-500 mt-2">{errors.email.message}</p>
@@ -96,7 +96,7 @@ export default function LoginForm() {
               "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900",
               "focus:ring-1 focus:ring-primary focus:ring-offset-4 focus:ring-offset-white focus:outline-none",
             ].join(" ")}
-            autoComplete="off"
+            autoComplete="current-password"
           />
           {errors.password && (
             <p className="text-red-500 mt-2">{errors.password.message}</p>

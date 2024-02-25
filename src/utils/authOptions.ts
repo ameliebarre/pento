@@ -51,21 +51,19 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     // We can pass in additional information from the user document MongoDB returns
     async jwt({ token, user }: any) {
-      if (user) {
-        token.user = {
-          _id: user._id,
-          email: user.email,
-          name: user.name,
-        };
-      }
+      await dbConnect();
+
+      const userByEmail = await User.findOne({ email: token.email });
+      userByEmail.password = undefined;
+      userByEmail.resetCode = undefined;
+      token.user = userByEmail;
+
       return token;
     },
     // If we want to access our extra user info from sessions we have to pass it the token here to get them in sync:
     session: async ({ session, token }: any) => {
-      if (token) {
-        session.user = token.user;
-        session.user.role = token.role;
-      }
+      session.user = token.user;
+
       return session;
     },
   },
