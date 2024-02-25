@@ -36,11 +36,8 @@ interface IFormInput {
   stock: number;
   shipping?: boolean;
   category: {
-    _id?: string;
-    name?: string;
-    slug?: string;
-    createdAt?: string;
-    updatedAt?: string;
+    label: string;
+    value: string;
   };
 }
 
@@ -67,12 +64,23 @@ const selectColourStyles: StylesConfig = {
   }),
 };
 
-export default function CreateProductForm() {
+interface CreateProductFormProps {
+  handleCloseModal: () => void;
+}
+
+export default function CreateProductForm({
+  handleCloseModal,
+}: CreateProductFormProps) {
   const [displayImages, setDisplayImages] = useState<ProductImage[]>([]);
   const [hasShipping, setHasShipping] = useState(true);
   const [currentColor, setCurrentColor] = useState("");
-  const { uploadImages, uploading, uploadedImages, deleteImage } =
-    useProductContext();
+  const {
+    uploadImages,
+    uploading,
+    uploadedImages,
+    createProduct,
+    deleteImage,
+  } = useProductContext();
 
   useEffect(() => {
     setDisplayImages(uploadedImages);
@@ -127,6 +135,7 @@ export default function CreateProductForm() {
     register,
     control,
     handleSubmit,
+    watch,
     formState: { isSubmitting, errors },
   } = useForm<IFormInput>({
     mode: "onChange",
@@ -138,19 +147,29 @@ export default function CreateProductForm() {
   const handleChangeShippingStatus = (status: boolean) =>
     setHasShipping(status);
 
+  const categoryInputValue = watch("category");
+
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    console.log("DATA : ", {
+    const response = await createProduct({
       ...data,
       color: currentColor ? currentColor : "",
       shipping: hasShipping,
       images: uploadedImages,
+      category: {
+        _id: categoryInputValue.value,
+        name: categoryInputValue.label,
+      },
     });
+
+    if (response?.ok) {
+      handleCloseModal();
+    }
   };
 
   const categoriesOptions: Options[] = categories.map((category) => {
     return {
-      value: category._id,
-      label: category.name,
+      value: category?._id,
+      label: category?.name,
     };
   });
 
@@ -254,7 +273,7 @@ export default function CreateProductForm() {
         />
         <Button
           label="Create product"
-          handleOnClick={open}
+          type="submit"
           className="text-md"
           isSubmitting={isSubmitting}
         />

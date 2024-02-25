@@ -15,11 +15,8 @@ const createProductSchema = Yup.object()
     stock: Yup.number().required("The stock is required"),
     shipping: Yup.boolean(),
     category: Yup.object().shape({
-      _id: Yup.string(),
-      name: Yup.string(),
-      slug: Yup.string(),
-      createdAt: Yup.string(),
-      updatedAt: Yup.string(),
+      label: Yup.string().required(),
+      value: Yup.string().required(),
     }),
   })
   .required("The category is required");

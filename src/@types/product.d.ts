@@ -5,20 +5,20 @@ import { ILike } from "./like";
 import { IRating } from "./rating";
 
 export interface IProduct {
-  _id: string;
+  _id?: string;
   title: string;
-  slug: string;
+  slug?: string;
   description: string;
   price: number;
-  previousPrice: number;
+  previousPrice?: number;
   color: string;
-  brand: string;
+  brand?: string;
   shipping: boolean;
-  category: ICategory;
+  category: { _id: string; name: string };
   images: Array<ProductImage>;
-  sold: number;
-  likes: Array<ILike>;
-  ratings: Array<IRating>;
+  sold?: number;
+  likes?: Array<ILike>;
+  ratings?: Array<IRating>;
 }
 
 export interface ProductImage {
@@ -27,23 +27,19 @@ export interface ProductImage {
 }
 
 export type ProductContextType = {
-  product: IProduct | null;
-  setProduct: Dispatch<SetStateAction<IProduct>>;
   products: IProduct[];
   setProducts: Dispatch<SetStateAction<IProduct[]>>;
   currentPage: number;
   setCurrentPage: Dispatch<SetStateAction<number>>;
   totalPages: number;
   setTotalPages: Dispatch<SetStateAction<number>>;
-  updatedProduct: IProduct | null;
-  setUpdatedProduct: Dispatch<SetStateAction<IProduct>>;
   uploading: boolean;
   setUploading: Dispatch<SetStateAction<boolean>>;
   uploadedImages: ProductImage[];
   setUploadedImages: Dispatch<SetStateAction<ProductImage[]>>;
   uploadImages: (files: File[], folder: string) => void;
   deleteImage: (public_id: string) => void;
-  createProduct: (product: IProduct) => void;
+  createProduct: (product: IProduct) => Promise<Response | undefined>;
   fetchProducts: () => void;
   updateProduct: (product: IProduct) => void;
   deleteProduct: () => void;

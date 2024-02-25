@@ -93,11 +93,13 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
       });
   };
 
-  const createProduct = async (product: IProduct) => {
+  const createProduct = async (
+    product: IProduct,
+  ): Promise<Response | undefined> => {
     try {
       const response = await fetch(`${process.env.API}/admin/product`, {
         method: "POST",
-        body: JSON.stringify({ product }),
+        body: JSON.stringify(product),
       });
 
       const data = await response.json();
@@ -105,8 +107,10 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
       if (!response.ok) {
         toast.error(data.error);
       } else {
-        toast.success(`Product ${data?.title} was successfully created.`);
-        router.push("/");
+        toast.success(`Product was successfully created.`);
+        setUploadedImages([]);
+
+        return response;
       }
     } catch (error: any) {
       toast.error("An error occured. Try again.");
@@ -182,16 +186,12 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
   return (
     <ProductContext.Provider
       value={{
-        product,
-        setProduct,
         products,
         setProducts,
         currentPage,
         setCurrentPage,
         totalPages,
         setTotalPages,
-        updatedProduct,
-        setUpdatedProduct,
         uploading,
         setUploading,
         uploadImages,

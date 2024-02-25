@@ -11,6 +11,8 @@ import { Button } from "@/ui";
 export default function AdminUsers() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const onCloseModal = () => setIsOpen(false);
+
   return (
     <>
       <section className="flex items-center gap-8 mb-4">
@@ -30,7 +32,7 @@ export default function AdminUsers() {
         />
       </section>
       <Modal handleClose={() => setIsOpen(false)} isOpen={isOpen}>
-        <CreateProductForm />
+        <CreateProductForm handleCloseModal={onCloseModal} />
       </Modal>
     </>
   );
