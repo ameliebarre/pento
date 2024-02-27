@@ -1,15 +1,15 @@
 "use client";
 
-import useCategoryContext from "@/hooks/useCategoryContext";
-import createProductSchema from "@/schemas/createProductSchema";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { StylesConfig } from "react-select";
 import { ColorResult } from "react-color";
-import { useDropzone } from "react-dropzone";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ClipLoader } from "react-spinners";
-import { FaFileUpload as FileUploadIcon } from "react-icons/fa";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import useCategoryContext from "@/hooks/useCategoryContext";
+import CreateProductSchema, {
+  CreateProductSchemaType,
+} from "@/schemas/createProductSchema";
 
 const PRODUCT_FOLDER = "pento/products";
 
@@ -137,9 +137,8 @@ export default function CreateProductForm({
     handleSubmit,
     watch,
     formState: { isSubmitting, errors },
-  } = useForm<IFormInput>({
-    mode: "onChange",
-    resolver: yupResolver(createProductSchema),
+  } = useForm<CreateProductSchemaType>({
+    resolver: zodResolver(CreateProductSchema),
   });
 
   const handleChangeColor = (color: ColorResult) => setCurrentColor(color.hex);
@@ -148,6 +147,7 @@ export default function CreateProductForm({
     setHasShipping(status);
 
   const categoryInputValue = watch("category");
+  const colorInput = watch("color");
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     const response = await createProduct({
@@ -202,6 +202,7 @@ export default function CreateProductForm({
           options={categoriesOptions}
           control={control}
           name="category"
+          error={errors.category}
           colourStyles={selectColourStyles}
         />
 

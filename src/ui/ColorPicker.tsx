@@ -1,6 +1,7 @@
+import useClickOutside from "@/hooks/useClickOutside";
 import clsx from "clsx";
-import { useState } from "react";
-import { BlockPicker, ColorResult } from "react-color";
+import { useRef, useState } from "react";
+import { SketchPicker, ColorResult } from "react-color";
 import {
   Control,
   Controller,
@@ -27,9 +28,14 @@ export default function ColorPicker<T extends FieldValues>({
   error,
 }: ColorPickerProps<T>) {
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+
+  const handleOutsideClick = () => setShowColorPicker(false);
+
+  useClickOutside(colorPickerRef, handleOutsideClick);
 
   return (
-    <div className="flex flex-col mb-4 w-full relative">
+    <div className="flex flex-col mb-4 w-full relative" ref={colorPickerRef}>
       <label htmlFor={name}>{label}</label>
       <Controller
         control={control}
@@ -46,7 +52,7 @@ export default function ColorPicker<T extends FieldValues>({
             )}
             onChange={() => onChange(currentColor)}
             onFocus={() => setShowColorPicker(true)}
-            onBlur={() => setShowColorPicker(false)}
+            //onBlur={() => setShowColorPicker(false)}
           />
         )}
       />
@@ -59,7 +65,7 @@ export default function ColorPicker<T extends FieldValues>({
       {error && <p className="text-red-500 mt-1">{error.message}</p>}
 
       {showColorPicker ? (
-        <BlockPicker color={currentColor} onSwatchHover={handleChangeColor} />
+        <SketchPicker color={currentColor} onChange={handleChangeColor} />
       ) : null}
     </div>
   );

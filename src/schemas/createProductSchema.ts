@@ -1,24 +1,33 @@
-import * as Yup from "yup";
+import { z } from "zod";
 
-const createProductSchema = Yup.object()
-  .shape({
-    title: Yup.string().required("The title is required"),
-    description: Yup.string().required("The description is required"),
-    price: Yup.number()
-      .test("", "Price must be greather than 1$", (value) =>
-        value ? value > 1 : false,
-      )
-      .required("The price is required"),
-    previousPrice: Yup.number(),
-    color: Yup.string(),
-    brand: Yup.string(),
-    stock: Yup.number().required("The stock is required"),
-    shipping: Yup.boolean(),
-    category: Yup.object().shape({
-      label: Yup.string().required(),
-      value: Yup.string().required(),
-    }),
-  })
-  .required("The category is required");
+const CreateProductSchema = z.object({
+  title: z.string().trim().min(5, { message: "The title is required" }),
+  description: z
+    .string()
+    .trim()
+    .min(10, { message: "The description is required" }),
+  price: z.coerce
+    .number({
+      required_error: "Price is required",
+      invalid_type_error: "Price must be a number",
+    })
+    .gte(1, { message: "Price must be greather than 1$" }),
+  previousPrice: z.coerce.number().optional(),
+  color: z.string().trim().optional(),
+  brand: z.string().optional(),
+  stock: z.coerce.number({
+    required_error: "The stock is required",
+  }),
+  shipping: z.boolean().default(true),
+  category: z.object(
+    {
+      label: z.string(),
+      value: z.string(),
+    },
+    { required_error: "The category is required" },
+  ),
+});
 
-export default createProductSchema;
+export type CreateProductSchemaType = z.infer<typeof CreateProductSchema>;
+
+export default CreateProductSchema;

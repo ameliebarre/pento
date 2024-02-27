@@ -1,7 +1,9 @@
-import * as Yup from "yup";
+import { z } from "zod";
 
-const createCategorySchema = Yup.object().shape({
-  name: Yup.string().required(),
+const CreateCategorySchema = z.object({
+  name: z.string().trim().min(5, { message: "The name is required" }),
 });
 
-export default createCategorySchema;
+export type CreateCategorySchemaType = z.infer<typeof CreateCategorySchema>;
+
+export default CreateCategorySchema;

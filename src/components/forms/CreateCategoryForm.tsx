@@ -1,9 +1,10 @@
 "use client";
 
 import useCategoryContext from "@/hooks/useCategoryContext";
-import { createCategorySchema } from "@/schemas";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useState } from "react";
+import CreateCategorySchema, {
+  CreateCategorySchemaType,
+} from "@/schemas/createCategorySchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ClipLoader } from "react-spinners";
 
@@ -19,9 +20,8 @@ export default function CreateCategoryForm() {
     handleSubmit,
     formState: { isSubmitting, isValid },
     reset,
-  } = useForm<IFormInput>({
-    mode: "onChange",
-    resolver: yupResolver(createCategorySchema),
+  } = useForm<CreateCategorySchemaType>({
+    resolver: zodResolver(CreateCategorySchema),
   });
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {

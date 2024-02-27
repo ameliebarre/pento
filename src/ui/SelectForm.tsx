@@ -1,4 +1,12 @@
-import { Control, Controller, FieldValues, Path } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  FieldError,
+  FieldErrorsImpl,
+  FieldValues,
+  Merge,
+  Path,
+} from "react-hook-form";
 import Select, { StylesConfig } from "react-select";
 
 export interface Options {
@@ -12,6 +20,7 @@ interface SelectFormProps<T extends FieldValues> {
   options: Options[];
   label?: string;
   colourStyles?: StylesConfig;
+  error?: Merge<FieldError, FieldErrorsImpl<{ value: string; label: string }>>;
 }
 
 export default function SelectForm<T extends FieldValues>({
@@ -20,6 +29,7 @@ export default function SelectForm<T extends FieldValues>({
   options,
   label,
   colourStyles,
+  error,
 }: SelectFormProps<T>) {
   return (
     <div className="flex flex-col mb-4 w-full">
@@ -41,6 +51,7 @@ export default function SelectForm<T extends FieldValues>({
           />
         )}
       />
+      {error && <p className="text-red-500 mt-1">{error.message}</p>}
     </div>
   );
 }
