@@ -4,15 +4,17 @@ import Category from "@/models/Category";
 import slugify from "slugify";
 
 export async function POST(req: Request) {
-  const { name } = await req.json();
-
   await dbConnect();
+
+  const body = await req.json();
 
   try {
     const category = await Category.create({
-      name,
-      slug: slugify(name),
+      ...body,
+      slug: slugify(body.name),
     });
+
+    console.log("CATEGORY RESPONSE : ", category);
 
     return NextResponse.json(category, { status: 200 });
   } catch (error: any) {

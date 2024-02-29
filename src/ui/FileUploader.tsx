@@ -5,13 +5,13 @@ import { IoCloseSharp as DeleteIcon } from "react-icons/io5";
 import { ClipLoader } from "react-spinners";
 
 import { Button } from "@/ui";
-import { ProductImage } from "@/@types/product";
+import { Image } from "@/@types/common";
 
 interface FileUploaderProps {
   onUploadFiles: (files: File[]) => void;
   onDeleteFile: (public_id: string) => void;
   uploading: boolean;
-  displayImages: ProductImage[];
+  displayImages: Image[];
   baseStyle?: CSSProperties;
   focusedStyle?: CSSProperties;
   acceptStyle?: CSSProperties;
@@ -90,7 +90,7 @@ export default function FileUploader({
         <aside className="flex flex-row flex-wrap mt-6 gap-6">
           {displayImages?.map((img) => (
             <div
-              className="inline-flex p-2 border border-black w-[100px] h-[100px] box-border relative"
+              className="inline-flex p-2 border border-black h-[100px] box-border relative"
               key={img.public_id}
             >
               <div className="flex min-w-0 overflow-hidden">

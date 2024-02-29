@@ -1,8 +1,11 @@
 "use client";
 
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import { PropsWithChildren, createContext, useState } from "react";
 import toast from "react-hot-toast";
+import Resizer from "react-image-file-resizer";
+
 import { CategoryContextType, ICategory } from "@/@types/category";
+import { Image } from "@/@types/common";
 
 export const CategoryContext = createContext<CategoryContextType | null>(null);
 
@@ -11,15 +14,74 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
   const [updatedCategory, setUpdatedCategory] = useState<ICategory | null>(
     null,
   );
+  const [uploading, setUploading] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState<Image[]>([]);
 
-  const createCategory = async (categoryName: string) => {
+  const uploadImages = (files: File[], folder: string) => {
+    const allUploadedFiles: any[] = [];
+
+    if (files) {
+      setUploading(true);
+      const uploadPromises = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+
+        const promise = new Promise((resolve) => {
+          Resizer.imageFileResizer(
+            file,
+            1280,
+            1280,
+            "JPEG",
+            100,
+            0,
+            (uri) => {
+              fetch(`${process.env.API}/admin/upload/image`, {
+                method: "POST",
+                body: JSON.stringify({ image: uri, folder }),
+              })
+                .then((response) => {
+                  return response.json();
+                })
+                .then((data) => {
+                  allUploadedFiles.unshift(data);
+                  resolve(data);
+                })
+                .catch((err) => {
+                  toast.error(
+                    "An error occured during image uplad. Try later.",
+                  );
+                  resolve(err);
+                });
+            },
+            "base64",
+          );
+        });
+        uploadPromises.push(promise);
+      }
+
+      Promise.all(uploadPromises)
+        .then(() => {
+          setUploadedImages(allUploadedFiles);
+          setUploading(false);
+        })
+        .catch(() => {
+          toast.error("An error occured during image uplad. Try later.");
+          setUploading(false);
+        });
+    }
+  };
+
+  const createCategory = async (
+    category: ICategory,
+  ): Promise<Response | undefined> => {
     try {
       const response = await fetch(`${process.env.API}/admin/category`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: categoryName }),
+        body: JSON.stringify(category),
       });
 
       const responseData = await response.json();
@@ -29,6 +91,9 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
       } else {
         toast.success("Category was successfully created.");
         setCategories([responseData.category, ...categories]);
+        setUploadedImages([]);
+
+        return response;
       }
     } catch (err) {
       toast.error("An error occured. Try again.");
@@ -110,8 +175,11 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
       value={{
         categories,
         setCategories,
-        updatedCategory,
-        setUpdatedCategory,
+        uploadImages,
+        uploading,
+        setUploading,
+        uploadedImages,
+        setUploadedImages,
         createCategory,
         fetchCategories,
         updateCategory,

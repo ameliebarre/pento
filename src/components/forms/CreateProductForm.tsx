@@ -7,12 +7,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import useCategoryContext from "@/hooks/useCategoryContext";
+import useProductContext from "@/hooks/useProductContext";
 import CreateProductSchema, {
   CreateProductSchemaType,
 } from "@/schemas/createProductSchema";
-
-const PRODUCT_FOLDER = "pento/products";
-
+import { Image } from "@/@types/common";
 import {
   Button,
   ColorPicker,
@@ -23,8 +22,6 @@ import {
   SwitchForm,
   TextareaForm,
 } from "@/ui";
-import useProductContext from "@/hooks/useProductContext";
-import { ProductImage } from "@/@types/product";
 
 interface IFormInput {
   title: string;
@@ -40,6 +37,8 @@ interface IFormInput {
     value: string;
   };
 }
+
+const PRODUCT_FOLDER = "pento/products";
 
 const selectColourStyles: StylesConfig = {
   control: (baseStyles, state) => ({
@@ -71,7 +70,7 @@ interface CreateProductFormProps {
 export default function CreateProductForm({
   handleCloseModal,
 }: CreateProductFormProps) {
-  const [displayImages, setDisplayImages] = useState<ProductImage[]>([]);
+  const [displayImages, setDisplayImages] = useState<Image[]>([]);
   const [hasShipping, setHasShipping] = useState(true);
   const [currentColor, setCurrentColor] = useState("");
   const {
@@ -147,7 +146,6 @@ export default function CreateProductForm({
     setHasShipping(status);
 
   const categoryInputValue = watch("category");
-  const colorInput = watch("color");
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     const response = await createProduct({

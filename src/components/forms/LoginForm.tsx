@@ -1,9 +1,9 @@
 "use client";
 
+import { yupResolver } from "@hookform/resolvers/yup";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { loginSchema } from "@/schemas";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useState } from "react";

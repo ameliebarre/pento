@@ -28,7 +28,7 @@ export default function Button({
     <button
       type={type}
       className={[
-        "rounded-md bg-primary px-4 block h-11 text-white cursor-pointer ease-out duration-300",
+        "rounded-md bg-primary px-4 block h-11 text-white cursor-pointer ease-out duration-300 min-w-[150px]",
         "flex items-center flex-row justify-center gap-3",
         "hover:bg-primary-800 active:bg-primary-900",
         "disabled:opacity-50 disabled:hover:bg-primary disabled:cursor-default",

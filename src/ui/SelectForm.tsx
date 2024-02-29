@@ -10,8 +10,8 @@ import {
 import Select, { StylesConfig } from "react-select";
 
 export interface Options {
-  value: string | number;
-  label: string;
+  value?: string;
+  label?: string;
 }
 
 interface SelectFormProps<T extends FieldValues> {

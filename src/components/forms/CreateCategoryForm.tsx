@@ -1,69 +1,125 @@
 "use client";
 
+import { Image } from "@/@types/common";
 import useCategoryContext from "@/hooks/useCategoryContext";
 import CreateCategorySchema, {
   CreateCategorySchemaType,
 } from "@/schemas/createCategorySchema";
+import { Button, FileUploader, InputForm } from "@/ui";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { ClipLoader } from "react-spinners";
 
 interface IFormInput {
   name: string;
 }
 
-export default function CreateCategoryForm() {
-  const { createCategory } = useCategoryContext();
+const CATEGORY_FOLDER = "pento/categories";
+
+interface CreateCategoryFormProps {
+  handleCloseModal: () => void;
+}
+
+export default function CreateCategoryForm({
+  handleCloseModal,
+}: CreateCategoryFormProps) {
+  const [displayImages, setDisplayImages] = useState<Image[]>([]);
+  const { createCategory, uploadImages, uploading, uploadedImages } =
+    useCategoryContext();
+
+  useEffect(() => {
+    setDisplayImages(uploadedImages);
+  }, [uploadedImages]);
+
+  const baseStyle = {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column" as "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "20px",
+    borderWidth: 2,
+    borderRadius: 10,
+    borderColor: "#8E8E8E",
+    borderStyle: "dashed",
+    backgroundColor: "#fafafa",
+    color: "#8E8E8E",
+    outline: "none",
+    transition: "border .24s ease-in-out",
+    height: 250,
+  };
+
+  const focusedStyle = {
+    borderColor: "#A27A60",
+  };
+
+  const acceptStyle = {
+    backgroundColor: "#EFEBE9",
+    borderColor: "#A27A60",
+  };
+
+  const rejectStyle = {
+    borderColor: "#ff1744",
+  };
 
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, isValid },
+    formState: { isSubmitting, errors },
     reset,
   } = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
   });
 
+  const handleUploadFiles = (files: File[]) => {
+    uploadImages(files, CATEGORY_FOLDER);
+  };
+
+  const handleDeleteFile = (public_id: string) => {
+    console.log("PUBLIC_ID : ", public_id);
+  };
+
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    createCategory(data.name);
-    reset();
+    const response = await createCategory({
+      ...data,
+      images: uploadedImages,
+    });
+
+    if (response?.ok) {
+      handleCloseModal();
+    }
   };
 
   return (
-    <div className="w-full shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] p-4 rounded-xl">
-      <form
-        action=""
-        method="POST"
-        className="flex items-center gap-3"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className="flex flex-col w-full">
-          <input
-            {...register("name", { required: true })}
-            id="name"
-            name="name"
-            type="text"
-            className={[
-              "h-12 mt-1 bg-neutral-100 rounded-md px-2 text-gray-900 focus:outline-none",
-            ].join(" ")}
-            placeholder="Armchairs"
-          />
-        </div>
-        <button
+    <div className="w-[60%] mx-auto mb-8 px-4">
+      <h2 className="text-2xl font-semibold pb-2 mb-5 border-b border-b-black">
+        Add a new category
+      </h2>
+      <form action="" method="POST" onSubmit={handleSubmit(onSubmit)}>
+        {/* Name */}
+        <InputForm
+          register={register}
+          name="name"
+          label="Name"
+          error={errors.name}
+          required
+        />
+        <FileUploader
+          displayImages={displayImages}
+          uploading={uploading}
+          onUploadFiles={handleUploadFiles}
+          onDeleteFile={handleDeleteFile}
+          baseStyle={baseStyle}
+          acceptStyle={acceptStyle}
+          rejectStyle={rejectStyle}
+          focusedStyle={focusedStyle}
+        />
+        <Button
+          label="Create category"
           type="submit"
-          className={[
-            "rounded-lg bg-primary w-[250px] block h-12 text-white cursor-pointer ease-out duration-300",
-            "hover:bg-primary-800 active:bg-primary-900",
-            "disabled:opacity-50 disabled:hover:bg-primary disabled:cursor-default",
-          ].join(" ")}
-          disabled={!isValid}
-        >
-          {isSubmitting ? (
-            <ClipLoader size="20px" color="#FFFFFF" className="mt-2" />
-          ) : (
-            "Create"
-          )}
-        </button>
+          className="text-md"
+          isSubmitting={isSubmitting}
+        />
       </form>
     </div>
   );

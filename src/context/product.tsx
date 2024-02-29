@@ -5,18 +5,17 @@ import Resizer from "react-image-file-resizer";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-import { IProduct, ProductContextType, ProductImage } from "@/@types/product";
+import { IProduct, ProductContextType } from "@/@types/product";
+import { Image } from "@/@types/common";
 
 export const ProductContext = createContext<ProductContextType | null>(null);
 
 export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
-  const [product, setProduct] = useState<IProduct | null>(null);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [updatedProduct, setUpdatedProduct] = useState<IProduct | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<ProductImage[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<Image[]>([]);
 
   const router = useRouter();
 
@@ -34,7 +33,7 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
           Resizer.imageFileResizer(
             file,
             1280,
-            1280,
+            820,
             "JPEG",
             100,
             0,
@@ -137,7 +136,7 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
     }
   };
 
-  const updateProduct = async () => {
+  const updateProduct = async (updatedProduct: IProduct) => {
     try {
       const response = await fetch(
         `${process.env.API}/admin/product/${updatedProduct?._id}`,
@@ -160,7 +159,7 @@ export const ProductProvider = ({ children }: PropsWithChildren<{}>) => {
     }
   };
 
-  const deleteProduct = async () => {
+  const deleteProduct = async (updatedProduct: IProduct) => {
     try {
       const response = await fetch(
         `${process.env.API}/admin/product/${updatedProduct?._id}`,

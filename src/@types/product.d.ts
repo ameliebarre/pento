@@ -3,6 +3,7 @@ import { ChangeEvent } from "react";
 import { ICategory } from "./category";
 import { ILike } from "./like";
 import { IRating } from "./rating";
+import { Image } from "./common";
 
 export interface IProduct {
   _id?: string;
@@ -15,15 +16,10 @@ export interface IProduct {
   brand?: string;
   shipping: boolean;
   category: { _id: string; name: string };
-  images: Array<ProductImage>;
+  images: Array<Image>;
   sold?: number;
   likes?: Array<ILike>;
   ratings?: Array<IRating>;
-}
-
-export interface ProductImage {
-  secure_url: string;
-  public_id: string;
 }
 
 export type ProductContextType = {
@@ -35,12 +31,12 @@ export type ProductContextType = {
   setTotalPages: Dispatch<SetStateAction<number>>;
   uploading: boolean;
   setUploading: Dispatch<SetStateAction<boolean>>;
-  uploadedImages: ProductImage[];
-  setUploadedImages: Dispatch<SetStateAction<ProductImage[]>>;
+  uploadedImages: Image[];
+  setUploadedImages: Dispatch<SetStateAction<Image[]>>;
   uploadImages: (files: File[], folder: string) => void;
   deleteImage: (public_id: string) => void;
   createProduct: (product: IProduct) => Promise<Response | undefined>;
   fetchProducts: () => void;
   updateProduct: (product: IProduct) => void;
-  deleteProduct: () => void;
+  deleteProduct: (product: IProduct) => void;
 };
