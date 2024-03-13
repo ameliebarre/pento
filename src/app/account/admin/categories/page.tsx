@@ -1,20 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdCategory as CategoryIcon } from "react-icons/md";
 import { FaPlus as PlusIcon } from "react-icons/fa";
 
 import Modal from "@/components/Modal";
 import CreateCategoryForm from "@/components/forms/CreateCategoryForm";
+import CategoriesList from "@/components/CategoriesList";
 import { Button } from "@/ui";
+import useCategoryContext from "@/hooks/useCategoryContext";
 
 export default function AdminCategories() {
   const [isOpen, setIsOpen] = useState(false);
+  const { categories, fetchCategories } = useCategoryContext();
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const onCloseModal = () => setIsOpen(false);
 
   return (
-    <>
+    <div>
       <section className="flex items-center gap-3 mb-4">
         <CategoryIcon size={40} />
         <div>
@@ -29,6 +36,9 @@ export default function AdminCategories() {
           handleOnClick={() => setIsOpen(true)}
         />
       </section>
+      <section className="mt-12">
+        <CategoriesList categories={categories} />
+      </section>
       <Modal
         handleClose={() => setIsOpen(false)}
         isOpen={isOpen}
@@ -36,6 +46,6 @@ export default function AdminCategories() {
       >
         <CreateCategoryForm handleCloseModal={onCloseModal} />
       </Modal>
-    </>
+    </div>
   );
 }

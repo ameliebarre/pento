@@ -14,8 +14,6 @@ export async function POST(req: Request) {
       slug: slugify(body.name),
     });
 
-    console.log("CATEGORY RESPONSE : ", category);
-
     return NextResponse.json(category, { status: 200 });
   } catch (error: any) {
     return NextResponse.json(error.message, { status: 500 });

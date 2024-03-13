@@ -1,5 +1,6 @@
 "use client";
 
+import { ICategory } from "@/@types/category";
 import { Image } from "@/@types/common";
 import useCategoryContext from "@/hooks/useCategoryContext";
 import CreateCategorySchema, {
@@ -23,13 +24,8 @@ interface CreateCategoryFormProps {
 export default function CreateCategoryForm({
   handleCloseModal,
 }: CreateCategoryFormProps) {
-  const [displayImages, setDisplayImages] = useState<Image[]>([]);
   const { createCategory, uploadImages, uploading, uploadedImages } =
     useCategoryContext();
-
-  useEffect(() => {
-    setDisplayImages(uploadedImages);
-  }, [uploadedImages]);
 
   const baseStyle = {
     flex: 1,
@@ -66,7 +62,6 @@ export default function CreateCategoryForm({
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-    reset,
   } = useForm<CreateCategorySchemaType>({
     resolver: zodResolver(CreateCategorySchema),
   });
@@ -80,14 +75,12 @@ export default function CreateCategoryForm({
   };
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    const response = await createCategory({
+    await createCategory({
       ...data,
       images: uploadedImages,
     });
 
-    if (response?.ok) {
-      handleCloseModal();
-    }
+    handleCloseModal();
   };
 
   return (
@@ -105,7 +98,7 @@ export default function CreateCategoryForm({
           required
         />
         <FileUploader
-          displayImages={displayImages}
+          displayImages={uploadedImages}
           uploading={uploading}
           onUploadFiles={handleUploadFiles}
           onDeleteFile={handleDeleteFile}

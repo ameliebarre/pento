@@ -84,13 +84,13 @@ export const CategoryProvider = ({ children }: PropsWithChildren<{}>) => {
         body: JSON.stringify(category),
       });
 
-      const responseData = await response.json();
+      const newCategory = await response.json();
 
       if (!response.ok) {
-        toast.error(responseData);
+        toast.error("An error occurred when creating the category");
       } else {
         toast.success("Category was successfully created.");
-        setCategories([responseData.category, ...categories]);
+        setCategories([newCategory, ...categories]);
         setUploadedImages([]);
 
         return response;

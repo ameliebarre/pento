@@ -31,22 +31,20 @@ export default function Modal({
   if (!isOpen) return null;
 
   return (
-    <ClientPortal wrapperId="portal-root">
-      <div className="fixed inset-0 bg-black bg-opacity-40 flex flex-col justify-center transition delay-300 duration-300 ease-in-out overflow-x-hidden z-999">
-        <div
-          className={twMerge(
-            "w-[60%] h-[90%] bg-white mx-auto my-0 flex flex-col items-center",
-            className,
-          )}
-        >
-          <div className="flex justify-end items-end w-full">
-            <button onClick={handleClose} className="text-black">
-              <CloseIcon size={30} className="m-4" />
-            </button>
-          </div>
-          <div className="w-full overflow-y-auto">{children}</div>
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex flex-col justify-center transition delay-300 duration-300 ease-in-out overflow-x-hidden z-999">
+      <div
+        className={twMerge(
+          "w-[60%] h-[90%] bg-white mx-auto my-0 flex flex-col items-center",
+          className,
+        )}
+      >
+        <div className="flex justify-end items-end w-full">
+          <button onClick={handleClose} className="text-black">
+            <CloseIcon size={30} className="m-4" />
+          </button>
         </div>
+        <div className="w-full overflow-y-auto">{children}</div>
       </div>
-    </ClientPortal>
+    </div>
   );
 }
