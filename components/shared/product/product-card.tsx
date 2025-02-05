@@ -12,19 +12,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card className='w-full max-w-sm border-none shadow-none'>
       <CardHeader className='p-0 items-center'>
-        <Link
-          href={`/products/${product.slug}`}
-          className='relative w-full aspect-[3/4] block'
-        >
+        <div className='relative w-full aspect-[3/4] block'>
           <Image
             src={product.images[0]}
             alt={product.name}
             fill
             sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
-            className='object-cover'
+            className='object-cover relative'
             priority={true}
           />
-        </Link>
+          <div className='absolute inset-0 flex items-end justify-center'>
+            <span className='bg-white/50 w-full text-black px-4 py-2 text-center text-xs'>
+              © Unsplash -{' '}
+              <Link
+                href={product.authorImageLink}
+                className='underline'
+                target='_blank'
+              >
+                {product.authorImage}
+              </Link>
+            </span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className='grid px-0 pt-2'>
         <Link href={`/products/${product.slug}`}>
