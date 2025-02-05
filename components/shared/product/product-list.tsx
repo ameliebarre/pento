@@ -12,14 +12,12 @@ type Product = {
 };
 
 type ProductListProps = {
-  data: Product[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
   title?: string;
-  limit?: number;
 };
 
-const ProductList = ({ data, title, limit }: ProductListProps) => {
-  const limitedData = limit ? data.slice(0, limit) : data;
-
+const ProductList = ({ data, title }: ProductListProps) => {
   return (
     <div className='my-10'>
       <div className='mb-4'>
@@ -28,7 +26,7 @@ const ProductList = ({ data, title, limit }: ProductListProps) => {
       </div>
       {data.length > 0 ? (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-          {limitedData.map((product: Product) => (
+          {data.map((product: Product) => (
             <div key={product.slug} className='h-full'>
               <ProductCard product={product} />
             </div>

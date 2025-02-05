@@ -44,7 +44,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className='flex-between gap-4'>
           <p>{product.rating} stars</p>
           {product.stock > 0 ? (
-            <ProductPrice price={product.price} />
+            <ProductPrice price={Number(product.price)} />
           ) : (
             <p className='text-destructive text-sm text-red-600'>
               Out of stock
