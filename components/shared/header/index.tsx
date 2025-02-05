@@ -28,10 +28,10 @@ const Header = () => {
               <li className='hover:underline underline-offset-8'>
                 <Link href='/products'>Products</Link>
               </li>
-              <li>
+              <li className='hover:underline underline-offset-8'>
                 <Link href='/showcase'>Showcase</Link>
               </li>
-              <li>
+              <li className='hover:underline underline-offset-8'>
                 <Link href='/contact'>Contact</Link>
               </li>
             </ul>
