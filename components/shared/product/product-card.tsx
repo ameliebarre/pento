@@ -2,17 +2,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import Image from 'next/image';
 import Link from 'next/link';
 import ProductPrice from './product-price';
-
-type Product = {
-  slug: string;
-  name: string;
-  price: number;
-  images: string[];
-  description?: string;
-  brand: string;
-  rating: number;
-  stock: number;
-};
+import { Product } from '@/types';
 
 type ProductCardProps = {
   product: Product;

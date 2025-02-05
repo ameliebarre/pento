@@ -1,19 +1,8 @@
 import ProductCard from './product-card';
-
-type Product = {
-  slug: string;
-  name: string;
-  price: number;
-  images: string[];
-  description?: string;
-  brand: string;
-  rating: number;
-  stock: number;
-};
+import { Product } from '@/types';
 
 type ProductListProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: Product[];
   title?: string;
 };
 

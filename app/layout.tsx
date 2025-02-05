@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from '@/lib/constants';
 import '@/assets/styles/globals.css';
 import 'tailwindcss/tailwind.css';
 
-const inter = Inter({
+const dm_sans = DM_Sans({
   subsets: ['latin'],
 });
 
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${dm_sans.className} antialiased`}>{children}</body>
     </html>
   );
 }
