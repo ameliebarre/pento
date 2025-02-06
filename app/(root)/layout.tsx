@@ -1,5 +1,6 @@
 import Footer from '@/components/footer';
 import Header from '@/components/shared/header';
+import HeroSection from '@/components/shared/hero-section';
 
 export default function RootLayout({
   children,
@@ -9,7 +10,7 @@ export default function RootLayout({
   return (
     <div className='flex flex-col'>
       <Header />
-      {/* <HeroSection /> */}
+      <HeroSection />
       <main className='flex-1 wrapper flex-grow flex-col gap-6'>
         {children}
       </main>

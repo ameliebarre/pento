@@ -10,7 +10,7 @@ type ProductCardProps = {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   return (
-    <Card className='w-full max-w-sm border-none shadow-none'>
+    <Card className='w-full border-none shadow-none'>
       <CardHeader className='p-0 items-center'>
         <div className='relative w-full aspect-[3/4] block'>
           <Image
