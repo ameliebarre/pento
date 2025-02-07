@@ -9,10 +9,13 @@ datasource db {
 }
 
 model Category {
-  id       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name     String    @unique
-  slug     String    @unique
-  products Product[]
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String    @unique
+  slug            String    @unique
+  image           String    @default("")
+  authorImage     String    @default("")
+  authorImageLink String    @default("")
+  products        Product[]
 }
 
 model Product {
