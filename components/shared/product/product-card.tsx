@@ -35,7 +35,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className='grid px-0 pt-2'>
+      <CardContent className='pt-2 pb-0 px-0'>
         <Link href={`/products/${product.slug}`}>
           <h2 className='text-md font-medium'>{product.name}</h2>
         </Link>

@@ -29,6 +29,14 @@
   .h3-bold {
     @apply font-bold text-xl lg:text-2xl;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE & Edge */
+    scrollbar-width: none; /* Firefox */
+  }
 }
 
 @layer base {

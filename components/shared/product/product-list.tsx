@@ -1,4 +1,3 @@
-import { Product } from '@/types';
 import Link from 'next/link';
 import { MoveRightIcon } from 'lucide-react';
 import ProductCard from './product-card';
@@ -8,7 +7,7 @@ const ProductList = async () => {
   const latestProducts = await getLatestProducts();
 
   return (
-    <div className='my-10'>
+    <div>
       <div className='mb-4 flex flex-col xs:flex-row gap-1 xs-gap-0 items-start xs:items-center xs:justify-between'>
         <div>
           <h2 className='h2-bold text-lg mb-1'>Catalog</h2>
@@ -24,7 +23,7 @@ const ProductList = async () => {
       </div>
       {latestProducts.length > 0 ? (
         <div className='grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6'>
-          {latestProducts.map((product: Product) => (
+          {latestProducts.map((product) => (
             <div key={product.slug} className='h-full'>
               <ProductCard product={product} />
             </div>
