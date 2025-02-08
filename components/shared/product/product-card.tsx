@@ -36,7 +36,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       </CardHeader>
       <CardContent className='pt-2 pb-0 px-0'>
-        <Link href={`/products/${product.slug}`}>
+        <Link href={`/product/${product.slug}`}>
           <h2 className='text-md font-medium'>{product.name}</h2>
         </Link>
         <div className='text-sm text-gray-600'>{product.brand}</div>
