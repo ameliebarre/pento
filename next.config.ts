@@ -2,7 +2,6 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   webpack(config, { isServer }) {
-    // Ensure that splitChunks is properly initialized before modifying cacheGroups
     if (!isServer && config.optimization.splitChunks) {
       config.optimization.splitChunks.cacheGroups = {
         styles: {

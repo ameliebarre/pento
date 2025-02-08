@@ -1,34 +1,29 @@
+import Link from 'next/link';
+import { MoveRightIcon } from 'lucide-react';
 import ProductCard from './product-card';
+import { getLatestProducts } from '@/lib/actions/product.actions';
 
-type Product = {
-  slug: string;
-  name: string;
-  price: number;
-  images: string[];
-  description?: string;
-  brand: string;
-  rating: number;
-  stock: number;
-};
-
-type ProductListProps = {
-  data: Product[];
-  title?: string;
-  limit?: number;
-};
-
-const ProductList = ({ data, title, limit }: ProductListProps) => {
-  const limitedData = limit ? data.slice(0, limit) : data;
+const ProductList = async () => {
+  const latestProducts = await getLatestProducts();
 
   return (
-    <div className='my-10'>
-      <div className='mb-4'>
-        <h2 className='h2-bold text-lg mb-1'>{title}</h2>
-        <hr className='border-t border-black w-48' />
+    <div>
+      <div className='mb-4 flex flex-col xs:flex-row gap-1 xs-gap-0 items-start xs:items-center xs:justify-between'>
+        <div>
+          <h2 className='h2-bold text-lg mb-1'>Catalog</h2>
+          <hr className='border-t border-black w-48 hidden xs:block' />
+        </div>
+        <Link href='/products' className='flex items-center group'>
+          View all products{' '}
+          <MoveRightIcon
+            strokeWidth='1.25'
+            className='w-12 transition-transform duration-200 ease-in-out group-hover:translate-x-2'
+          />
+        </Link>
       </div>
-      {data.length > 0 ? (
-        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-          {limitedData.map((product: Product) => (
+      {latestProducts.length > 0 ? (
+        <div className='grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6'>
+          {latestProducts.map((product) => (
             <div key={product.slug} className='h-full'>
               <ProductCard product={product} />
             </div>

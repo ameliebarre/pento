@@ -1,10 +1,18 @@
+import CategoryList from '@/components/shared/category-list';
+import DesignerFocus from '@/components/shared/designer-focus';
+import HeroSection from '@/components/shared/hero-section';
 import ProductList from '@/components/shared/product/product-list';
-import sampleData from '@/db/sample-data';
+import { getAllCategories } from '@/lib/actions/category.actions';
 
 const Homepage = async () => {
+  const categories = await getAllCategories();
+
   return (
     <>
-      <ProductList data={sampleData.products} title='Catalog' />
+      <HeroSection />
+      <ProductList />
+      <CategoryList categories={categories} />
+      <DesignerFocus />
     </>
   );
 };

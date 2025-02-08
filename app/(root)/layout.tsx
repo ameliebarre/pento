@@ -7,9 +7,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className='flex h-screen flex-col'>
+    <div className='flex flex-col'>
       <Header />
-      <main className='flex-1 wrapper flex-grow'>{children}</main>
+      <main className='flex-1 flex wrapper flex-grow flex-col gap-10'>
+        {children}
+      </main>
       <Footer />
     </div>
   );
