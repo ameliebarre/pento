@@ -1,10 +1,17 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { APP_NAME } from '@/lib/constants';
 import { ShoppingCart } from 'lucide-react';
 import { UserRoundIcon } from 'lucide-react';
+import { APP_NAME } from '@/lib/constants';
 import Menu from './menu';
 import ButtonLink from '../buttonLink';
+
+const navLinks = [
+  { name: 'Products', href: '/products' },
+  { name: 'Who we are', href: '/' },
+  { name: 'Contact', href: '/' },
+];
 
 const Header = () => {
   return (
@@ -23,18 +30,15 @@ const Header = () => {
               priority={true}
             />
           </Link>
-          <nav className='hidden md:flex'>
-            <ul className='list-none flex flex-row gap-6'>
-              <li className='hover:underline underline-offset-8'>
-                <Link href='/products'>Products</Link>
-              </li>
-              <li className='hover:underline underline-offset-8'>
-                <Link href='/showcase'>Showcase</Link>
-              </li>
-              <li className='hover:underline underline-offset-8'>
-                <Link href='/contact'>Contact</Link>
-              </li>
-            </ul>
+          <nav className='hidden md:flex md:space-x-8'>
+            {navLinks.map((link) => (
+              <div key={link.name} className='relative group'>
+                <Link href={link.href} className='text-slate-900'>
+                  {link.name}
+                </Link>
+                <div className='absolute left-0 -bottom-1 w-full h-[1.5px] bg-slate-900 scale-x-0 transition-transform duration-300 ease-in-out group-hover:scale-x-100'></div>
+              </div>
+            ))}
           </nav>
         </div>
         <nav className='flex-end flex gap-6'>

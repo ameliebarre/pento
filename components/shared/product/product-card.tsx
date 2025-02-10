@@ -28,6 +28,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 href={product.authorImageLink}
                 className='underline'
                 target='_blank'
+                rel='noopener noreferrer'
               >
                 {product.authorImage}
               </Link>
