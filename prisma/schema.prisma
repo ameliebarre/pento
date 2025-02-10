@@ -22,11 +22,7 @@ model Product {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String
   slug            String   @unique(map: "product_slug_idx")
-  categoryId      String   @db.Uuid
-  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  images          String[]
   authorImage     String
-  authorImageLink String   @default("")
   brand           String
   description     String
   stock           Int
@@ -35,6 +31,10 @@ model Product {
   numReviews      Int      @default(0)
   isFeatured      Boolean
   createdAt       DateTime @default(now()) @db.Timestamp(6)
+  authorImageLink String   @default("")
+  categoryId      String   @db.Uuid
+  image           String
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -61,15 +61,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")

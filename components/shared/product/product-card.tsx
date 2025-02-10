@@ -14,7 +14,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       <CardHeader className='p-0 items-center'>
         <div className='relative w-full aspect-[3/4] block'>
           <Image
-            src={product.images[0]}
+            src={product.image}
             alt={product.name}
             fill
             sizes='(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'

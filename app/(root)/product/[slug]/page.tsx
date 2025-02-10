@@ -34,7 +34,7 @@ const ProductDetailsPage = async (props: ProductDetailsPageProps) => {
           <div className='w-full z-0 sticky top-4'>
             <div className='aspect-[4/3]'>
               <Image
-                src={product.images[0]}
+                src={product.image}
                 alt={product.slug}
                 className='w-full h-full'
                 layout='responsive'
