@@ -1,13 +1,40 @@
 'use client';
+import { useActionState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { signInDefaultValues } from '@/lib/constants';
+import { signInWithCredentials } from '@/lib/actions/user.actions';
+import { useFormStatus } from 'react-dom';
 
 const CredentialsSignInForm = () => {
+  const [data, action] = useActionState(signInWithCredentials, {
+    success: false,
+    message: '',
+  });
+
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+
+  const SignInButton = () => {
+    const { pending } = useFormStatus();
+
+    return (
+      <Button
+        disabled={pending}
+        className='uppercase w-full font-medium tracking-wide'
+        variant='default'
+      >
+        {pending ? 'Signing In...' : 'Sign In'}
+      </Button>
+    );
+  };
+
   return (
-    <form>
+    <form action={action}>
+      <input type='hidden' name='callbackUrl' value={callbackUrl} />
       <div className='flex-1'></div>
       <div className='space-y-6'>
         <div>
@@ -41,13 +68,11 @@ const CredentialsSignInForm = () => {
           </span>
         </div>
         <div>
-          <Button
-            className='uppercase w-full font-medium tracking-wide'
-            variant='default'
-          >
-            Sign in
-          </Button>
+          <SignInButton />
         </div>
+        {data && !data.success && (
+          <div className='text-center text-destructive'>{data.message}</div>
+        )}
         <p className='text-center'>
           Don&apos;t have an account ?{' '}
           <Link

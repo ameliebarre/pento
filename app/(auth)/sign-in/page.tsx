@@ -1,12 +1,28 @@
+import { redirect } from 'next/navigation';
 import { playfair_display } from '@/app/layout';
+import { auth } from '@/auth';
 import { Metadata } from 'next';
 import CredentialsSignInForm from './credentials-signin-form';
 
-export const metaDat: Metadata = {
+export const metaData: Metadata = {
   title: 'Sign In',
 };
 
-const SignInPage = () => {
+type SignInPageProps = {
+  searchParams: Promise<{
+    callbackUrl: string;
+  }>;
+};
+
+const SignInPage = async (props: SignInPageProps) => {
+  const { callbackUrl } = await props.searchParams;
+
+  const session = await auth();
+
+  if (session) {
+    return redirect(callbackUrl || '/');
+  }
+
   return (
     <div className='w-full max-w-md mx-auto'>
       <h2

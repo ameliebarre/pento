@@ -1,4 +1,4 @@
-'user server';
+'use server';
 
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { signIn, signOut } from '@/auth';
@@ -18,6 +18,7 @@ export async function signInWithCredentials(
 
     return { success: true, message: 'Signed in successfully !' };
   } catch (error) {
+    console.log('error : ', error);
     if (isRedirectError(error)) {
       throw error;
     }
