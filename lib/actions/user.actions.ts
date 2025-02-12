@@ -1,7 +1,7 @@
 'use server';
 
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { signIn, signOut } from '@/auth';
+import { signIn, signOut, auth } from '@/auth';
 import { signInFormSchema } from '../validators';
 
 export async function signInWithCredentials(
@@ -30,3 +30,7 @@ export async function signInWithCredentials(
 export async function signOutUser() {
   await signOut();
 }
+
+export const getSession = async () => {
+  return await auth();
+};

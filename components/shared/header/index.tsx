@@ -2,10 +2,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
-import { UserRoundIcon } from 'lucide-react';
 import { APP_NAME } from '@/lib/constants';
-import Menu from './menu';
-import ButtonLink from '../buttonLink';
+import MobileMenu from './mobile-menu';
+import ButtonLink from '../button-link';
+import UserButton from './user-button';
 
 const navLinks = [
   { name: 'Products', href: '/products' },
@@ -19,7 +19,7 @@ const Header = () => {
       <div className='wrapper flex-between'>
         <div className='flex-start gap-3 md:gap-8'>
           <div className='md:hidden'>
-            <Menu />
+            <MobileMenu />
           </div>
           <Link href='/' className='flex-start'>
             <Image
@@ -46,9 +46,7 @@ const Header = () => {
             <ShoppingCart className='!w-6 !h-6 md:!w-4 md:!h-4' />
             <span className='hidden md:inline'>Cart</span>
           </ButtonLink>
-          <ButtonLink href='/sign-in' className='hidden md:flex'>
-            <UserRoundIcon /> Sign In
-          </ButtonLink>
+          <UserButton />
         </nav>
       </div>
     </header>

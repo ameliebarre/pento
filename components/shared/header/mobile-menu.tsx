@@ -9,9 +9,9 @@ import {
   SheetTitle,
   SheetFooter,
 } from '@/components/ui/sheet';
-import ButtonLink from '../buttonLink';
+import ButtonLink from '../button-link';
 
-const Menu = () => {
+const MobileMenu = () => {
   return (
     <nav className='md:hidden'>
       <Sheet>
@@ -56,4 +56,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default MobileMenu;

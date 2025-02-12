@@ -1,12 +1,7 @@
 import { redirect } from 'next/navigation';
 import { playfair_display } from '@/app/layout';
 import { auth } from '@/auth';
-import { Metadata } from 'next';
 import CredentialsSignInForm from './credentials-signin-form';
-
-export const metaData: Metadata = {
-  title: 'Sign In',
-};
 
 type SignInPageProps = {
   searchParams: Promise<{
