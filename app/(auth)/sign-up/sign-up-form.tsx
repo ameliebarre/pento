@@ -1,5 +1,6 @@
 'use client';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -7,13 +8,26 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { signUpDefaultValues } from '@/lib/constants';
 import { signUpUser } from '@/lib/actions/user.actions';
-import { useFormStatus } from 'react-dom';
+import { FieldError } from '@/components/shared/field-error';
+import { EMPTY_FORM_STATE } from '@/types';
 
 const SignUpForm = () => {
-  const [data, action] = useActionState(signUpUser, {
-    success: false,
-    message: '',
+  const [formState, action] = useActionState(signUpUser, EMPTY_FORM_STATE);
+
+  const [formData, setFormData] = useState({
+    name: signUpDefaultValues.name,
+    email: signUpDefaultValues.email,
+    password: signUpDefaultValues.password,
+    confirmPassword: signUpDefaultValues.confirmPassword,
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
@@ -43,11 +57,12 @@ const SignUpForm = () => {
             id='name'
             name='name'
             type='text'
-            required
             autoComplete='email'
             className='focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 mt-2'
-            defaultValue={signUpDefaultValues.name}
+            value={formData.name}
+            onChange={(e) => handleChange(e)}
           />
+          <FieldError formState={formState} name='name' />
         </div>
         <div>
           <Label htmlFor='email'>Email</Label>
@@ -55,11 +70,12 @@ const SignUpForm = () => {
             id='email'
             name='email'
             type='email'
-            required
             autoComplete='email'
             className='focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 mt-2'
-            defaultValue={signUpDefaultValues.email}
+            value={formData.email}
+            onChange={(e) => handleChange(e)}
           />
+          <FieldError formState={formState} name='email' />
         </div>
         <div>
           <Label htmlFor='password'>Password</Label>
@@ -70,8 +86,10 @@ const SignUpForm = () => {
             required
             autoComplete='password'
             className='focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'
-            defaultValue={signUpDefaultValues.password}
+            value={formData.password}
+            onChange={(e) => handleChange(e)}
           />
+          <FieldError formState={formState} name='password' />
         </div>
         <div>
           <Label htmlFor='confirmPassword'>Confirm password</Label>
@@ -82,15 +100,16 @@ const SignUpForm = () => {
             required
             autoComplete='confirmPassword'
             className='focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'
-            defaultValue={signUpDefaultValues.confirmPassword}
+            value={formData.confirmPassword}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <div>
           <SignUpButton />
         </div>
-        {data && !data.success && (
-          <div className='text-center text-destructive'>{data.message}</div>
-        )}
+        <div className='text-center pt-2'>
+          <FieldError formState={formState} name='unknownError' />
+        </div>
         <p className='text-center'>
           Already have an account ?{' '}
           <Link

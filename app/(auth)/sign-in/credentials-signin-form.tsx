@@ -1,5 +1,6 @@
 'use client';
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -7,13 +8,27 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { signInDefaultValues } from '@/lib/constants';
 import { signInWithCredentials } from '@/lib/actions/user.actions';
-import { useFormStatus } from 'react-dom';
+import { FieldError } from '@/components/shared/field-error';
+import { EMPTY_FORM_STATE } from '@/types';
 
 const CredentialsSignInForm = () => {
-  const [data, action] = useActionState(signInWithCredentials, {
-    success: false,
-    message: '',
+  const [formState, action] = useActionState(
+    signInWithCredentials,
+    EMPTY_FORM_STATE
+  );
+
+  const [formData, setFormData] = useState({
+    email: signInDefaultValues.email,
+    password: signInDefaultValues.password,
   });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
@@ -46,7 +61,8 @@ const CredentialsSignInForm = () => {
             required
             autoComplete='email'
             className='focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 mt-2'
-            defaultValue={signInDefaultValues.email}
+            value={formData.email}
+            onChange={(e) => handleChange(e)}
           />
         </div>
         <div className='flex flex-col gap-y-2'>
@@ -58,7 +74,8 @@ const CredentialsSignInForm = () => {
             required
             autoComplete='password'
             className='focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'
-            defaultValue={signInDefaultValues.password}
+            value={formData.password}
+            onChange={(e) => handleChange(e)}
           />
           <span className='text-sm'>
             Forgotten your password?{' '}
@@ -70,9 +87,9 @@ const CredentialsSignInForm = () => {
         <div>
           <SignInButton />
         </div>
-        {data && !data.success && (
-          <div className='text-center text-destructive'>{data.message}</div>
-        )}
+        <div className='text-center'>
+          <FieldError formState={formState} name='unknownError' />
+        </div>
         <p className='text-center'>
           Don&apos;t have an account ?{' '}
           <Link

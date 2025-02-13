@@ -5,6 +5,8 @@ import { hashSync } from 'bcrypt-ts-edge';
 import { signIn, signOut, auth } from '@/auth';
 import { signInFormSchema, signUpFormSchema } from '../validators';
 import { prisma } from '@/db/prisma';
+import { FormState } from '@/types';
+import { fromErrorToFormState, toFormState } from '../utils';
 
 export async function signInWithCredentials(
   prevState: unknown,
@@ -18,13 +20,13 @@ export async function signInWithCredentials(
 
     await signIn('credentials', user);
 
-    return { success: true, message: 'Signed in successfully !' };
+    return toFormState('SUCCESS', 'Signed in successfully !');
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    return { success: false, message: 'Invalid email or password' };
+    return fromErrorToFormState(error);
   }
 }
 
@@ -32,7 +34,7 @@ export async function signOutUser() {
   await signOut();
 }
 
-export async function signUpUser(prevState: unknown, formData: FormData) {
+export async function signUpUser(formState: FormState, formData: FormData) {
   try {
     const user = signUpFormSchema.parse({
       name: formData.get('name'),
@@ -58,13 +60,13 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
       password: plainPassword,
     });
 
-    return { success: true, message: 'User registered successfully' };
+    return toFormState('SUCCESS', 'User created successfully');
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    return { success: false, message: 'User was not registered' };
+    return fromErrorToFormState(error);
   }
 }
 
