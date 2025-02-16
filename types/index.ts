@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { insertProductSchema, insertCategorySchema } from '@/lib/validators';
+import {
+  insertProductSchema,
+  insertCategorySchema,
+  cartItemSchema,
+  insertCartSchema,
+} from '@/lib/validators';
 
 export type Product = z.infer<typeof insertProductSchema> & {
   id: string;
@@ -25,3 +30,7 @@ export const EMPTY_FORM_STATE: FormState = {
   fieldErrors: {},
   timestamp: Date.now(),
 };
+
+export type Cart = z.infer<typeof insertCartSchema>;
+
+export type CartItem = z.infer<typeof cartItemSchema>;
