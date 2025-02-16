@@ -58,6 +58,10 @@ export const config = {
     async session({ session, user, trigger, token }: any) {
       // Set the user ID from the token
       session.user.id = token.sub;
+      session.user.role = token.role;
+      session.user.name = token.name;
+
+      console.log('TOKEN', token);
 
       // If there is an update, set the user name
       if (trigger === 'update') {
@@ -65,6 +69,28 @@ export const config = {
       }
 
       return session;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user }: any) {
+      // Assign user fields to the token
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.role = user.role;
+
+        if (user.name === 'NO_NAME') {
+          token.name = user.email!.split('@')[0];
+
+          // Update the database to reflect the token name
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { name: token.name },
+          });
+        }
+      }
+
+      return token;
     },
   },
 } satisfies NextAuthConfig;
