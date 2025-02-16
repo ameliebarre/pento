@@ -14,7 +14,7 @@ export const insertProductSchema = z.object({
   brand: z.string().min(5, 'Brand must be at least 5 characters'),
   description: z.string().min(5, 'Description must be at least 5 characters'),
   stock: z.coerce.number(),
-  images: z.array(z.string()).min(1, 'Product must have at least one image'),
+  image: z.string().min(1, 'Product must have at least one image'),
   isFeatured: z.boolean(),
   price: currency,
   authorImage: z.string(),
@@ -28,3 +28,20 @@ export const insertCategorySchema = z.object({
   authorImage: z.string(),
   authorImageLink: z.string(),
 });
+
+export const signInFormSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string(),
+});
+
+export const signUpFormSchema = z
+  .object({
+    name: z.string().min(5, 'Name must be at least 5 characters'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: `Passwords don't match`,
+    path: ['confirmPassword'],
+  });

@@ -1,10 +1,17 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { APP_NAME } from '@/lib/constants';
 import { ShoppingCart } from 'lucide-react';
-import { UserRoundIcon } from 'lucide-react';
-import Menu from './menu';
-import ButtonLink from '../buttonLink';
+import { APP_NAME } from '@/lib/constants';
+import MobileMenu from './mobile-menu';
+import ButtonLink from '../button-link';
+import UserButton from './user-button';
+
+const navLinks = [
+  { name: 'Products', href: '/products' },
+  { name: 'Who we are', href: '/' },
+  { name: 'Contact', href: '/' },
+];
 
 const Header = () => {
   return (
@@ -12,7 +19,7 @@ const Header = () => {
       <div className='wrapper flex-between'>
         <div className='flex-start gap-3 md:gap-8'>
           <div className='md:hidden'>
-            <Menu />
+            <MobileMenu />
           </div>
           <Link href='/' className='flex-start'>
             <Image
@@ -23,18 +30,15 @@ const Header = () => {
               priority={true}
             />
           </Link>
-          <nav className='hidden md:flex'>
-            <ul className='list-none flex flex-row gap-6'>
-              <li className='hover:underline underline-offset-8'>
-                <Link href='/products'>Products</Link>
-              </li>
-              <li className='hover:underline underline-offset-8'>
-                <Link href='/showcase'>Showcase</Link>
-              </li>
-              <li className='hover:underline underline-offset-8'>
-                <Link href='/contact'>Contact</Link>
-              </li>
-            </ul>
+          <nav className='hidden md:flex md:space-x-8'>
+            {navLinks.map((link) => (
+              <div key={link.name} className='relative group'>
+                <Link href={link.href} className='text-slate-900'>
+                  {link.name}
+                </Link>
+                <div className='absolute left-0 -bottom-1 w-full h-[1.5px] bg-slate-900 scale-x-0 transition-transform duration-300 ease-in-out group-hover:scale-x-100'></div>
+              </div>
+            ))}
           </nav>
         </div>
         <nav className='flex-end flex gap-6'>
@@ -42,9 +46,7 @@ const Header = () => {
             <ShoppingCart className='!w-6 !h-6 md:!w-4 md:!h-4' />
             <span className='hidden md:inline'>Cart</span>
           </ButtonLink>
-          <ButtonLink href='/sign-in' className='hidden md:flex'>
-            <UserRoundIcon /> Sign In
-          </ButtonLink>
+          <UserButton />
         </nav>
       </div>
     </header>
