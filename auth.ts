@@ -1,6 +1,6 @@
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import NextAuth from 'next-auth';
-import type { NextAuthConfig } from 'next-auth';
+import { NextResponse } from 'next/server';
+import NextAuth, { type NextAuthConfig } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compareSync } from 'bcrypt-ts-edge';
 import { prisma } from './db/prisma';
@@ -91,6 +91,31 @@ export const config = {
       }
 
       return token;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async authorized({ request }: any) {
+      // Check for session cart cookie
+      if (!request.cookies.get('sessionCartId')) {
+        // Generate a new cart ID cookie
+        const sessionCartId = crypto.randomUUID();
+
+        // Clone request headers
+        const newRequestHeaders = new Headers(request.headers);
+
+        // Create new response and add the new headers
+        const response = NextResponse.next({
+          request: {
+            headers: newRequestHeaders,
+          },
+        });
+
+        // Set newly generated session cart ID cookie
+        response.cookies.set('sessionCartId', sessionCartId);
+
+        return response;
+      } else {
+        return true;
+      }
     },
   },
 } satisfies NextAuthConfig;
