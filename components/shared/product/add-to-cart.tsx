@@ -19,35 +19,35 @@ const toastConfig: ToastOptions = {
   pauseOnHover: true,
 };
 
+const showToast = (
+  variant: 'success' | 'error',
+  title: string,
+  subTitle: React.ReactNode
+) => {
+  toast(<Toast variant={variant} title={title} subTitle={subTitle} />, {
+    ...toastConfig,
+    className: `custom-toast custom-${variant}-toast`,
+  });
+};
+
 const AddToCart = ({ product }: AddToCartProps) => {
   const [loading, setLoading] = useState(false);
 
-  const showToast = useCallback(
-    (
-      variant: 'success' | 'error',
-      title: string,
-      subTitle: React.ReactNode
-    ) => {
-      toast(<Toast variant={variant} title={title} subTitle={subTitle} />, {
-        ...toastConfig,
-        className: `custom-toast custom-${variant}-toast`,
-      });
-    },
-    []
-  );
-
   const handleAddToCart = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
+    setLoading((prev) => {
+      if (prev) return prev; // Prevent multiple clicks
+      return true;
+    });
 
     try {
       const res = await addItemToCart(product);
-      if (!res.success) {
-        showToast('error', 'Oops! Something went wrong', res.message);
+
+      if (!res?.success) {
+        showToast('error', 'Oops! Something went wrong', res?.message);
       } else {
         showToast(
           'success',
-          'Nice Choice!',
+          res.message,
           <span>
             This item is now in your cart.{' '}
             <Link href='/cart' className='text-slate-900 underline'>
@@ -65,12 +65,13 @@ const AddToCart = ({ product }: AddToCartProps) => {
     } finally {
       setLoading(false);
     }
-  }, [product, loading, showToast]);
+  }, [product]);
 
   return (
     <Button
       className='w-full rounded-full select-none'
       onClick={handleAddToCart}
+      disabled={loading}
     >
       {loading ? 'Adding to cart...' : 'Add to cart'}
     </Button>

@@ -35,3 +35,15 @@ export const EMPTY_FORM_STATE: FormState = {
 export type Cart = z.infer<typeof insertCartSchema>;
 
 export type CartItem = z.infer<typeof cartItemSchema>;
+
+export type CartWithFormattedPrices = Omit<
+  Cart,
+  'itemsPrice' | 'totalPrice' | 'shippingPrice' | 'taxPrice'
+> & {
+  id: string;
+  items: CartItem[];
+  itemsPrice: string;
+  totalPrice: string;
+  shippingPrice: string;
+  taxPrice: string;
+};
