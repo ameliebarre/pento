@@ -3,15 +3,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/lib/actions/product.actions';
 import { cn } from '@/lib/utils';
-import { playfair_display } from '@/app/layout';
-import QuantitySelector from '@/components/shared/quantity-selector';
-import { Button } from '@/components/ui/button';
+import { playfair_display } from '@/lib/fonts';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import AddToCart from '@/components/shared/product/add-to-cart';
 
 type ProductDetailsPageProps = {
   params: Promise<{ slug: string }>;
@@ -73,10 +72,15 @@ const ProductDetailsPage = async (props: ProductDetailsPageProps) => {
           </div>
           <div className='mt-4 text-slate-600'>{product.description}</div>
           <div className='mt-6 flex items-center gap-3'>
-            <QuantitySelector />
-            <Button className='w-full rounded-full select-none'>
-              Add to cart
-            </Button>
+            <AddToCart
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                price: product.price,
+                image: product.image,
+              }}
+            />
           </div>
           <div className='mt-12'>
             <Link

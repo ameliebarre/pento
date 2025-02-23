@@ -1,4 +1,4 @@
-import { playfair_display } from '@/app/layout';
+import { playfair_display } from '@/lib/fonts';
 import { MoveRightIcon } from 'lucide-react';
 import Image from 'next/image';
 

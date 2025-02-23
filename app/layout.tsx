@@ -1,16 +1,8 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { APP_NAME, APP_DESCRIPTION, SERVER_URL } from '@/lib/constants';
 import '@/assets/styles/globals.css';
 import 'tailwindcss/tailwind.css';
-
-export const dm_sans = DM_Sans({
-  subsets: ['latin'],
-});
-
-export const playfair_display = Playfair_Display({
-  subsets: ['latin'],
-});
+import { dm_sans } from '@/lib/fonts';
 
 export const metadata: Metadata = {
   title: {
