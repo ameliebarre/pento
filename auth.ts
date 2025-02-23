@@ -1,9 +1,35 @@
-import { PrismaAdapter } from '@auth/prisma-adapter';
+export const runtime = 'nodejs';
+
 import { NextResponse } from 'next/server';
-import NextAuth, { type NextAuthConfig } from 'next-auth';
+import NextAuth, { type NextAuthConfig, User, Session } from 'next-auth';
+import type { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compareSync } from 'bcrypt-ts-edge';
-import { prisma } from './db/prisma';
+
+interface ExtendedUser extends User {
+  id: string;
+  role: string;
+}
+
+interface ExtendedJWT extends JWT {
+  id?: string;
+  role?: string;
+}
+
+interface ExtendedSession extends Session {
+  user: ExtendedUser;
+}
+
+interface AuthResponse {
+  success: boolean;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    password?: string;
+  };
+}
 
 export const config = {
   pages: {
@@ -14,106 +40,98 @@ export const config = {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       credentials: {
         email: { type: 'email' },
         password: { type: 'password' },
       },
-      async authorize(credentials) {
-        if (credentials === null) {
-          return null;
-        }
+      async authorize(credentials): Promise<ExtendedUser | null> {
+        if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findFirst({
-          where: { email: credentials.email as string },
-        });
-
-        // Check if the user and the password exist
-        if (user && user.password) {
-          const isMatch = compareSync(
-            credentials.password as string,
-            user.password
+        try {
+          // Fetch user from API
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/get-user`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: credentials.email }),
+            }
           );
 
-          // If password is correct return user
-          if (isMatch) {
-            return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              role: user.role,
-            };
+          if (!res.ok) {
+            console.error('Failed to fetch user:', res.statusText);
+            return null;
           }
+
+          const data: AuthResponse = await res.json();
+          if (!data.success || !data.user) return null;
+
+          const { id, name, email, role, password } = data.user;
+
+          // Verify password
+          if (
+            password &&
+            compareSync(credentials.password as string, password)
+          ) {
+            return { id, name, email, role };
+          }
+        } catch (error) {
+          console.error('Error in authorize:', error);
         }
 
-        // If user does not exist or the password does not match, return null
         return null;
       },
     }),
   ],
   callbacks: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async session({ session, user, trigger, token }: any) {
-      // Set the user ID from the token
-      session.user.id = token.sub;
-      session.user.role = token.role;
-      session.user.name = token.name;
-
-      // If there is an update, set the user name
-      if (trigger === 'update') {
-        session.user.name = user.name;
-      }
-
-      return session;
+    async session({ session, token }: { session: Session; token: JWT }) {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub ?? '',
+          role: (token as ExtendedJWT).role ?? 'user',
+          name: (token.name as string) ?? '',
+        },
+      } as ExtendedSession;
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async jwt({ token, user }: any) {
-      // Assign user fields to the token
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.role = user.role;
+        const extendedUser = user as ExtendedUser;
+        token.id = extendedUser.id;
+        token.name = extendedUser.name;
+        token.email = extendedUser.email;
+        token.role = extendedUser.role;
 
-        if (user.name === 'NO_NAME') {
-          token.name = user.email!.split('@')[0];
+        if (extendedUser.name === 'NO_NAME' && extendedUser.email) {
+          token.name = extendedUser.email.split('@')[0];
 
-          // Update the database to reflect the token name
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { name: token.name },
-          });
+          await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/update-user`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: extendedUser.id, name: token.name }),
+            }
+          ).catch((error) => console.error('Error updating user:', error));
         }
       }
-
-      return token;
+      return token as ExtendedJWT;
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async authorized({ request }: any) {
-      // Check for session cart cookie
-      if (!request.cookies.get('sessionCartId')) {
-        // Generate a new cart ID cookie
-        const sessionCartId = crypto.randomUUID();
+    async authorized({ request }: { request: Request }) {
+      const cookies = request.headers.get('cookie') || '';
+      const sessionCartId = cookies.includes('sessionCartId');
 
-        // Clone request headers
-        const newRequestHeaders = new Headers(request.headers);
-
-        // Create new response and add the new headers
-        const response = NextResponse.next({
-          request: {
-            headers: newRequestHeaders,
-          },
-        });
-
-        // Set newly generated session cart ID cookie
-        response.cookies.set('sessionCartId', sessionCartId);
-
+      if (!sessionCartId) {
+        const newCartId = crypto.randomUUID();
+        const response = NextResponse.next();
+        response.cookies.set('sessionCartId', newCartId);
         return response;
-      } else {
-        return true;
       }
+
+      return true;
     },
   },
 } satisfies NextAuthConfig;
