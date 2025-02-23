@@ -35,7 +35,7 @@ export async function addItemToCart(productItem: CartItem) {
     if (!session) throw new Error('User not authenticated');
 
     const userId = session.user?.id as string | undefined;
-    const cart = await getMyCart();
+    const cart = await getCart();
     const addedProduct = cartItemSchema.parse(productItem);
 
     // Find product in database
@@ -55,6 +55,7 @@ export async function addItemToCart(productItem: CartItem) {
       await prisma.cart.create({ data: newCart });
 
       revalidatePath(`/product/${product.slug}`);
+
       return {
         success: true,
         message: 'Product was successfully added to cart',
@@ -125,9 +126,7 @@ export async function addItemToCart(productItem: CartItem) {
   }
 }
 
-export async function getMyCart(): Promise<
-  CartWithFormattedPrices | undefined
-> {
+export async function getCart(): Promise<CartWithFormattedPrices | undefined> {
   const sessionCartId = (await cookies()).get('sessionCartId')?.value;
 
   if (!sessionCartId) {
@@ -163,7 +162,7 @@ export async function removeItemFromCart(productId: string) {
     if (!sessionCartId) throw new Error('Cart session not found');
 
     // Get the user's cart
-    const cart = await getMyCart();
+    const cart = await getCart();
     if (!cart) {
       throw new Error('Cart not found');
     }

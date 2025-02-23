@@ -15,7 +15,7 @@ export type Product = z.infer<typeof insertProductSchema> & {
 
 export type Category = z.infer<typeof insertCategorySchema> & {
   id: string;
-  createdAt: Date;
+  createdAt?: Date;
 };
 
 export type FormState = {

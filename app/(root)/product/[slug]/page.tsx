@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/lib/actions/product.actions';
 import { cn } from '@/lib/utils';
-import { playfair_display } from '@/app/layout';
-import QuantitySelector from '@/components/shared/quantity-selector';
+import { playfair_display } from '@/lib/fonts';
 import {
   Accordion,
   AccordionContent,
@@ -73,14 +72,12 @@ const ProductDetailsPage = async (props: ProductDetailsPageProps) => {
           </div>
           <div className='mt-4 text-slate-600'>{product.description}</div>
           <div className='mt-6 flex items-center gap-3'>
-            <QuantitySelector />
             <AddToCart
               product={{
-                productId: product.id,
+                id: product.id,
                 name: product.name,
                 slug: product.slug,
                 price: product.price,
-                quantity: 1,
                 image: product.image,
               }}
             />

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { playfair_display } from '@/app/layout';
+import { playfair_display } from '@/lib/fonts';
 import { auth } from '@/auth';
 import SignUpForm from './sign-up-form';
 
