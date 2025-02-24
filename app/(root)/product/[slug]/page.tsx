@@ -72,15 +72,7 @@ const ProductDetailsPage = async (props: ProductDetailsPageProps) => {
           </div>
           <div className='mt-4 text-slate-600'>{product.description}</div>
           <div className='mt-6 flex items-center gap-3'>
-            <AddToCart
-              product={{
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                price: product.price,
-                image: product.image,
-              }}
-            />
+            <AddToCart product={product} />
           </div>
           <div className='mt-12'>
             <Link

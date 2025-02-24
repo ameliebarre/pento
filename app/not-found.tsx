@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import Header from '@/components/shared/header';
+import Header from '@/components/shared/header/header';
 import Footer from '@/components/footer';
 
 const NotFoundPage = () => {

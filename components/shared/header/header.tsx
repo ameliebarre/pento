@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 import { APP_NAME } from '@/lib/constants';
 import MobileMenu from './mobile-menu';
-import ButtonLink from '../button-link';
 import UserButton from './user-button';
+import Cart from '@/components/shared/cart';
 
 const navLinks = [
   { name: 'Products', href: '/products' },
@@ -41,11 +41,16 @@ const Header = () => {
             ))}
           </nav>
         </div>
-        <nav className='flex-end flex gap-6'>
-          <ButtonLink href='/cart'>
-            <ShoppingCart className='!w-6 !h-6 md:!w-4 md:!h-4' />
-            <span className='hidden md:inline'>Cart</span>
-          </ButtonLink>
+        <nav className='flex-end flex gap-8 items-center'>
+          <Cart
+            className='cursor-pointer text-bg-slate-900'
+            triggerElement={
+              <ShoppingCart
+                className='w-6 h-6 md:w-6 md:h-6'
+                strokeWidth={1.5}
+              />
+            }
+          />
           <UserButton />
         </nav>
       </div>

@@ -1,5 +1,5 @@
 import Footer from '@/components/footer';
-import Header from '@/components/shared/header';
+import Header from '@/components/shared/header/header';
 
 export default function AuthLayout({
   children,

@@ -73,7 +73,7 @@ export async function addItemToCart(productItem: CartItem) {
 
       await prisma.cart.create({ data: newCart });
 
-      revalidatePath(`/product/${product.slug}`);
+      revalidatePath(`/`);
 
       return {
         success: true,

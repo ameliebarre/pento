@@ -1,5 +1,5 @@
 import Footer from '@/components/footer';
-import Header from '@/components/shared/header';
+import Header from '@/components/shared/header/header';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

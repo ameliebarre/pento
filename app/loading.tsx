@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import loader from '@/assets/loader.gif';
-import Header from '@/components/shared/header';
+import Header from '@/components/shared/header/header';
 import Footer from '@/components/footer';
 
 const LoadingPage = () => {

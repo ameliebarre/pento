@@ -1,24 +1,28 @@
 'use client';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import QuantitySelector from '@/components/shared/quantity-selector';
 import AddToCartButton from '@/components/shared/product/add-to-cart-button';
+import { Product } from '@/types';
 
-interface ProductActionsProps {
-  product: {
-    id: string;
-    name: string;
-    slug: string;
-    price: string;
-    image: string;
-  };
-}
-
-const AddToCart = ({ product }: ProductActionsProps) => {
+const AddToCart = ({ product }: { product: Product }) => {
   const [quantity, setQuantity] = useState(1);
+  const minQuantity = 1;
+
+  const increment = useCallback(() => {
+    setQuantity((prev) => Math.min(prev + 1, product.stock));
+  }, [product.stock]);
+
+  const decrement = useCallback(() => {
+    setQuantity((prev) => Math.max(prev - 1, minQuantity));
+  }, [minQuantity]);
 
   return (
     <div className='w-full mt-6 flex items-center gap-3'>
-      <QuantitySelector quantity={quantity} onQuantityChange={setQuantity} />
+      <QuantitySelector
+        quantity={quantity}
+        increment={increment}
+        decrement={decrement}
+      />
       <AddToCartButton
         product={{
           productId: product.id,

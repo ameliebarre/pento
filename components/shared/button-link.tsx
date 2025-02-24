@@ -8,6 +8,7 @@ type ButtonLinkProps = {
   className?: string;
   fontSize?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   fontWeight?: 'normal' | 'bold';
+  variant?: 'default' | 'ghost' | 'outline' | 'secondary' | 'destructive';
 };
 
 const ButtonLink = ({
@@ -16,6 +17,7 @@ const ButtonLink = ({
   className,
   fontSize = 'md',
   fontWeight = 'normal',
+  variant = 'ghost',
 }: ButtonLinkProps) => {
   const size =
     fontSize === 'sm'
@@ -31,7 +33,7 @@ const ButtonLink = ({
   return (
     <Button
       asChild
-      variant='ghost'
+      variant={variant}
       className={cn(
         'p-0 hover:bg-transparent flex items-center gap-2 font-normal',
         size,
