@@ -29,7 +29,7 @@ export function formatNumberWithDecimal(num: number): string {
 /**
  * Format errors
  */
-export async function fromErrorToFormState(error: unknown) {
+export async function formatErrorMessage(error: unknown) {
   if (error instanceof ZodError) {
     return {
       status: 'ERROR' as const,
@@ -71,7 +71,10 @@ export async function fromErrorToFormState(error: unknown) {
   };
 }
 
-export function toFormState(status: 'SUCCESS' | 'ERROR', message: string) {
+export function returnErrorMessage(
+  status: 'SUCCESS' | 'ERROR',
+  message: string
+) {
   return {
     status,
     message,

@@ -1,35 +1,9 @@
 export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
-import NextAuth, { type NextAuthConfig, User, Session } from 'next-auth';
-import type { JWT } from 'next-auth/jwt';
+import NextAuth, { type NextAuthConfig } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compareSync } from 'bcrypt-ts-edge';
-
-interface ExtendedUser extends User {
-  id: string;
-  role: string;
-}
-
-interface ExtendedJWT extends JWT {
-  id?: string;
-  role?: string;
-}
-
-interface ExtendedSession extends Session {
-  user: ExtendedUser;
-}
-
-interface AuthResponse {
-  success: boolean;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    password?: string;
-  };
-}
 
 export const config = {
   pages: {
@@ -46,7 +20,7 @@ export const config = {
         email: { type: 'email' },
         password: { type: 'password' },
       },
-      async authorize(credentials): Promise<ExtendedUser | null> {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
         try {
@@ -65,7 +39,7 @@ export const config = {
             return null;
           }
 
-          const data: AuthResponse = await res.json();
+          const data = await res.json();
           if (!data.success || !data.user) return null;
 
           const { id, name, email, role, password } = data.user;
@@ -86,41 +60,40 @@ export const config = {
     }),
   ],
   callbacks: {
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
           id: token.sub ?? '',
-          role: (token as ExtendedJWT).role ?? 'user',
+          role: (token.role as string) ?? 'user',
           name: (token.name as string) ?? '',
         },
-      } as ExtendedSession;
+      };
     },
-    async jwt({ token, user }: { token: JWT; user?: User }) {
+    async jwt({ token, user }) {
       if (user) {
-        const extendedUser = user as ExtendedUser;
-        token.id = extendedUser.id;
-        token.name = extendedUser.name;
-        token.email = extendedUser.email;
-        token.role = extendedUser.role;
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.role = user.role;
 
-        if (extendedUser.name === 'NO_NAME' && extendedUser.email) {
-          token.name = extendedUser.email.split('@')[0];
+        if (user.name === 'NO_NAME' && user.email) {
+          token.name = user.email.split('@')[0];
 
           await fetch(
             `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/update-user`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: extendedUser.id, name: token.name }),
+              body: JSON.stringify({ id: user.id, name: token.name }),
             }
           ).catch((error) => console.error('Error updating user:', error));
         }
       }
-      return token as ExtendedJWT;
+      return token;
     },
-    async authorized({ request }: { request: Request }) {
+    async authorized({ request }) {
       const cookies = request.headers.get('cookie') || '';
       const sessionCartId = cookies.includes('sessionCartId');
 

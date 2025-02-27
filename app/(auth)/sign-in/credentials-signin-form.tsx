@@ -1,19 +1,18 @@
 'use client';
 import { useActionState, useState } from 'react';
-import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { signInDefaultValues } from '@/lib/constants';
-import { signInWithCredentials } from '@/lib/actions/user.actions';
+import { signInUser } from '@/lib/actions/user.actions';
 import { FieldError } from '@/components/shared/field-error';
 import { EMPTY_FORM_STATE } from '@/types';
 
 const CredentialsSignInForm = () => {
-  const [formState, action] = useActionState(
-    signInWithCredentials,
+  const [formState, action, isPending] = useActionState(
+    signInUser,
     EMPTY_FORM_STATE
   );
 
@@ -33,19 +32,15 @@ const CredentialsSignInForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  const SignInButton = () => {
-    const { pending } = useFormStatus();
-
-    return (
-      <Button
-        disabled={pending}
-        className='uppercase w-full font-medium tracking-wide'
-        variant='default'
-      >
-        {pending ? 'Signing In...' : 'Sign In'}
-      </Button>
-    );
-  };
+  const SignInButton = () => (
+    <Button
+      disabled={isPending}
+      className='uppercase w-full font-medium tracking-wide'
+      variant='default'
+    >
+      {isPending ? 'Signing In...' : 'Sign In'}
+    </Button>
+  );
 
   return (
     <form action={action}>
