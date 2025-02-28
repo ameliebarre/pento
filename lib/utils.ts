@@ -3,6 +3,17 @@ import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { ZodError } from 'zod';
 
+type ErrorResponse = {
+  status: 'ERROR';
+  message: string;
+  fieldErrors: Record<string, string[]>;
+  timestamp: number;
+};
+
+type AuthError = {
+  type: string;
+};
+
 /**
  * Merge class names
  */
@@ -27,40 +38,74 @@ export function formatNumberWithDecimal(num: number): string {
 }
 
 /**
- * Format errors
+ * Handles Zod validation errors.
  */
-export async function formatErrorMessage(error: unknown) {
-  if (error instanceof ZodError) {
+function handleZodError(error: ZodError): ErrorResponse {
+  return {
+    status: 'ERROR',
+    message: '',
+    fieldErrors: error.flatten().fieldErrors as Record<string, string[]>,
+    timestamp: Date.now(),
+  };
+}
+
+/**
+ * Handles known Prisma errors.
+ */
+function handlePrismaError(
+  error: Prisma.PrismaClientKnownRequestError
+): ErrorResponse {
+  if (error.code === 'P2002') {
     return {
-      status: 'ERROR' as const,
-      message: '',
-      fieldErrors: error.flatten().fieldErrors,
+      status: 'ERROR',
+      message: 'A user with this email already exists.',
+      fieldErrors: {
+        email: ['It seems this email is already taken. Try to sign instead.'],
+      },
       timestamp: Date.now(),
     };
-  } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === 'P2002') {
+  }
+
+  return handleUnknownError();
+}
+
+/**
+ * Handles authentication errors (e.g., from NextAuth).
+ */
+function handleAuthError(error: unknown): ErrorResponse {
+  const errorMessages: Record<string, string> = {
+    CredentialsSignin:
+      'The email or password you entered is incorrect. Please try again.',
+    AccessDenied:
+      'You do not have permission to access this account. Try with another one.',
+    OAuthAccountNotLinked:
+      'This email is linked to another sign-in method. Use the correct provider.',
+    MissingCredentials: 'Please enter both email and password.',
+    Verification:
+      'Your verification link has expired. Please request a new one.',
+  };
+
+  if (typeof error === 'object' && error !== null && 'type' in error) {
+    const authError = error as AuthError;
+    if (authError.type in errorMessages) {
       return {
-        status: 'ERROR' as const,
-        message: 'A user with this email already exists.',
-        fieldErrors: { email: ['Email is already taken'] }, // Attach error to the email field
-        timestamp: Date.now(),
-      };
-    } else {
-      return {
-        status: 'ERROR' as const,
-        message: `Database error: ${error.message}`,
-        fieldErrors: {
-          unknownErrors: [
-            'It seems like there was an error. Please try again later.',
-          ],
-        },
+        status: 'ERROR',
+        message: errorMessages[authError.type],
+        fieldErrors: { credentials: [errorMessages[authError.type]] },
         timestamp: Date.now(),
       };
     }
   }
 
+  return handleUnknownError();
+}
+
+/**
+ * Handles unknown errors.
+ */
+function handleUnknownError(): ErrorResponse {
   return {
-    status: 'ERROR' as const,
+    status: 'ERROR',
     message: 'An unknown error occurred',
     fieldErrors: {
       unknownError: [
@@ -69,6 +114,28 @@ export async function formatErrorMessage(error: unknown) {
     },
     timestamp: Date.now(),
   };
+}
+
+/**
+ * Main function to format error messages.
+ */
+export async function formatErrorMessage(
+  error: unknown
+): Promise<ErrorResponse> {
+  console.log('ERROR !!!', error);
+  if (error instanceof Error) {
+    return handleAuthError(error);
+  }
+
+  if (error instanceof ZodError) {
+    return handleZodError(error);
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return handlePrismaError(error);
+  }
+
+  return handleUnknownError();
 }
 
 export function returnErrorMessage(

@@ -88,36 +88,13 @@
   }
 }
 
-.custom-toast {
-  background: white !important;
-  border-radius: 8px !important;
-  height: 90px;
-}
 
-.custom-success-toast {
-  border: 1px solid #0f172a !important;
-}
 
-.custom-error-toast {
-  border: 1px solid #dc2626 !important;
-}
-
-/* Override all progress bar related styles */
-.custom-success-toast .Toastify__progress-bar,
-.custom-success-toast .Toastify__progress-bar--animated,
-.custom-success-toast .Toastify__progress-bar--controlled,
-.custom-success-toast .Toastify__progress-bar-theme--light {
-  background: #0f172a !important;
-}
-
-.custom-error-toast .Toastify__progress-bar,
-.custom-error-toast .Toastify__progress-bar--animated,
-.custom-error-toast .Toastify__progress-bar--controlled,
-.custom-error-toast .Toastify__progress-bar-theme--light {
-  background: #dc2626 !important;
-}
-
-/* Add styles for close button */
-.custom-toast .Toastify__close-button {
-  display: none;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

@@ -84,6 +84,7 @@ const CredentialsSignInForm = () => {
         </div>
         <div className='text-center'>
           <FieldError formState={formState} name='unknownError' />
+          <FieldError formState={formState} name='credentials' />
         </div>
         <p className='text-center'>
           Don&apos;t have an account ?{' '}

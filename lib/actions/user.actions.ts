@@ -17,7 +17,7 @@ export async function signInUser(formState: unknown, formData: FormData) {
     await signIn('credentials', user);
 
     return returnErrorMessage('SUCCESS', 'Signed in successfully !');
-  } catch (error) {
+  } catch (error: unknown) {
     if (isRedirectError(error)) {
       throw error;
     }
