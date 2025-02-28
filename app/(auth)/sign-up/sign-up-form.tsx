@@ -1,6 +1,5 @@
 'use client';
 import { useActionState, useState } from 'react';
-import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
@@ -12,7 +11,10 @@ import { FieldError } from '@/components/shared/field-error';
 import { EMPTY_FORM_STATE } from '@/types';
 
 const SignUpForm = () => {
-  const [formState, action] = useActionState(signUpUser, EMPTY_FORM_STATE);
+  const [formState, action, isPending] = useActionState(
+    signUpUser,
+    EMPTY_FORM_STATE
+  );
 
   const [formData, setFormData] = useState({
     name: signUpDefaultValues.name,
@@ -32,19 +34,15 @@ const SignUpForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
-  const SignUpButton = () => {
-    const { pending } = useFormStatus();
-
-    return (
-      <Button
-        disabled={pending}
-        className='uppercase w-full font-medium tracking-wide'
-        variant='default'
-      >
-        {pending ? 'Submitting...' : 'Sign Up'}
-      </Button>
-    );
-  };
+  const SignUpButton = () => (
+    <Button
+      disabled={isPending}
+      className='uppercase w-full font-medium tracking-wide'
+      variant='default'
+    >
+      {isPending ? 'Submitting...' : 'Sign Up'}
+    </Button>
+  );
 
   return (
     <form action={action}>
