@@ -22,14 +22,12 @@ export type FormState = {
   status: 'ERROR' | 'SUCCESS' | 'UNSET';
   message: string;
   fieldErrors: Record<string, string[]>;
-  timestamp: number;
 };
 
 export const EMPTY_FORM_STATE: FormState = {
   status: 'UNSET',
   message: '',
   fieldErrors: {},
-  timestamp: Date.now(),
 };
 
 export type Cart = z.infer<typeof insertCartSchema>;

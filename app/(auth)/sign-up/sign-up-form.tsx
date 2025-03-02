@@ -107,6 +107,9 @@ const SignUpForm = () => {
         </div>
         <div className='text-center pt-2'>
           <FieldError formState={formState} name='unknownError' />
+          {formState.status === 'ERROR' ? (
+            <FieldError formState={formState} name='customMessage' />
+          ) : null}
         </div>
         <p className='text-center'>
           Already have an account ?{' '}

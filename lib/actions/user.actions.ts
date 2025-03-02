@@ -5,7 +5,7 @@ import { signIn, signOut, auth } from '@/auth';
 import { signInFormSchema, signUpFormSchema } from '../validators';
 import { prisma } from '@/db/prisma';
 import { FormState } from '@/types';
-import { formatErrorMessage, returnErrorMessage } from '../utils';
+import { formatErrorMessage, returnCustomMessage } from '../utils';
 
 export async function signInUser(formState: unknown, formData: FormData) {
   try {
@@ -16,7 +16,7 @@ export async function signInUser(formState: unknown, formData: FormData) {
 
     await signIn('credentials', user);
 
-    return returnErrorMessage('SUCCESS', 'Signed in successfully !');
+    return returnCustomMessage('SUCCESS', 'Signed in successfully !');
   } catch (error: unknown) {
     if (isRedirectError(error)) {
       throw error;
@@ -52,7 +52,7 @@ export async function signUpUser(formState: FormState, formData: FormData) {
       password: plainPassword,
     });
 
-    return returnErrorMessage('SUCCESS', 'User created successfully');
+    return returnCustomMessage('SUCCESS', 'User created successfully');
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;

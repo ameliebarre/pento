@@ -7,7 +7,6 @@ type ErrorResponse = {
   status: 'ERROR';
   message: string;
   fieldErrors: Record<string, string[]>;
-  timestamp: number;
 };
 
 type AuthError = {
@@ -45,7 +44,6 @@ function handleZodError(error: ZodError): ErrorResponse {
     status: 'ERROR',
     message: '',
     fieldErrors: error.flatten().fieldErrors as Record<string, string[]>,
-    timestamp: Date.now(),
   };
 }
 
@@ -62,7 +60,6 @@ function handlePrismaError(
       fieldErrors: {
         email: ['It seems this email is already taken. Try to sign instead.'],
       },
-      timestamp: Date.now(),
     };
   }
 
@@ -92,7 +89,6 @@ function handleAuthError(error: unknown): ErrorResponse {
         status: 'ERROR',
         message: errorMessages[authError.type],
         fieldErrors: { credentials: [errorMessages[authError.type]] },
-        timestamp: Date.now(),
       };
     }
   }
@@ -112,7 +108,6 @@ function handleUnknownError(): ErrorResponse {
         'It seems like there was an error. Please try again later.',
       ],
     },
-    timestamp: Date.now(),
   };
 }
 
@@ -122,33 +117,42 @@ function handleUnknownError(): ErrorResponse {
 export async function formatErrorMessage(
   error: unknown
 ): Promise<ErrorResponse> {
-  console.log('ERROR !!!', error);
-  if (error instanceof Error) {
-    return handleAuthError(error);
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    return handlePrismaError(error);
+  }
+
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'status' in error &&
+    'message' in error
+  ) {
+    return error as ErrorResponse;
   }
 
   if (error instanceof ZodError) {
     return handleZodError(error);
   }
 
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    return handlePrismaError(error);
+  if (error instanceof Error) {
+    return handleAuthError(error);
   }
 
   return handleUnknownError();
 }
 
-export function returnErrorMessage(
+export const returnCustomMessage = (
   status: 'SUCCESS' | 'ERROR',
   message: string
-) {
+) => {
   return {
     status,
     message,
-    fieldErrors: {},
-    timestamp: Date.now(),
+    fieldErrors: {
+      customMessage: [message],
+    },
   };
-}
+};
 
 /**
  * Round number to 2 decimal places
