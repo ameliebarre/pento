@@ -1,53 +1,25 @@
-export const runtime = 'nodejs';
-
-import { NextResponse } from 'next/server';
-import NextAuth, { type NextAuthConfig, User, Session } from 'next-auth';
-import type { JWT } from 'next-auth/jwt';
+import NextAuth from 'next-auth';
+import { NextAuthConfig } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compareSync } from 'bcrypt-ts-edge';
+import { NextResponse } from 'next/server';
+import Google from 'next-auth/providers/google';
 
-interface ExtendedUser extends User {
-  id: string;
-  role: string;
-}
-
-interface ExtendedJWT extends JWT {
-  id?: string;
-  role?: string;
-}
-
-interface ExtendedSession extends Session {
-  user: ExtendedUser;
-}
-
-interface AuthResponse {
-  success: boolean;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-    password?: string;
-  };
-}
-
-export const config = {
-  pages: {
-    signIn: '/sign-in',
-    error: '/sign-in',
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
+const config = {
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
     CredentialsProvider({
       credentials: {
         email: { type: 'email' },
         password: { type: 'password' },
       },
-      async authorize(credentials): Promise<ExtendedUser | null> {
-        if (!credentials?.email || !credentials?.password) return null;
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Email and password are required');
+        }
 
         try {
           // Fetch user from API
@@ -61,66 +33,74 @@ export const config = {
           );
 
           if (!res.ok) {
-            console.error('Failed to fetch user:', res.statusText);
-            return null;
+            throw new Error('Failed to fetch user data');
           }
 
-          const data: AuthResponse = await res.json();
-          if (!data.success || !data.user) return null;
+          let data;
+          try {
+            data = await res.json();
+          } catch {
+            throw new Error('Invalid response from authentication server');
+          }
+
+          if (!data?.success || !data?.user) {
+            throw new Error('Invalid email or password');
+          }
 
           const { id, name, email, role, password } = data.user;
 
           // Verify password
           if (
-            password &&
-            compareSync(credentials.password as string, password)
+            !password ||
+            !compareSync(credentials.password as string, password)
           ) {
-            return { id, name, email, role };
+            throw new Error('Invalid email or password');
           }
-        } catch (error) {
-          console.error('Error in authorize:', error);
-        }
 
-        return null;
+          return { id, name, email, role };
+        } catch {
+          throw new Error('Authentication failed');
+        }
       },
     }),
   ],
   callbacks: {
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token }) {
+      console.log('token', token);
+      console.log('session', session);
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.sub ?? '',
-          role: (token as ExtendedJWT).role ?? 'user',
+          id: token.sub,
+          role: (token.role as string) ?? 'user',
           name: (token.name as string) ?? '',
         },
-      } as ExtendedSession;
+      };
     },
-    async jwt({ token, user }: { token: JWT; user?: User }) {
+    async jwt({ token, user }) {
       if (user) {
-        const extendedUser = user as ExtendedUser;
-        token.id = extendedUser.id;
-        token.name = extendedUser.name;
-        token.email = extendedUser.email;
-        token.role = extendedUser.role;
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.role = user.role;
 
-        if (extendedUser.name === 'NO_NAME' && extendedUser.email) {
-          token.name = extendedUser.email.split('@')[0];
+        if (user.name === 'NO_NAME' && user.email) {
+          token.name = user.email.split('@')[0];
 
           await fetch(
             `${process.env.NEXT_PUBLIC_SERVER_URL}/api/auth/update-user`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: extendedUser.id, name: token.name }),
+              body: JSON.stringify({ id: user.id, name: token.name }),
             }
           ).catch((error) => console.error('Error updating user:', error));
         }
       }
-      return token as ExtendedJWT;
+      return token;
     },
-    async authorized({ request }: { request: Request }) {
+    async authorized({ request }) {
       const cookies = request.headers.get('cookie') || '';
       const sessionCartId = cookies.includes('sessionCartId');
 

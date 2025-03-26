@@ -1,17 +1,13 @@
 'use server';
-
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { hashSync } from 'bcrypt-ts-edge';
 import { signIn, signOut, auth } from '@/auth';
 import { signInFormSchema, signUpFormSchema } from '../validators';
 import { prisma } from '@/db/prisma';
 import { FormState } from '@/types';
-import { fromErrorToFormState, toFormState } from '../utils';
+import { formatErrorMessage, returnCustomMessage } from '../utils';
 
-export async function signInWithCredentials(
-  prevState: unknown,
-  formData: FormData
-) {
+export async function signInUser(formState: unknown, formData: FormData) {
   try {
     const user = signInFormSchema.parse({
       email: formData.get('email'),
@@ -20,18 +16,14 @@ export async function signInWithCredentials(
 
     await signIn('credentials', user);
 
-    return toFormState('SUCCESS', 'Signed in successfully !');
-  } catch (error) {
+    return returnCustomMessage('SUCCESS', 'Signed in successfully !');
+  } catch (error: unknown) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    return fromErrorToFormState(error);
+    return formatErrorMessage(error);
   }
-}
-
-export async function signOutUser() {
-  await signOut();
 }
 
 export async function signUpUser(formState: FormState, formData: FormData) {
@@ -60,14 +52,18 @@ export async function signUpUser(formState: FormState, formData: FormData) {
       password: plainPassword,
     });
 
-    return toFormState('SUCCESS', 'User created successfully');
+    return returnCustomMessage('SUCCESS', 'User created successfully');
   } catch (error) {
     if (isRedirectError(error)) {
       throw error;
     }
 
-    return fromErrorToFormState(error);
+    return formatErrorMessage(error);
   }
+}
+
+export async function signOutUser() {
+  await signOut();
 }
 
 export const getSession = async () => {
