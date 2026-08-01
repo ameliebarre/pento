@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Geist_Mono } from "next/font/google";
+import { DM_Sans, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
@@ -14,6 +14,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Pento",
   description: "Boutique en ligne construite avec Next.js, Prisma et Tailwind.",
@@ -25,10 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={`${dmSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">
+    <html
+      lang="fr"
+      className={`${dmSans.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <SiteHeader />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4">{children}</main>
       </body>
     </html>
   );
