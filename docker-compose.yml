@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pento
+      POSTGRES_PASSWORD: pento
+      POSTGRES_DB: pento_dev
+    ports:
+      - "5434:5432"
+    volumes:
+      - pento_db_data:/var/lib/postgresql/data
+
+volumes:
+  pento_db_data:
