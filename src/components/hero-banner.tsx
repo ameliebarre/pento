@@ -23,7 +23,7 @@ export function HeroBanner() {
           </p>
           <Link
             href="/products"
-            className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-black"
+            className="group inline-flex items-center gap-2 rounded-[6px] bg-white px-6 py-3 text-sm font-medium text-black"
           >
             Shop now
             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />

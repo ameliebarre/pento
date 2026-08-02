@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const CATEGORIES = [
   { label: "Sofas", slug: "sofas", image: "/images/sofa.png" },
@@ -12,10 +13,7 @@ const CATEGORIES = [
 export function ShopByCategory() {
   return (
     <section className="flex flex-col items-start gap-6 py-16">
-      <div className="relative inline-block pb-2">
-        <h2 className="text-md font-bold uppercase">Shop by categories</h2>
-        <span className="bg-foreground absolute bottom-0 left-0 h-[1.5] w-[190%]" />
-      </div>
+      <h2 className="font-heading text-2xl font-semibold">Shop by categories</h2>
       <div className="flex w-full flex-col gap-4 sm:flex-row">
         {CATEGORIES.map((category) => (
           <Link
@@ -31,6 +29,11 @@ export function ShopByCategory() {
                 sizes="(min-width: 640px) 20vw, 100vw"
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 text-sm text-white">
+                {category.label}
+                <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </span>
             </div>
           </Link>
         ))}
