@@ -1,6 +1,7 @@
 import { HeroBanner } from "@/components/hero-banner";
 import { ShopByCategory } from "@/components/shop-by-category";
 import { DesignerSpotlight } from "@/components/designer-spotlight";
+import { BrowseByMovement } from "@/components/browse-by-movement";
 
 export default async function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default async function HomePage() {
       <HeroBanner />
       <ShopByCategory />
       <DesignerSpotlight />
+      <BrowseByMovement />
     </div>
   );
 }

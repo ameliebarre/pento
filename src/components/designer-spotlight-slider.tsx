@@ -98,7 +98,7 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
               </div>
             </div>
             <div className="flex w-full items-center justify-between gap-4">
-              <p className="text-muted-foreground max-w-md text-sm">{slide.description}</p>
+              <p className="text-muted-foreground text-md max-w-md">{slide.description}</p>
               <div className="flex shrink-0 items-center gap-1">
                 <Button
                   type="button"
