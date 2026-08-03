@@ -12,6 +12,10 @@ vi.mock("next-auth", () => ({
   AuthError: class AuthError extends Error {},
 }));
 
+vi.mock("@/lib/email", () => ({
+  sendPasswordResetEmail: vi.fn(),
+}));
+
 import { signIn } from "@/auth";
 import {
   loginAction,
@@ -19,12 +23,15 @@ import {
   resetPasswordAction,
   signupAction,
 } from "@/actions/auth";
+import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
 const mockedSignIn = vi.mocked(signIn);
+const mockedSendPasswordResetEmail = vi.mocked(sendPasswordResetEmail);
 
 beforeEach(() => {
   mockedSignIn.mockReset();
+  mockedSendPasswordResetEmail.mockReset();
 });
 
 async function createUser(email: string, password = "oldpassword123") {
@@ -42,19 +49,22 @@ describe("requestPasswordResetAction", () => {
     const state = await requestPasswordResetAction(undefined, formData);
 
     expect(state?.error).toBeDefined();
-    expect(state?.resetUrl).toBeUndefined();
+    expect(state?.success).toBeUndefined();
+    expect(mockedSendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
-  it("returns an error when no account matches the email", async () => {
+  it("returns a generic success and sends no email when no account matches", async () => {
     const formData = new FormData();
     formData.set("email", "unknown@example.com");
 
     const state = await requestPasswordResetAction(undefined, formData);
 
-    expect(state?.error).toBe("Aucun compte associé à cet email.");
+    expect(state?.success).toBe(true);
+    expect(state?.error).toBeUndefined();
+    expect(mockedSendPasswordResetEmail).not.toHaveBeenCalled();
   });
 
-  it("creates a verification token and returns a reset url for a known email", async () => {
+  it("creates a verification token and emails a reset link for a known email", async () => {
     const user = await createUser("known@example.com");
     const formData = new FormData();
     formData.set("email", user.email!);
@@ -62,9 +72,14 @@ describe("requestPasswordResetAction", () => {
     const state = await requestPasswordResetAction(undefined, formData);
 
     expect(state?.error).toBeUndefined();
-    expect(state?.resetUrl).toMatch(/^\/reset-password\?token=.+/);
+    expect(state?.success).toBe(true);
+    expect(mockedSendPasswordResetEmail).toHaveBeenCalledTimes(1);
 
-    const token = state!.resetUrl!.split("token=")[1];
+    const [emailedTo, resetUrl] = mockedSendPasswordResetEmail.mock.calls[0];
+    expect(emailedTo).toBe(user.email);
+    expect(resetUrl).toMatch(/^\/reset-password\?token=.+/);
+
+    const token = resetUrl.split("token=")[1];
     const stored = await prisma.verificationToken.findUnique({ where: { token } });
     expect(stored?.identifier).toBe(user.email);
     expect(stored?.expires.getTime()).toBeGreaterThan(Date.now());
@@ -75,11 +90,12 @@ describe("requestPasswordResetAction", () => {
     const formData = new FormData();
     formData.set("email", user.email!);
 
-    const first = await requestPasswordResetAction(undefined, formData);
-    const second = await requestPasswordResetAction(undefined, formData);
+    await requestPasswordResetAction(undefined, formData);
+    await requestPasswordResetAction(undefined, formData);
 
-    const firstToken = first!.resetUrl!.split("token=")[1];
-    const secondToken = second!.resetUrl!.split("token=")[1];
+    expect(mockedSendPasswordResetEmail).toHaveBeenCalledTimes(2);
+    const firstToken = mockedSendPasswordResetEmail.mock.calls[0][1].split("token=")[1];
+    const secondToken = mockedSendPasswordResetEmail.mock.calls[1][1].split("token=")[1];
 
     expect(firstToken).not.toBe(secondToken);
     await expect(
@@ -88,6 +104,18 @@ describe("requestPasswordResetAction", () => {
     await expect(
       prisma.verificationToken.findUnique({ where: { token: secondToken } }),
     ).resolves.not.toBeNull();
+  });
+
+  it("returns an error and does not crash when the email fails to send", async () => {
+    mockedSendPasswordResetEmail.mockRejectedValueOnce(new Error("Resend is down"));
+    const user = await createUser("undeliverable@example.com");
+    const formData = new FormData();
+    formData.set("email", user.email!);
+
+    const state = await requestPasswordResetAction(undefined, formData);
+
+    expect(state?.success).toBeUndefined();
+    expect(state?.error).toBe("L'envoi de l'email a échoué. Merci de réessayer plus tard.");
   });
 });
 

@@ -19,16 +19,11 @@ export default function ForgotPasswordPage() {
           <CardTitle className="pb-4 text-center text-4xl">Mot de passe oublié</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {state?.resetUrl ? (
-            <>
-              <p className="text-muted-foreground text-center text-sm">
-                Aucun service d&apos;envoi d&apos;email n&apos;est configuré sur cet environnement.
-                Voici votre lien de réinitialisation :
-              </p>
-              <Link href={state.resetUrl} className="text-center text-sm underline">
-                Réinitialiser mon mot de passe
-              </Link>
-            </>
+          {state?.success ? (
+            <p role="status" className="text-muted-foreground text-center text-sm">
+              Si un compte existe pour cet email, un lien de réinitialisation vient de lui être
+              envoyé.
+            </p>
           ) : (
             <form action={formAction} className="flex flex-col gap-4">
               <p className="text-muted-foreground text-center text-sm">

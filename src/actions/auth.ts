@@ -6,10 +6,11 @@ import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 
 import { signIn } from "@/auth";
+import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
 
 export type AuthActionState = { error?: string } | undefined;
-export type ForgotPasswordState = { error?: string; resetUrl?: string } | undefined;
+export type ForgotPasswordState = { error?: string; success?: boolean } | undefined;
 export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
 
 const RESET_TOKEN_TTL_MS = 1000 * 60 * 60;
@@ -69,8 +70,11 @@ export async function requestPasswordResetAction(
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
+
+  // Always return a generic success response, whether or not the account exists,
+  // so this endpoint can't be used to enumerate registered emails.
   if (!user) {
-    return { error: "Aucun compte associé à cet email." };
+    return { success: true };
   }
 
   await prisma.verificationToken.deleteMany({ where: { identifier: email } });
@@ -80,7 +84,14 @@ export async function requestPasswordResetAction(
     data: { identifier: email, token, expires: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
   });
 
-  return { resetUrl: `/reset-password?token=${token}` };
+  try {
+    await sendPasswordResetEmail(email, `/reset-password?token=${token}`);
+  } catch (error) {
+    console.error("Failed to send password reset email", error);
+    return { error: "L'envoi de l'email a échoué. Merci de réessayer plus tard." };
+  }
+
+  return { success: true };
 }
 
 export async function resetPasswordAction(
