@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const PRODUCT_LINKS = [
+export const PRODUCT_LINKS = [
   { label: "Shop All", href: "/products" },
   { label: "Sofas", href: "/products/sofas" },
   { label: "Armchairs", href: "/products/armchairs" },
@@ -11,7 +11,7 @@ const PRODUCT_LINKS = [
 
 export function ProductsNav() {
   return (
-    <nav aria-label="Catégories de produits" className="flex items-center gap-8 text-sm">
+    <nav aria-label="Catégories de produits" className="hidden items-center gap-8 text-sm md:flex">
       {PRODUCT_LINKS.map((link) => (
         <Link key={link.href} href={link.href}>
           {link.label}
