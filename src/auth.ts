@@ -20,7 +20,6 @@ declare module "next-auth/jwt" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  // Credentials provider needs JWT sessions (no database session support).
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
@@ -55,8 +54,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { id: user.id, name: user.name, email: user.email, image: user.image };
       },
     }),
-    // Ajoutez d'autres providers ici (Google, GitHub, ...):
-    // import Google from "next-auth/providers/google"
-    // Google({ clientId: process.env.AUTH_GOOGLE_ID, clientSecret: process.env.AUTH_GOOGLE_SECRET }),
   ],
 });
