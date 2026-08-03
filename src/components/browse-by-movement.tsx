@@ -43,7 +43,7 @@ const MOVEMENTS = [
 
 export function BrowseByMovement() {
   return (
-    <section className="flex flex-col gap-6 py-16">
+    <section className="flex flex-col gap-6 py-4">
       <div className="flex items-center justify-between">
         <h2 className="font-heading text-2xl font-semibold">Browse by movement</h2>
         <Link href="/products" className="group inline-flex items-center gap-2 text-sm font-medium">
