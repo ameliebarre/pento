@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 beforeEach(async () => {
   await prisma.verificationToken.deleteMany();
+  await prisma.rateLimitBucket.deleteMany();
   await prisma.user.deleteMany();
 });
 

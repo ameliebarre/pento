@@ -16,6 +16,10 @@ vi.mock("@/lib/email", () => ({
   sendPasswordResetEmail: vi.fn(),
 }));
 
+vi.mock("next/headers", () => ({
+  headers: vi.fn().mockResolvedValue(new Headers({ "x-forwarded-for": "203.0.113.1" })),
+}));
+
 import { signIn } from "@/auth";
 import {
   loginAction,
@@ -116,6 +120,22 @@ describe("requestPasswordResetAction", () => {
 
     expect(state?.success).toBeUndefined();
     expect(state?.error).toBe("L'envoi de l'email a échoué. Merci de réessayer plus tard.");
+  });
+
+  it("rate-limits repeated requests for the same email", async () => {
+    const user = await createUser("rate-limited@example.com");
+    const formData = new FormData();
+    formData.set("email", user.email!);
+
+    for (let i = 0; i < 3; i++) {
+      const state = await requestPasswordResetAction(undefined, formData);
+      expect(state?.success).toBe(true);
+    }
+
+    const state = await requestPasswordResetAction(undefined, formData);
+
+    expect(state?.error).toBe("Trop de tentatives. Merci de réessayer dans quelques minutes.");
+    expect(mockedSendPasswordResetEmail).toHaveBeenCalledTimes(3);
   });
 });
 
@@ -307,5 +327,22 @@ describe("loginAction", () => {
     formData.set("password", "password123");
 
     await expect(loginAction(undefined, formData)).rejects.toThrow("network down");
+  });
+
+  it("rate-limits repeated attempts for the same email", async () => {
+    mockedSignIn.mockRejectedValue(new AuthError("Invalid credentials"));
+    const formData = new FormData();
+    formData.set("email", "brute-forced@example.com");
+    formData.set("password", "wrongpassword");
+
+    for (let i = 0; i < 10; i++) {
+      const state = await loginAction(undefined, formData);
+      expect(state?.error).toBe("Email ou mot de passe incorrect.");
+    }
+
+    const state = await loginAction(undefined, formData);
+
+    expect(state?.error).toBe("Trop de tentatives. Merci de réessayer dans quelques minutes.");
+    expect(mockedSignIn).toHaveBeenCalledTimes(10);
   });
 });

@@ -8,12 +8,20 @@ import { AuthError } from "next-auth";
 import { signIn } from "@/auth";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { prisma } from "@/lib/prisma";
+import { hitRateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
 
 export type AuthActionState = { error?: string } | undefined;
 export type ForgotPasswordState = { error?: string; success?: boolean } | undefined;
 export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
 
 const RESET_TOKEN_TTL_MS = 1000 * 60 * 60;
+
+const RATE_LIMIT_ERROR = "Trop de tentatives. Merci de réessayer dans quelques minutes.";
+const LOGIN_EMAIL_LIMIT = { max: 10, windowMs: 10 * 60 * 1000 };
+const LOGIN_IP_LIMIT = { max: 30, windowMs: 10 * 60 * 1000 };
+const FORGOT_PASSWORD_EMAIL_LIMIT = { max: 3, windowMs: 60 * 60 * 1000 };
+const FORGOT_PASSWORD_IP_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 
 export async function signupAction(
   _prevState: AuthActionState,
@@ -45,12 +53,20 @@ export async function loginAction(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").toLowerCase().trim();
+  const password = formData.get("password");
+  const ip = await getClientIp();
+
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    hitRateLimit(`login:email:${email}`, LOGIN_EMAIL_LIMIT),
+    hitRateLimit(`login:ip:${ip}`, LOGIN_IP_LIMIT),
+  ]);
+  if (!emailAllowed || !ipAllowed) {
+    return { error: RATE_LIMIT_ERROR };
+  }
+
   try {
-    await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirectTo: "/",
-    });
+    await signIn("credentials", { email, password, redirectTo: "/" });
   } catch (error) {
     if (error instanceof AuthError) {
       return { error: "Email ou mot de passe incorrect." };
@@ -67,6 +83,15 @@ export async function requestPasswordResetAction(
 
   if (!email) {
     return { error: "Merci de renseigner votre email." };
+  }
+
+  const ip = await getClientIp();
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    hitRateLimit(`forgot-password:email:${email}`, FORGOT_PASSWORD_EMAIL_LIMIT),
+    hitRateLimit(`forgot-password:ip:${ip}`, FORGOT_PASSWORD_IP_LIMIT),
+  ]);
+  if (!emailAllowed || !ipAllowed) {
+    return { error: RATE_LIMIT_ERROR };
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
