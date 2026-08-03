@@ -5,11 +5,13 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "@/lib/prisma";
+import { jwtCallback } from "@/lib/auth-jwt-callback";
 
 declare module "next-auth" {
   interface User {
     firstName?: string | null;
     lastName?: string | null;
+    passwordChangedAt?: Date | null;
   }
 
   interface Session {
@@ -22,6 +24,7 @@ declare module "next-auth/jwt" {
     id?: string;
     firstName?: string | null;
     lastName?: string | null;
+    passwordChangedAt?: string | null;
   }
 }
 
@@ -32,14 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/login",
   },
   callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-      }
-      return token;
-    },
+    jwt: ({ token, user }) => jwtCallback(token, user),
     session({ session, token }) {
       if (token.id) session.user.id = token.id;
       session.user.firstName = token.firstName;
@@ -71,6 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
           email: user.email,
           image: user.image,
+          passwordChangedAt: user.passwordChangedAt,
         };
       },
     }),

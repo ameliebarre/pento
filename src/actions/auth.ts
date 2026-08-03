@@ -113,7 +113,7 @@ export async function resetPasswordAction(
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.update({
     where: { email: verificationToken.identifier },
-    data: { passwordHash },
+    data: { passwordHash, passwordChangedAt: new Date() },
   });
 
   await prisma.verificationToken.delete({ where: { token } });
