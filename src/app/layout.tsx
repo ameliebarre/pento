@@ -36,7 +36,9 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col overflow-x-hidden">
         <SiteHeader />
-        <main className="mx-auto w-full flex-1 px-24">{children}</main>
+        <main id="main-content" className="mx-auto w-full flex-1 px-24">
+          {children}
+        </main>
       </body>
     </html>
   );

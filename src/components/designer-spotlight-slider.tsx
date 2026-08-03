@@ -40,8 +40,13 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
   }
 
   return (
-    <div className="grid min-h-90 grid-cols-1 overflow-hidden sm:grid-cols-2">
-      <div className="relative min-h-80 overflow-hidden sm:min-h-full">
+    <div
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Designers à l'honneur"
+      className="grid grid-cols-1 overflow-hidden lg:min-h-90 lg:grid-cols-2"
+    >
+      <div className="relative aspect-4/3 w-full overflow-hidden sm:aspect-video lg:aspect-auto lg:min-h-full">
         <AnimatePresence custom={direction} initial={false}>
           <motion.div
             key={slide.image}
@@ -55,16 +60,20 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
           >
             <Image
               src={slide.image}
-              alt={slide.name}
+              alt={`Portrait de ${slide.name}`}
               fill
-              sizes="(min-width: 640px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="flex flex-col items-start justify-center gap-5.5 overflow-hidden bg-neutral-100 px-8 py-16 sm:px-16">
+      <div
+        aria-live="polite"
+        aria-atomic="true"
+        className="flex flex-col items-start justify-center gap-5.5 overflow-hidden bg-neutral-100 px-6 py-10 sm:px-10 sm:py-12 lg:px-16 lg:py-16"
+      >
         <AnimatePresence custom={direction} mode="wait" initial={false}>
           <motion.div
             key={index}
@@ -74,11 +83,17 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${slide.name} — diapositive ${index + 1} sur ${slides.length}`}
             className="flex w-full flex-col items-start gap-5.5"
           >
-            <div className="flex w-full items-center justify-between gap-4">
-              <h3 className="font-heading text-3xl md:text-4xl">{slide.title}</h3>
-              <div className="flex items-center gap-1.5 pt-3 text-sm tabular-nums">
+            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <h3 className="font-heading min-w-0 text-3xl md:text-4xl">{slide.title}</h3>
+              <div
+                aria-hidden="true"
+                className="flex shrink-0 items-center gap-1.5 text-sm tabular-nums sm:pt-3"
+              >
                 <AnimatePresence mode="popLayout" custom={direction} initial={false}>
                   <motion.span
                     key={index}
@@ -97,8 +112,15 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
                 <span>{String(slides.length).padStart(2, "0")}</span>
               </div>
             </div>
-            <div className="flex w-full items-center justify-between gap-4">
-              <p className="text-muted-foreground text-md max-w-md">{slide.description}</p>
+            <p className="text-muted-foreground text-md max-w-md">{slide.description}</p>
+            <div className="flex w-full flex-wrap items-center justify-between gap-4">
+              <Link
+                href="/products"
+                className="group inline-flex items-center gap-2 text-sm font-medium"
+              >
+                Découvrir son histoire
+                <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
               <div className="flex shrink-0 items-center gap-1">
                 <Button
                   type="button"
@@ -108,7 +130,7 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
                   disabled={isFirst}
                   aria-label="Designer précédent"
                 >
-                  <ArrowLeft className="size-4" />
+                  <ArrowLeft aria-hidden="true" className="size-4" />
                 </Button>
                 <Button
                   type="button"
@@ -118,17 +140,10 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
                   disabled={isLast}
                   aria-label="Designer suivant"
                 >
-                  <ArrowRight className="size-4" />
+                  <ArrowRight aria-hidden="true" className="size-4" />
                 </Button>
               </div>
             </div>
-            <Link
-              href="/products"
-              className="group inline-flex items-center gap-2 text-sm font-medium"
-            >
-              Découvrir son histoire
-              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
           </motion.div>
         </AnimatePresence>
       </div>

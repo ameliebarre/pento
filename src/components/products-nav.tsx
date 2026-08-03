@@ -11,7 +11,7 @@ const PRODUCT_LINKS = [
 
 export function ProductsNav() {
   return (
-    <nav className="flex items-center gap-8 text-sm">
+    <nav aria-label="Catégories de produits" className="flex items-center gap-8 text-sm">
       {PRODUCT_LINKS.map((link) => (
         <Link key={link.href} href={link.href}>
           {link.label}

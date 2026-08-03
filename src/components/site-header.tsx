@@ -11,12 +11,18 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow"
+      >
+        Aller au contenu principal
+      </a>
       <div className="mx-auto flex items-center justify-between px-24 py-6">
         <Link href="/">
           <Image src="/logo.svg" alt="Pento" className="max-w-24" width={124} height={30} />
         </Link>
         <ProductsNav />
-        <nav className="flex items-center gap-2">
+        <nav aria-label="Compte et panier" className="flex items-center gap-2">
           {session?.user ? (
             <form
               action={async () => {
@@ -25,7 +31,7 @@ export async function SiteHeader() {
               }}
             >
               <Button variant="ghost" size="icon-lg" type="submit" aria-label="Se déconnecter">
-                <User className="size-5" />
+                <User aria-hidden="true" className="size-5" />
               </Button>
             </form>
           ) : (
@@ -36,7 +42,7 @@ export async function SiteHeader() {
               nativeButton={false}
               aria-label="Se connecter"
             >
-              <User className="size-5" />
+              <User aria-hidden="true" className="size-5" />
             </Button>
           )}
           <Button
@@ -46,7 +52,7 @@ export async function SiteHeader() {
             nativeButton={false}
             aria-label="Panier"
           >
-            <ShoppingCart className="size-5" />
+            <ShoppingCart aria-hidden="true" className="size-5" />
           </Button>
         </nav>
       </div>

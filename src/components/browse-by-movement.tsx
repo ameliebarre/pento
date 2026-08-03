@@ -43,37 +43,41 @@ const MOVEMENTS = [
 
 export function BrowseByMovement() {
   return (
-    <section className="flex flex-col gap-6 py-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-heading text-2xl font-semibold">Browse by movement</h2>
+    <section aria-labelledby="browse-by-movement-heading" className="flex flex-col gap-6 py-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <h2 id="browse-by-movement-heading" className="font-heading text-2xl font-semibold">
+          Browse by movement
+        </h2>
         <Link href="/products" className="group inline-flex items-center gap-2 text-sm font-medium">
           View all movements
-          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+          <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
         {MOVEMENTS.map((movement) => (
-          <div key={movement.name} className="flex flex-col gap-2">
+          <li key={movement.name} className="flex flex-col gap-2">
             <div className="relative aspect-4/3 w-full overflow-hidden">
               <Image
                 src={movement.image}
                 alt={movement.name}
                 fill
-                sizes="(min-width: 640px) 33vw, 100vw"
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                 className="object-cover"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-start justify-between gap-2">
                 <h3 className="font-heading text-xl font-semibold">{movement.name}</h3>
-                <span className="text-muted-foreground text-xs">{movement.pieces} pièces</span>
+                <span className="text-muted-foreground shrink-0 pt-1 text-xs whitespace-nowrap">
+                  {movement.pieces} pièces
+                </span>
               </div>
               <p className="text-muted-foreground text-sm">{movement.description}</p>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
