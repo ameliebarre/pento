@@ -12,7 +12,8 @@ export async function signupAction(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const name = String(formData.get("name") ?? "");
+  const firstName = String(formData.get("firstName") ?? "");
+  const lastName = String(formData.get("lastName") ?? "");
   const email = String(formData.get("email") ?? "").toLowerCase().trim();
   const password = String(formData.get("password") ?? "");
 
@@ -27,7 +28,7 @@ export async function signupAction(
 
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.create({
-    data: { name, email, passwordHash },
+    data: { firstName, lastName, email, passwordHash },
   });
 
   await signIn("credentials", { email, password, redirectTo: "/" });

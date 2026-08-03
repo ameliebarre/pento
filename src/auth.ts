@@ -7,14 +7,21 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
 declare module "next-auth" {
+  interface User {
+    firstName?: string | null;
+    lastName?: string | null;
+  }
+
   interface Session {
-    user: { id: string } & DefaultSession["user"];
+    user: { id: string; firstName?: string | null; lastName?: string | null } & DefaultSession["user"];
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     id?: string;
+    firstName?: string | null;
+    lastName?: string | null;
   }
 }
 
@@ -26,11 +33,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+      }
       return token;
     },
     session({ session, token }) {
       if (token.id) session.user.id = token.id;
+      session.user.firstName = token.firstName;
+      session.user.lastName = token.lastName;
       return session;
     },
   },
@@ -51,7 +64,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const isValid = await bcrypt.compare(password, user.passwordHash);
         if (!isValid) return null;
 
-        return { id: user.id, name: user.name, email: user.email, image: user.image };
+        return {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
+          email: user.email,
+          image: user.image,
+        };
       },
     }),
   ],
