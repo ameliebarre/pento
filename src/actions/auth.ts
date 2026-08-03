@@ -1,5 +1,7 @@
 "use server";
 
+import crypto from "crypto";
+
 import bcrypt from "bcryptjs";
 import { AuthError } from "next-auth";
 
@@ -7,6 +9,10 @@ import { signIn } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
 export type AuthActionState = { error?: string } | undefined;
+export type ForgotPasswordState = { error?: string; resetUrl?: string } | undefined;
+export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
+
+const RESET_TOKEN_TTL_MS = 1000 * 60 * 60;
 
 export async function signupAction(
   _prevState: AuthActionState,
@@ -50,4 +56,56 @@ export async function loginAction(
     }
     throw error;
   }
+}
+
+export async function requestPasswordResetAction(
+  _prevState: ForgotPasswordState,
+  formData: FormData,
+): Promise<ForgotPasswordState> {
+  const email = String(formData.get("email") ?? "").toLowerCase().trim();
+
+  if (!email) {
+    return { error: "Merci de renseigner votre email." };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return { error: "Aucun compte associé à cet email." };
+  }
+
+  await prisma.verificationToken.deleteMany({ where: { identifier: email } });
+
+  const token = crypto.randomBytes(32).toString("hex");
+  await prisma.verificationToken.create({
+    data: { identifier: email, token, expires: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
+  });
+
+  return { resetUrl: `/reset-password?token=${token}` };
+}
+
+export async function resetPasswordAction(
+  _prevState: ResetPasswordState,
+  formData: FormData,
+): Promise<ResetPasswordState> {
+  const token = String(formData.get("token") ?? "");
+  const password = String(formData.get("password") ?? "");
+
+  if (password.length < 8) {
+    return { error: "Le mot de passe doit contenir au moins 8 caractères." };
+  }
+
+  const verificationToken = await prisma.verificationToken.findUnique({ where: { token } });
+  if (!verificationToken || verificationToken.expires < new Date()) {
+    return { error: "Ce lien de réinitialisation est invalide ou a expiré." };
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.update({
+    where: { email: verificationToken.identifier },
+    data: { passwordHash },
+  });
+
+  await prisma.verificationToken.delete({ where: { token } });
+
+  return { success: true };
 }
