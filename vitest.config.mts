@@ -12,8 +12,9 @@ export default defineConfig({
   test: {
     environment: "node",
     env: testEnv,
-    setupFiles: ["./vitest.setup.ts"],
-    include: ["src/**/*.test.ts"],
+    setupFiles: ["./vitest.setup.ts", "./vitest.setup.dom.ts"],
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    fileParallelism: false,
   },
   resolve: {
     alias: {
