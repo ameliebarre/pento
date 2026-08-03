@@ -2,6 +2,7 @@ import { HeroBanner } from "@/components/hero-banner";
 import { ShopByCategory } from "@/components/shop-by-category";
 import { DesignerSpotlight } from "@/components/designer-spotlight";
 import { BrowseByMovement } from "@/components/browse-by-movement";
+import { Newsletter } from "@/components/newsletter";
 import { TrustFeatures } from "@/components/trust-features";
 
 export default async function HomePage() {
@@ -11,6 +12,7 @@ export default async function HomePage() {
       <ShopByCategory />
       <DesignerSpotlight />
       <BrowseByMovement />
+      <Newsletter />
       <TrustFeatures />
     </div>
   );

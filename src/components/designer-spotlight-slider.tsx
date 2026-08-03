@@ -112,7 +112,7 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
                 <span>{String(slides.length).padStart(2, "0")}</span>
               </div>
             </div>
-            <p className="text-muted-foreground text-md max-w-md">{slide.description}</p>
+            <p className="text-md max-w-md text-[#6a6a6a]">{slide.description}</p>
             <div className="flex w-full flex-wrap items-center justify-between gap-4">
               <Link
                 href="/products"
