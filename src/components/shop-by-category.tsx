@@ -12,29 +12,35 @@ const CATEGORIES = [
 
 export function ShopByCategory() {
   return (
-    <section aria-labelledby="shop-by-category-heading" className="flex flex-col items-start gap-6 py-16">
-      <h2 id="shop-by-category-heading" className="font-heading text-2xl font-semibold">
+    <section
+      aria-labelledby="shop-by-category-heading"
+      className="flex flex-col gap-2 py-16 lg:flex-row lg:items-start lg:gap-6"
+    >
+      <h2 id="shop-by-category-heading" className="shrink-0 text-sm font-semibold uppercase">
         Shop by categories
       </h2>
-      <ul className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <ul className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-5">
         {CATEGORIES.map((category) => (
           <li key={category.slug}>
             <Link
               href={`/products/${category.slug}`}
               className="group flex flex-col items-center gap-3"
             >
-              <div className="relative aspect-3/4 w-full overflow-hidden">
+              <div className="relative aspect-square w-full overflow-hidden">
                 <Image
                   src={category.image}
                   alt=""
                   fill
-                  sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
+                  sizes="(min-width: 1024px) 20vw, (min-width: 640px) 25vw, 33vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
-                <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 text-sm text-white">
+                <span className="absolute inset-x-2 bottom-2 inline-flex items-center gap-1 text-xs whitespace-nowrap text-white">
                   {category.label}
-                  <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="size-3 shrink-0 transition-transform duration-300 group-hover:translate-x-1"
+                  />
                 </span>
               </div>
             </Link>

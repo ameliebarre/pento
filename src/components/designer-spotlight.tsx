@@ -48,10 +48,8 @@ const SLIDES: DesignerSlide[] = [
 
 export function DesignerSpotlight() {
   return (
-    <section className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <h2 className="font-heading text-2xl font-semibold">Designers à l&apos;honneur</h2>
-      </div>
+    <section className="flex flex-col gap-2">
+      <h2 className="text-sm font-semibold uppercase">Designers à l&apos;honneur</h2>
       <DesignerSpotlightSlider slides={SLIDES} />
     </section>
   );

@@ -43,18 +43,20 @@ const MOVEMENTS = [
 
 export function BrowseByMovement() {
   return (
-    <section aria-labelledby="browse-by-movement-heading" className="flex flex-col gap-6 py-4">
+    <section aria-labelledby="browse-by-movement-heading" className="flex flex-col gap-2 py-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h2 id="browse-by-movement-heading" className="font-heading text-2xl font-semibold">
+        <h2 id="browse-by-movement-heading" className="text-sm font-semibold uppercase">
           Browse by movement
         </h2>
         <Link href="/products" className="group inline-flex items-center gap-2 text-sm font-medium">
           View all movements
-          <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+          <ArrowRight
+            aria-hidden="true"
+            className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+          />
         </Link>
       </div>
-
-      <ul className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {MOVEMENTS.map((movement) => (
           <li key={movement.name} className="flex flex-col gap-2">
             <div className="relative aspect-4/3 w-full overflow-hidden">
@@ -66,10 +68,10 @@ export function BrowseByMovement() {
                 className="object-cover"
               />
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-heading text-xl font-semibold">{movement.name}</h3>
-                <span className="text-muted-foreground shrink-0 pt-1 text-xs whitespace-nowrap">
+            <div className="flex flex-col">
+              <div className="flex items-start justify-between">
+                <h3 className="uppercase">{movement.name}</h3>
+                <span className="shrink-0 pt-1 text-xs whitespace-nowrap">
                   {movement.pieces} pièces
                 </span>
               </div>

@@ -24,11 +24,13 @@ export async function SiteHeader() {
       <div className="mx-auto flex items-center justify-between px-4 py-6 sm:px-8 md:px-6">
         <div className="flex items-center gap-4">
           <MobileNav />
-          <Link href="/">
-            <Image src="/logo.svg" alt="Pento" className="max-w-24" width={124} height={30} />
-          </Link>
+          <div className="flex items-center gap-8">
+            <Link href="/">
+              <Image src="/logo.svg" alt="Pento" className="max-w-24" width={124} height={30} />
+            </Link>
+            <ProductsNav />
+          </div>
         </div>
-        <ProductsNav />
         <nav aria-label="Compte et panier" className="flex items-center gap-2">
           {session?.user ? (
             <Link
