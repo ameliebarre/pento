@@ -15,7 +15,7 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="text-muted-foreground line-clamp-2 text-sm">{product.description}</p>
         </CardContent>
         <CardFooter>
-          <span className="font-medium">{formatPrice(product.priceCents, product.currency)}</span>
+          <span className="font-medium">{formatPrice(product.price.toString(), product.currency)}</span>
         </CardFooter>
       </Card>
     </Link>
