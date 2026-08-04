@@ -9,6 +9,7 @@ import { hitRateLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/request-ip";
 
 export type AuthActionState = { error?: string } | undefined;
+export type SignupState = { error?: string; success?: boolean } | undefined;
 export type ForgotPasswordState = { error?: string; success?: boolean } | undefined;
 export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
 
@@ -19,9 +20,9 @@ const FORGOT_PASSWORD_EMAIL_LIMIT = { max: 3, windowMs: 60 * 60 * 1000 };
 const FORGOT_PASSWORD_IP_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 
 export async function signupAction(
-  _prevState: AuthActionState,
+  _prevState: SignupState,
   formData: FormData,
-): Promise<AuthActionState> {
+): Promise<SignupState> {
   const firstName = String(formData.get("firstName") ?? "");
   const lastName = String(formData.get("lastName") ?? "");
   const email = String(formData.get("email") ?? "").toLowerCase().trim();
@@ -31,6 +32,9 @@ export async function signupAction(
     return { error: "Email invalide ou mot de passe trop court (8 caractères min)." };
   }
 
+  // With requireEmailVerification on, Better Auth never throws for a duplicate email
+  // here — it returns a generic success shape either way, so a signup attempt can't
+  // be used to check whether an address is already registered.
   try {
     await auth.api.signUpEmail({
       body: {
@@ -43,12 +47,12 @@ export async function signupAction(
     });
   } catch (error) {
     if (error instanceof APIError) {
-      return { error: "Un compte existe déjà avec cet email." };
+      return { error: "Impossible de créer le compte. Merci de réessayer." };
     }
     throw error;
   }
 
-  redirect("/");
+  return { success: true };
 }
 
 export async function loginAction(
@@ -71,6 +75,11 @@ export async function loginAction(
     await auth.api.signInEmail({ body: { email, password } });
   } catch (error) {
     if (error instanceof APIError) {
+      if (error.body?.code === "EMAIL_NOT_VERIFIED") {
+        return {
+          error: "Merci de confirmer votre email avant de vous connecter. Un nouveau lien vient de vous être envoyé.",
+        };
+      }
       return { error: "Email ou mot de passe incorrect." };
     }
     throw error;

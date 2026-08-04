@@ -168,8 +168,8 @@ describe("signupAction", () => {
     expect(mockedSignUpEmail).not.toHaveBeenCalled();
   });
 
-  it("returns a friendly error when the account already exists", async () => {
-    mockedSignUpEmail.mockRejectedValueOnce(new APIError("UNPROCESSABLE_ENTITY"));
+  it("returns a generic error for unexpected Better Auth failures", async () => {
+    mockedSignUpEmail.mockRejectedValueOnce(new APIError("BAD_REQUEST"));
     const formData = new FormData();
     formData.set("firstName", "Ada");
     formData.set("lastName", "Lovelace");
@@ -178,18 +178,21 @@ describe("signupAction", () => {
 
     const state = await signupAction(undefined, formData);
 
-    expect(state?.error).toBe("Un compte existe déjà avec cet email.");
-    expect(mockedRedirect).not.toHaveBeenCalled();
+    expect(state?.error).toBe("Impossible de créer le compte. Merci de réessayer.");
+    expect(state?.success).toBeUndefined();
   });
 
-  it("signs the user up with the derived name and redirects home", async () => {
+  it("signs the user up with the derived name and reports success without redirecting", async () => {
+    // Better Auth returns a generic success response here even for a duplicate email
+    // (requireEmailVerification is on), so this test also covers that case implicitly:
+    // there's no branch in signupAction that distinguishes "new" from "duplicate".
     const formData = new FormData();
     formData.set("firstName", "Ada");
     formData.set("lastName", "Lovelace");
     formData.set("email", "ada.lovelace@example.com");
     formData.set("password", "password123");
 
-    await signupAction(undefined, formData);
+    const state = await signupAction(undefined, formData);
 
     expect(mockedSignUpEmail).toHaveBeenCalledWith({
       body: {
@@ -200,7 +203,8 @@ describe("signupAction", () => {
         lastName: "Lovelace",
       },
     });
-    expect(mockedRedirect).toHaveBeenCalledWith("/");
+    expect(state?.success).toBe(true);
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 });
 
@@ -228,6 +232,22 @@ describe("loginAction", () => {
     const state = await loginAction(undefined, formData);
 
     expect(state?.error).toBe("Email ou mot de passe incorrect.");
+    expect(mockedRedirect).not.toHaveBeenCalled();
+  });
+
+  it("returns a dedicated message when the email isn't verified yet", async () => {
+    mockedSignInEmail.mockRejectedValueOnce(
+      new APIError("FORBIDDEN", { message: "Email not verified", code: "EMAIL_NOT_VERIFIED" }),
+    );
+    const formData = new FormData();
+    formData.set("email", "unverified@example.com");
+    formData.set("password", "password123");
+
+    const state = await loginAction(undefined, formData);
+
+    expect(state?.error).toBe(
+      "Merci de confirmer votre email avant de vous connecter. Un nouveau lien vient de vous être envoyé.",
+    );
     expect(mockedRedirect).not.toHaveBeenCalled();
   });
 
