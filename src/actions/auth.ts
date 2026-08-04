@@ -1,18 +1,32 @@
 "use server";
 
-import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 
-import { signIn } from "@/auth";
-import { prisma } from "@/lib/prisma";
+import { APIError } from "better-auth/api";
+
+import { auth } from "@/auth";
+import { hitRateLimit } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/request-ip";
 
 export type AuthActionState = { error?: string } | undefined;
+export type SignupState = { error?: string; success?: boolean } | undefined;
+export type ForgotPasswordState = { error?: string; success?: boolean } | undefined;
+export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
+
+const RATE_LIMIT_ERROR = "Trop de tentatives. Merci de réessayer dans quelques minutes.";
+const SIGNUP_EMAIL_LIMIT = { max: 5, windowMs: 60 * 60 * 1000 };
+const SIGNUP_IP_LIMIT = { max: 20, windowMs: 60 * 60 * 1000 };
+const LOGIN_EMAIL_LIMIT = { max: 10, windowMs: 10 * 60 * 1000 };
+const LOGIN_IP_LIMIT = { max: 30, windowMs: 10 * 60 * 1000 };
+const FORGOT_PASSWORD_EMAIL_LIMIT = { max: 3, windowMs: 60 * 60 * 1000 };
+const FORGOT_PASSWORD_IP_LIMIT = { max: 10, windowMs: 60 * 60 * 1000 };
 
 export async function signupAction(
-  _prevState: AuthActionState,
+  _prevState: SignupState,
   formData: FormData,
-): Promise<AuthActionState> {
-  const name = String(formData.get("name") ?? "");
+): Promise<SignupState> {
+  const firstName = String(formData.get("firstName") ?? "");
+  const lastName = String(formData.get("lastName") ?? "");
   const email = String(formData.get("email") ?? "").toLowerCase().trim();
   const password = String(formData.get("password") ?? "");
 
@@ -20,33 +34,122 @@ export async function signupAction(
     return { error: "Email invalide ou mot de passe trop court (8 caractères min)." };
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return { error: "Un compte existe déjà avec cet email." };
+  const ip = await getClientIp();
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    hitRateLimit(`signup:email:${email}`, SIGNUP_EMAIL_LIMIT),
+    hitRateLimit(`signup:ip:${ip}`, SIGNUP_IP_LIMIT),
+  ]);
+  if (!emailAllowed || !ipAllowed) {
+    return { error: RATE_LIMIT_ERROR };
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({
-    data: { name, email, passwordHash },
-  });
+  // With requireEmailVerification on, Better Auth never throws for a duplicate email
+  // here — it returns a generic success shape either way, so a signup attempt can't
+  // be used to check whether an address is already registered.
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        email,
+        password,
+        name: [firstName, lastName].filter(Boolean).join(" ") || email,
+        firstName,
+        lastName,
+      },
+    });
+  } catch (error) {
+    if (error instanceof APIError) {
+      return { error: "Impossible de créer le compte. Merci de réessayer." };
+    }
+    throw error;
+  }
 
-  await signIn("credentials", { email, password, redirectTo: "/" });
+  return { success: true };
 }
 
 export async function loginAction(
   _prevState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
+  const email = String(formData.get("email") ?? "").toLowerCase().trim();
+  const password = String(formData.get("password") ?? "");
+  const ip = await getClientIp();
+
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    hitRateLimit(`login:email:${email}`, LOGIN_EMAIL_LIMIT),
+    hitRateLimit(`login:ip:${ip}`, LOGIN_IP_LIMIT),
+  ]);
+  if (!emailAllowed || !ipAllowed) {
+    return { error: RATE_LIMIT_ERROR };
+  }
+
   try {
-    await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirectTo: "/",
-    });
+    await auth.api.signInEmail({ body: { email, password } });
   } catch (error) {
-    if (error instanceof AuthError) {
+    if (error instanceof APIError) {
+      if (error.body?.code === "EMAIL_NOT_VERIFIED") {
+        return {
+          error: "Merci de confirmer votre email avant de vous connecter. Un nouveau lien vient de vous être envoyé.",
+        };
+      }
       return { error: "Email ou mot de passe incorrect." };
     }
     throw error;
   }
+
+  redirect("/");
+}
+
+export async function requestPasswordResetAction(
+  _prevState: ForgotPasswordState,
+  formData: FormData,
+): Promise<ForgotPasswordState> {
+  const email = String(formData.get("email") ?? "").toLowerCase().trim();
+
+  if (!email) {
+    return { error: "Merci de renseigner votre email." };
+  }
+
+  const ip = await getClientIp();
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    hitRateLimit(`forgot-password:email:${email}`, FORGOT_PASSWORD_EMAIL_LIMIT),
+    hitRateLimit(`forgot-password:ip:${ip}`, FORGOT_PASSWORD_IP_LIMIT),
+  ]);
+  if (!emailAllowed || !ipAllowed) {
+    return { error: RATE_LIMIT_ERROR };
+  }
+
+  // Better Auth's requestPasswordReset already returns a generic success response
+  // whether or not the account exists (with timing-attack mitigation baked in), so
+  // we don't need to look the user up ourselves — just forward to it and always
+  // report success either way.
+  try {
+    await auth.api.requestPasswordReset({ body: { email, redirectTo: "/reset-password" } });
+  } catch (error) {
+    console.error("Password reset request failed", error);
+  }
+
+  return { success: true };
+}
+
+export async function resetPasswordAction(
+  _prevState: ResetPasswordState,
+  formData: FormData,
+): Promise<ResetPasswordState> {
+  const token = String(formData.get("token") ?? "");
+  const password = String(formData.get("password") ?? "");
+
+  if (password.length < 8) {
+    return { error: "Le mot de passe doit contenir au moins 8 caractères." };
+  }
+
+  try {
+    await auth.api.resetPassword({ body: { newPassword: password, token } });
+  } catch (error) {
+    if (error instanceof APIError) {
+      return { error: "Ce lien de réinitialisation est invalide ou a expiré." };
+    }
+    throw error;
+  }
+
+  return { success: true };
 }

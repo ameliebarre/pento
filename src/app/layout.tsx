@@ -34,9 +34,9 @@ export default function RootLayout({
       lang="fr"
       className={`${dmSans.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col overflow-x-hidden">
+      <body className="flex h-full flex-col overflow-x-hidden">
         <SiteHeader />
-        <main id="main-content" className="mx-auto w-full flex-1 px-24">
+        <main id="main-content" className="mx-auto w-full flex-1 px-6">
           {children}
         </main>
       </body>

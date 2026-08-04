@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth } from "@/auth";
+import { getSession } from "@/lib/get-session";
 import { prisma } from "@/lib/prisma";
 
 async function getOrCreateCart(userId: string) {
@@ -14,7 +14,7 @@ async function getOrCreateCart(userId: string) {
 }
 
 export async function addToCartAction(productId: string) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) {
     throw new Error("Vous devez être connecté pour ajouter un produit au panier.");
   }
@@ -31,7 +31,7 @@ export async function addToCartAction(productId: string) {
 }
 
 export async function removeFromCartAction(cartItemId: string) {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user?.id) {
     throw new Error("Vous devez être connecté pour modifier votre panier.");
   }

@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.category.upsert({
-    where: { slug: "chair" },
+    where: { slug: "chairs" },
     update: {},
     create: { name: "Chairs", slug: "chairs" },
   });
@@ -52,8 +52,8 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: "john@gmail.com" },
-    update: {},
-    create: { name: "john", email: "john@gmail.com" },
+    update: { firstName: "John", lastName: "Doe" },
+    create: { name: "John Doe", firstName: "John", lastName: "Doe", email: "john@gmail.com" },
   });
 }
 
