@@ -14,6 +14,8 @@ export type ForgotPasswordState = { error?: string; success?: boolean } | undefi
 export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
 
 const RATE_LIMIT_ERROR = "Trop de tentatives. Merci de réessayer dans quelques minutes.";
+const SIGNUP_EMAIL_LIMIT = { max: 5, windowMs: 60 * 60 * 1000 };
+const SIGNUP_IP_LIMIT = { max: 20, windowMs: 60 * 60 * 1000 };
 const LOGIN_EMAIL_LIMIT = { max: 10, windowMs: 10 * 60 * 1000 };
 const LOGIN_IP_LIMIT = { max: 30, windowMs: 10 * 60 * 1000 };
 const FORGOT_PASSWORD_EMAIL_LIMIT = { max: 3, windowMs: 60 * 60 * 1000 };
@@ -30,6 +32,15 @@ export async function signupAction(
 
   if (!email || password.length < 8) {
     return { error: "Email invalide ou mot de passe trop court (8 caractères min)." };
+  }
+
+  const ip = await getClientIp();
+  const [emailAllowed, ipAllowed] = await Promise.all([
+    hitRateLimit(`signup:email:${email}`, SIGNUP_EMAIL_LIMIT),
+    hitRateLimit(`signup:ip:${ip}`, SIGNUP_IP_LIMIT),
+  ]);
+  if (!emailAllowed || !ipAllowed) {
+    return { error: RATE_LIMIT_ERROR };
   }
 
   // With requireEmailVerification on, Better Auth never throws for a duplicate email

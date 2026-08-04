@@ -206,6 +206,24 @@ describe("signupAction", () => {
     expect(state?.success).toBe(true);
     expect(mockedRedirect).not.toHaveBeenCalled();
   });
+
+  it("rate-limits repeated signups for the same email", async () => {
+    const formData = new FormData();
+    formData.set("firstName", "Ada");
+    formData.set("lastName", "Lovelace");
+    formData.set("email", "rate-limited-signup@example.com");
+    formData.set("password", "password123");
+
+    for (let i = 0; i < 5; i++) {
+      const state = await signupAction(undefined, formData);
+      expect(state?.success).toBe(true);
+    }
+
+    const state = await signupAction(undefined, formData);
+
+    expect(state?.error).toBe("Trop de tentatives. Merci de réessayer dans quelques minutes.");
+    expect(mockedSignUpEmail).toHaveBeenCalledTimes(5);
+  });
 });
 
 describe("loginAction", () => {

@@ -6,12 +6,17 @@ import { getSession } from "@/lib/get-session";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ revoked?: string }>;
+}) {
   const session = await getSession();
   if (!session?.user) {
     redirect("/login");
   }
 
+  const { revoked } = await searchParams;
   const { firstName, lastName, email } = session.user;
 
   return (
@@ -33,6 +38,22 @@ export default async function ProfilePage() {
             <span className="text-muted-foreground text-sm">Email</span>
             <span className="text-sm font-medium">{email}</span>
           </div>
+          {revoked && (
+            <p role="status" className="text-muted-foreground text-center text-sm">
+              Les autres appareils ont été déconnectés.
+            </p>
+          )}
+          <form
+            action={async () => {
+              "use server";
+              await auth.api.revokeOtherSessions({ headers: await headers() });
+              redirect("/profile?revoked=1");
+            }}
+          >
+            <Button type="submit" variant="outline" className="h-10 w-full rounded-[6px]">
+              Déconnecter les autres appareils
+            </Button>
+          </form>
           <form
             action={async () => {
               "use server";
