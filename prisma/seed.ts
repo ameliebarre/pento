@@ -53,7 +53,7 @@ async function main() {
   await prisma.user.upsert({
     where: { email: "john@gmail.com" },
     update: { firstName: "John", lastName: "Doe" },
-    create: { firstName: "John", lastName: "Doe", email: "john@gmail.com" },
+    create: { name: "John Doe", firstName: "John", lastName: "Doe", email: "john@gmail.com" },
   });
 }
 

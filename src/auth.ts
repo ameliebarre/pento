@@ -1,75 +1,33 @@
-import NextAuth, { type DefaultSession } from "next-auth";
-import type {} from "next-auth/jwt";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@/lib/prisma";
-import { jwtCallback } from "@/lib/auth-jwt-callback";
+import { sendPasswordResetEmail } from "@/lib/email";
 
-declare module "next-auth" {
-  interface User {
-    firstName?: string | null;
-    lastName?: string | null;
-    passwordChangedAt?: Date | null;
-  }
-
-  interface Session {
-    user: { id: string; firstName?: string | null; lastName?: string | null } & DefaultSession["user"];
-  }
-}
-
-declare module "next-auth/jwt" {
-  interface JWT {
-    id?: string;
-    firstName?: string | null;
-    lastName?: string | null;
-    passwordChangedAt?: string | null;
-  }
-}
-
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login",
-  },
-  callbacks: {
-    jwt: ({ token, user }) => jwtCallback(token, user),
-    session({ session, token }) {
-      if (token.id) session.user.id = token.id;
-      session.user.firstName = token.firstName;
-      session.user.lastName = token.lastName;
-      return session;
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: "postgresql",
+  }),
+  secret: process.env.AUTH_SECRET,
+  baseURL: process.env.AUTH_URL,
+  user: {
+    additionalFields: {
+      firstName: { type: "string", required: false },
+      lastName: { type: "string", required: false },
     },
   },
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Mot de passe", type: "password" },
-      },
-      authorize: async (credentials) => {
-        const email = credentials?.email as string | undefined;
-        const password = credentials?.password as string | undefined;
-        if (!email || !password) return null;
-
-        const user = await prisma.user.findUnique({ where: { email } });
-        if (!user?.passwordHash) return null;
-
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) return null;
-
-        return {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          name: [user.firstName, user.lastName].filter(Boolean).join(" ") || null,
-          email: user.email,
-          image: user.image,
-          passwordChangedAt: user.passwordChangedAt,
-        };
-      },
-    }),
-  ],
+  emailAndPassword: {
+    enabled: true,
+    revokeSessionsOnPasswordReset: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendPasswordResetEmail(user.email, url);
+    },
+  },
+  // We keep our own Postgres-backed limiter (src/lib/rate-limit.ts) so email-scoped
+  // limiting (not just IP+path) applies to login and forgot-password.
+  rateLimit: {
+    enabled: false,
+  },
+  plugins: [nextCookies()],
 });

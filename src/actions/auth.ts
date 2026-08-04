@@ -1,21 +1,16 @@
 "use server";
 
-import crypto from "crypto";
+import { redirect } from "next/navigation";
 
-import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
+import { APIError } from "better-auth/api";
 
-import { signIn } from "@/auth";
-import { sendPasswordResetEmail } from "@/lib/email";
-import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
 import { hitRateLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/request-ip";
 
 export type AuthActionState = { error?: string } | undefined;
 export type ForgotPasswordState = { error?: string; success?: boolean } | undefined;
 export type ResetPasswordState = { error?: string; success?: boolean } | undefined;
-
-const RESET_TOKEN_TTL_MS = 1000 * 60 * 60;
 
 const RATE_LIMIT_ERROR = "Trop de tentatives. Merci de réessayer dans quelques minutes.";
 const LOGIN_EMAIL_LIMIT = { max: 10, windowMs: 10 * 60 * 1000 };
@@ -36,17 +31,24 @@ export async function signupAction(
     return { error: "Email invalide ou mot de passe trop court (8 caractères min)." };
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) {
-    return { error: "Un compte existe déjà avec cet email." };
+  try {
+    await auth.api.signUpEmail({
+      body: {
+        email,
+        password,
+        name: [firstName, lastName].filter(Boolean).join(" ") || email,
+        firstName,
+        lastName,
+      },
+    });
+  } catch (error) {
+    if (error instanceof APIError) {
+      return { error: "Un compte existe déjà avec cet email." };
+    }
+    throw error;
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.create({
-    data: { firstName, lastName, email, passwordHash },
-  });
-
-  await signIn("credentials", { email, password, redirectTo: "/" });
+  redirect("/");
 }
 
 export async function loginAction(
@@ -54,7 +56,7 @@ export async function loginAction(
   formData: FormData,
 ): Promise<AuthActionState> {
   const email = String(formData.get("email") ?? "").toLowerCase().trim();
-  const password = formData.get("password");
+  const password = String(formData.get("password") ?? "");
   const ip = await getClientIp();
 
   const [emailAllowed, ipAllowed] = await Promise.all([
@@ -66,13 +68,15 @@ export async function loginAction(
   }
 
   try {
-    await signIn("credentials", { email, password, redirectTo: "/" });
+    await auth.api.signInEmail({ body: { email, password } });
   } catch (error) {
-    if (error instanceof AuthError) {
+    if (error instanceof APIError) {
       return { error: "Email ou mot de passe incorrect." };
     }
     throw error;
   }
+
+  redirect("/");
 }
 
 export async function requestPasswordResetAction(
@@ -94,26 +98,14 @@ export async function requestPasswordResetAction(
     return { error: RATE_LIMIT_ERROR };
   }
 
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  // Always return a generic success response, whether or not the account exists,
-  // so this endpoint can't be used to enumerate registered emails.
-  if (!user) {
-    return { success: true };
-  }
-
-  await prisma.verificationToken.deleteMany({ where: { identifier: email } });
-
-  const token = crypto.randomBytes(32).toString("hex");
-  await prisma.verificationToken.create({
-    data: { identifier: email, token, expires: new Date(Date.now() + RESET_TOKEN_TTL_MS) },
-  });
-
+  // Better Auth's requestPasswordReset already returns a generic success response
+  // whether or not the account exists (with timing-attack mitigation baked in), so
+  // we don't need to look the user up ourselves — just forward to it and always
+  // report success either way.
   try {
-    await sendPasswordResetEmail(email, `/reset-password?token=${token}`);
+    await auth.api.requestPasswordReset({ body: { email, redirectTo: "/reset-password" } });
   } catch (error) {
-    console.error("Failed to send password reset email", error);
-    return { error: "L'envoi de l'email a échoué. Merci de réessayer plus tard." };
+    console.error("Password reset request failed", error);
   }
 
   return { success: true };
@@ -130,18 +122,14 @@ export async function resetPasswordAction(
     return { error: "Le mot de passe doit contenir au moins 8 caractères." };
   }
 
-  const verificationToken = await prisma.verificationToken.findUnique({ where: { token } });
-  if (!verificationToken || verificationToken.expires < new Date()) {
-    return { error: "Ce lien de réinitialisation est invalide ou a expiré." };
+  try {
+    await auth.api.resetPassword({ body: { newPassword: password, token } });
+  } catch (error) {
+    if (error instanceof APIError) {
+      return { error: "Ce lien de réinitialisation est invalide ou a expiré." };
+    }
+    throw error;
   }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  await prisma.user.update({
-    where: { email: verificationToken.identifier },
-    data: { passwordHash, passwordChangedAt: new Date() },
-  });
-
-  await prisma.verificationToken.delete({ where: { token } });
 
   return { success: true };
 }

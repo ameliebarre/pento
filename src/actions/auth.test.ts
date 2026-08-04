@@ -1,49 +1,47 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import bcrypt from "bcryptjs";
-import { AuthError } from "next-auth";
+import { APIError } from "better-auth/api";
 
 vi.mock("@/auth", () => ({
-  signIn: vi.fn(),
-  signOut: vi.fn(),
-  auth: vi.fn(),
-}));
-
-vi.mock("next-auth", () => ({
-  AuthError: class AuthError extends Error {},
-}));
-
-vi.mock("@/lib/email", () => ({
-  sendPasswordResetEmail: vi.fn(),
+  auth: {
+    api: {
+      signUpEmail: vi.fn(),
+      signInEmail: vi.fn(),
+      requestPasswordReset: vi.fn(),
+      resetPassword: vi.fn(),
+    },
+  },
 }));
 
 vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue(new Headers({ "x-forwarded-for": "203.0.113.1" })),
 }));
 
-import { signIn } from "@/auth";
+vi.mock("next/navigation", () => ({
+  redirect: vi.fn(),
+}));
+
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import {
   loginAction,
   requestPasswordResetAction,
   resetPasswordAction,
   signupAction,
 } from "@/actions/auth";
-import { sendPasswordResetEmail } from "@/lib/email";
-import { prisma } from "@/lib/prisma";
 
-const mockedSignIn = vi.mocked(signIn);
-const mockedSendPasswordResetEmail = vi.mocked(sendPasswordResetEmail);
+const mockedSignUpEmail = vi.mocked(auth.api.signUpEmail);
+const mockedSignInEmail = vi.mocked(auth.api.signInEmail);
+const mockedRequestPasswordReset = vi.mocked(auth.api.requestPasswordReset);
+const mockedResetPassword = vi.mocked(auth.api.resetPassword);
+const mockedRedirect = vi.mocked(redirect);
 
 beforeEach(() => {
-  mockedSignIn.mockReset();
-  mockedSendPasswordResetEmail.mockReset();
+  mockedSignUpEmail.mockReset();
+  mockedSignInEmail.mockReset();
+  mockedRequestPasswordReset.mockReset();
+  mockedResetPassword.mockReset();
+  mockedRedirect.mockReset();
 });
-
-async function createUser(email: string, password = "oldpassword123") {
-  const passwordHash = await bcrypt.hash(password, 10);
-  return prisma.user.create({
-    data: { email, passwordHash, firstName: "Test", lastName: "User" },
-  });
-}
 
 describe("requestPasswordResetAction", () => {
   it("returns an error when the email field is empty", async () => {
@@ -54,10 +52,24 @@ describe("requestPasswordResetAction", () => {
 
     expect(state?.error).toBeDefined();
     expect(state?.success).toBeUndefined();
-    expect(mockedSendPasswordResetEmail).not.toHaveBeenCalled();
+    expect(mockedRequestPasswordReset).not.toHaveBeenCalled();
   });
 
-  it("returns a generic success and sends no email when no account matches", async () => {
+  it("forwards the request to Better Auth with a redirect back to /reset-password", async () => {
+    const formData = new FormData();
+    formData.set("email", "known@example.com");
+
+    const state = await requestPasswordResetAction(undefined, formData);
+
+    expect(state?.success).toBe(true);
+    expect(state?.error).toBeUndefined();
+    expect(mockedRequestPasswordReset).toHaveBeenCalledWith({
+      body: { email: "known@example.com", redirectTo: "/reset-password" },
+    });
+  });
+
+  it("still returns a generic success when the request fails (no account, send failure, etc.)", async () => {
+    mockedRequestPasswordReset.mockRejectedValueOnce(new APIError("BAD_REQUEST"));
     const formData = new FormData();
     formData.set("email", "unknown@example.com");
 
@@ -65,67 +77,11 @@ describe("requestPasswordResetAction", () => {
 
     expect(state?.success).toBe(true);
     expect(state?.error).toBeUndefined();
-    expect(mockedSendPasswordResetEmail).not.toHaveBeenCalled();
-  });
-
-  it("creates a verification token and emails a reset link for a known email", async () => {
-    const user = await createUser("known@example.com");
-    const formData = new FormData();
-    formData.set("email", user.email!);
-
-    const state = await requestPasswordResetAction(undefined, formData);
-
-    expect(state?.error).toBeUndefined();
-    expect(state?.success).toBe(true);
-    expect(mockedSendPasswordResetEmail).toHaveBeenCalledTimes(1);
-
-    const [emailedTo, resetUrl] = mockedSendPasswordResetEmail.mock.calls[0];
-    expect(emailedTo).toBe(user.email);
-    expect(resetUrl).toMatch(/^\/reset-password\?token=.+/);
-
-    const token = resetUrl.split("token=")[1];
-    const stored = await prisma.verificationToken.findUnique({ where: { token } });
-    expect(stored?.identifier).toBe(user.email);
-    expect(stored?.expires.getTime()).toBeGreaterThan(Date.now());
-  });
-
-  it("invalidates any previous token when requested again", async () => {
-    const user = await createUser("repeat@example.com");
-    const formData = new FormData();
-    formData.set("email", user.email!);
-
-    await requestPasswordResetAction(undefined, formData);
-    await requestPasswordResetAction(undefined, formData);
-
-    expect(mockedSendPasswordResetEmail).toHaveBeenCalledTimes(2);
-    const firstToken = mockedSendPasswordResetEmail.mock.calls[0][1].split("token=")[1];
-    const secondToken = mockedSendPasswordResetEmail.mock.calls[1][1].split("token=")[1];
-
-    expect(firstToken).not.toBe(secondToken);
-    await expect(
-      prisma.verificationToken.findUnique({ where: { token: firstToken } }),
-    ).resolves.toBeNull();
-    await expect(
-      prisma.verificationToken.findUnique({ where: { token: secondToken } }),
-    ).resolves.not.toBeNull();
-  });
-
-  it("returns an error and does not crash when the email fails to send", async () => {
-    mockedSendPasswordResetEmail.mockRejectedValueOnce(new Error("Resend is down"));
-    const user = await createUser("undeliverable@example.com");
-    const formData = new FormData();
-    formData.set("email", user.email!);
-
-    const state = await requestPasswordResetAction(undefined, formData);
-
-    expect(state?.success).toBeUndefined();
-    expect(state?.error).toBe("L'envoi de l'email a échoué. Merci de réessayer plus tard.");
   });
 
   it("rate-limits repeated requests for the same email", async () => {
-    const user = await createUser("rate-limited@example.com");
     const formData = new FormData();
-    formData.set("email", user.email!);
+    formData.set("email", "rate-limited@example.com");
 
     for (let i = 0; i < 3; i++) {
       const state = await requestPasswordResetAction(undefined, formData);
@@ -135,7 +91,7 @@ describe("requestPasswordResetAction", () => {
     const state = await requestPasswordResetAction(undefined, formData);
 
     expect(state?.error).toBe("Trop de tentatives. Merci de réessayer dans quelques minutes.");
-    expect(mockedSendPasswordResetEmail).toHaveBeenCalledTimes(3);
+    expect(mockedRequestPasswordReset).toHaveBeenCalledTimes(3);
   });
 });
 
@@ -148,9 +104,11 @@ describe("resetPasswordAction", () => {
     const state = await resetPasswordAction(undefined, formData);
 
     expect(state?.error).toBe("Le mot de passe doit contenir au moins 8 caractères.");
+    expect(mockedResetPassword).not.toHaveBeenCalled();
   });
 
-  it("returns an error when the token does not exist", async () => {
+  it("returns a friendly error when the token is invalid or expired", async () => {
+    mockedResetPassword.mockRejectedValueOnce(new APIError("BAD_REQUEST"));
     const formData = new FormData();
     formData.set("token", "does-not-exist");
     formData.set("password", "newpassword123");
@@ -160,31 +118,7 @@ describe("resetPasswordAction", () => {
     expect(state?.error).toBe("Ce lien de réinitialisation est invalide ou a expiré.");
   });
 
-  it("returns an error when the token is expired", async () => {
-    const user = await createUser("expired@example.com");
-    await prisma.verificationToken.create({
-      data: { identifier: user.email!, token: "expired-token", expires: new Date(Date.now() - 1000) },
-    });
-
-    const formData = new FormData();
-    formData.set("token", "expired-token");
-    formData.set("password", "newpassword123");
-
-    const state = await resetPasswordAction(undefined, formData);
-
-    expect(state?.error).toBe("Ce lien de réinitialisation est invalide ou a expiré.");
-  });
-
-  it("updates the password and consumes the token on success", async () => {
-    const user = await createUser("resettable@example.com", "oldpassword123");
-    await prisma.verificationToken.create({
-      data: {
-        identifier: user.email!,
-        token: "valid-token",
-        expires: new Date(Date.now() + 1000 * 60 * 60),
-      },
-    });
-
+  it("updates the password on success", async () => {
     const formData = new FormData();
     formData.set("token", "valid-token");
     formData.set("password", "newpassword456");
@@ -192,42 +126,23 @@ describe("resetPasswordAction", () => {
     const state = await resetPasswordAction(undefined, formData);
 
     expect(state?.success).toBe(true);
-
-    const updated = await prisma.user.findUnique({ where: { email: user.email! } });
-    expect(await bcrypt.compare("newpassword456", updated!.passwordHash!)).toBe(true);
-    expect(await bcrypt.compare("oldpassword123", updated!.passwordHash!)).toBe(false);
-
-    await expect(
-      prisma.verificationToken.findUnique({ where: { token: "valid-token" } }),
-    ).resolves.toBeNull();
+    expect(mockedResetPassword).toHaveBeenCalledWith({
+      body: { newPassword: "newpassword456", token: "valid-token" },
+    });
   });
 
-  it("rejects reusing an already-consumed token", async () => {
-    const user = await createUser("onceonly@example.com");
-    await prisma.verificationToken.create({
-      data: {
-        identifier: user.email!,
-        token: "single-use-token",
-        expires: new Date(Date.now() + 1000 * 60 * 60),
-      },
-    });
-
+  it("rethrows errors that aren't APIError", async () => {
+    mockedResetPassword.mockRejectedValueOnce(new Error("database down"));
     const formData = new FormData();
-    formData.set("token", "single-use-token");
-    formData.set("password", "firstattempt1");
-    await resetPasswordAction(undefined, formData);
+    formData.set("token", "valid-token");
+    formData.set("password", "newpassword456");
 
-    const secondFormData = new FormData();
-    secondFormData.set("token", "single-use-token");
-    secondFormData.set("password", "secondattempt2");
-    const secondState = await resetPasswordAction(undefined, secondFormData);
-
-    expect(secondState?.error).toBe("Ce lien de réinitialisation est invalide ou a expiré.");
+    await expect(resetPasswordAction(undefined, formData)).rejects.toThrow("database down");
   });
 });
 
 describe("signupAction", () => {
-  it("returns an error and creates no user when the password is too short", async () => {
+  it("returns an error and does not call Better Auth when the password is too short", async () => {
     const formData = new FormData();
     formData.set("firstName", "Ada");
     formData.set("lastName", "Lovelace");
@@ -237,11 +152,10 @@ describe("signupAction", () => {
     const state = await signupAction(undefined, formData);
 
     expect(state?.error).toBe("Email invalide ou mot de passe trop court (8 caractères min).");
-    await expect(prisma.user.findUnique({ where: { email: "ada@example.com" } })).resolves.toBeNull();
-    expect(mockedSignIn).not.toHaveBeenCalled();
+    expect(mockedSignUpEmail).not.toHaveBeenCalled();
   });
 
-  it("returns an error and creates no user when the email is missing", async () => {
+  it("returns an error and does not call Better Auth when the email is missing", async () => {
     const formData = new FormData();
     formData.set("firstName", "Ada");
     formData.set("lastName", "Lovelace");
@@ -251,11 +165,11 @@ describe("signupAction", () => {
     const state = await signupAction(undefined, formData);
 
     expect(state?.error).toBe("Email invalide ou mot de passe trop court (8 caractères min).");
-    expect(mockedSignIn).not.toHaveBeenCalled();
+    expect(mockedSignUpEmail).not.toHaveBeenCalled();
   });
 
-  it("returns an error when an account already exists for that email", async () => {
-    await createUser("existing@example.com");
+  it("returns a friendly error when the account already exists", async () => {
+    mockedSignUpEmail.mockRejectedValueOnce(new APIError("UNPROCESSABLE_ENTITY"));
     const formData = new FormData();
     formData.set("firstName", "Ada");
     formData.set("lastName", "Lovelace");
@@ -265,11 +179,10 @@ describe("signupAction", () => {
     const state = await signupAction(undefined, formData);
 
     expect(state?.error).toBe("Un compte existe déjà avec cet email.");
-    expect(mockedSignIn).not.toHaveBeenCalled();
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 
-  it("creates the user with a hashed password and signs them in", async () => {
-    mockedSignIn.mockResolvedValueOnce(undefined);
+  it("signs the user up with the derived name and redirects home", async () => {
     const formData = new FormData();
     formData.set("firstName", "Ada");
     formData.set("lastName", "Lovelace");
@@ -278,23 +191,21 @@ describe("signupAction", () => {
 
     await signupAction(undefined, formData);
 
-    const created = await prisma.user.findUnique({ where: { email: "ada.lovelace@example.com" } });
-    expect(created?.firstName).toBe("Ada");
-    expect(created?.lastName).toBe("Lovelace");
-    expect(created?.passwordHash).not.toBe("password123");
-    expect(await bcrypt.compare("password123", created!.passwordHash!)).toBe(true);
-
-    expect(mockedSignIn).toHaveBeenCalledWith("credentials", {
-      email: "ada.lovelace@example.com",
-      password: "password123",
-      redirectTo: "/",
+    expect(mockedSignUpEmail).toHaveBeenCalledWith({
+      body: {
+        email: "ada.lovelace@example.com",
+        password: "password123",
+        name: "Ada Lovelace",
+        firstName: "Ada",
+        lastName: "Lovelace",
+      },
     });
+    expect(mockedRedirect).toHaveBeenCalledWith("/");
   });
 });
 
 describe("loginAction", () => {
-  it("signs in with the submitted credentials and returns no error on success", async () => {
-    mockedSignIn.mockResolvedValueOnce(undefined);
+  it("signs in with the submitted credentials and redirects home on success", async () => {
     const formData = new FormData();
     formData.set("email", "user@example.com");
     formData.set("password", "password123");
@@ -302,15 +213,14 @@ describe("loginAction", () => {
     const state = await loginAction(undefined, formData);
 
     expect(state).toBeUndefined();
-    expect(mockedSignIn).toHaveBeenCalledWith("credentials", {
-      email: "user@example.com",
-      password: "password123",
-      redirectTo: "/",
+    expect(mockedSignInEmail).toHaveBeenCalledWith({
+      body: { email: "user@example.com", password: "password123" },
     });
+    expect(mockedRedirect).toHaveBeenCalledWith("/");
   });
 
   it("returns a friendly error when the credentials are rejected", async () => {
-    mockedSignIn.mockRejectedValueOnce(new AuthError("Invalid credentials"));
+    mockedSignInEmail.mockRejectedValueOnce(new APIError("UNAUTHORIZED"));
     const formData = new FormData();
     formData.set("email", "user@example.com");
     formData.set("password", "wrongpassword");
@@ -318,10 +228,11 @@ describe("loginAction", () => {
     const state = await loginAction(undefined, formData);
 
     expect(state?.error).toBe("Email ou mot de passe incorrect.");
+    expect(mockedRedirect).not.toHaveBeenCalled();
   });
 
-  it("rethrows errors that are not AuthError", async () => {
-    mockedSignIn.mockRejectedValueOnce(new Error("network down"));
+  it("rethrows errors that are not APIError", async () => {
+    mockedSignInEmail.mockRejectedValueOnce(new Error("network down"));
     const formData = new FormData();
     formData.set("email", "user@example.com");
     formData.set("password", "password123");
@@ -330,7 +241,7 @@ describe("loginAction", () => {
   });
 
   it("rate-limits repeated attempts for the same email", async () => {
-    mockedSignIn.mockRejectedValue(new AuthError("Invalid credentials"));
+    mockedSignInEmail.mockRejectedValue(new APIError("UNAUTHORIZED"));
     const formData = new FormData();
     formData.set("email", "brute-forced@example.com");
     formData.set("password", "wrongpassword");
@@ -343,6 +254,6 @@ describe("loginAction", () => {
     const state = await loginAction(undefined, formData);
 
     expect(state?.error).toBe("Trop de tentatives. Merci de réessayer dans quelques minutes.");
-    expect(mockedSignIn).toHaveBeenCalledTimes(10);
+    expect(mockedSignInEmail).toHaveBeenCalledTimes(10);
   });
 });

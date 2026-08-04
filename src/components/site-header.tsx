@@ -2,13 +2,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { ShoppingCart, User } from "lucide-react";
 
-import { auth } from "@/auth";
+import { getSession } from "@/lib/get-session";
 import { Button } from "@/components/ui/button";
 import { ProductsNav } from "@/components/products-nav";
 import { MobileNav } from "@/components/mobile-nav";
 
 export async function SiteHeader() {
-  const session = await auth();
+  const session = await getSession();
   const initial = session?.user
     ? (session.user.firstName?.trim()?.[0] ?? session.user.email?.[0] ?? "?").toUpperCase()
     : null;

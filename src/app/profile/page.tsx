@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
+import { getSession } from "@/lib/get-session";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function ProfilePage() {
-  const session = await auth();
+  const session = await getSession();
   if (!session?.user) {
     redirect("/login");
   }
@@ -34,7 +36,8 @@ export default async function ProfilePage() {
           <form
             action={async () => {
               "use server";
-              await signOut({ redirectTo: "/" });
+              await auth.api.signOut({ headers: await headers() });
+              redirect("/");
             }}
           >
             <Button type="submit" variant="outline" className="h-10 w-full rounded-[6px]">
