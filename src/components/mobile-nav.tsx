@@ -85,7 +85,7 @@ export function MobileNav() {
                 <X aria-hidden="true" className="size-5" />
               </button>
               {PRODUCT_LINKS.map((link) => (
-                <motion.div key={link.href} variants={linkVariants}>
+                <motion.div key={link.label} variants={linkVariants}>
                   <Link
                     href={link.href}
                     onClick={() => setOpen(false)}

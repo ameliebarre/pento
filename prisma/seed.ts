@@ -14,7 +14,7 @@ async function resetCatalog() {
   await prisma.product.deleteMany();
   await prisma.designer.deleteMany();
   await prisma.manufacturer.deleteMany();
-  await prisma.style.deleteMany();
+  await prisma.movement.deleteMany();
   await prisma.material.deleteMany();
   await prisma.image.deleteMany();
   await prisma.country.deleteMany();
@@ -48,10 +48,20 @@ async function main() {
   // ---------------------------------------------------------------------
   // Countries
   // ---------------------------------------------------------------------
-  const countryNames = ["France", "Italie", "Allemagne", "Danemark", "États-Unis", "Suisse", "Pays-Bas"];
+  const countryNames = [
+    "France",
+    "Italie",
+    "Allemagne",
+    "Danemark",
+    "États-Unis",
+    "Suisse",
+    "Pays-Bas",
+  ];
   const countries = Object.fromEntries(
     await Promise.all(
-      countryNames.map(async (name) => [name, await prisma.country.create({ data: { name } })] as const),
+      countryNames.map(
+        async (name) => [name, await prisma.country.create({ data: { name } })] as const,
+      ),
     ),
   );
 
@@ -66,9 +76,13 @@ async function main() {
     "Fait main",
     "Extérieur",
     "Durable",
+    "Design italien",
+    "Éclairage",
   ];
   const tags = Object.fromEntries(
-    await Promise.all(tagNames.map(async (name) => [name, await prisma.tag.create({ data: { name } })] as const)),
+    await Promise.all(
+      tagNames.map(async (name) => [name, await prisma.tag.create({ data: { name } })] as const),
+    ),
   );
 
   // ---------------------------------------------------------------------
@@ -137,8 +151,24 @@ async function main() {
       biography: `Maître du design italien, Achille Castiglioni a marqué l'histoire par sa capacité à transformer les objets les plus simples en créations d'une remarquable ingéniosité.
       Son travail repose sur une observation attentive des usages, où chaque détail répond à une fonction avec élégance et humour.
       Des luminaires aux assises, ses créations illustrent un design intemporel, pensé pour durer et enrichir le quotidien.`,
-      quote: "Regardez les choses avec les yeux d'un enfant qui ne sait pas encore qu'elles sont impossibles.",
+      quote:
+        "Regardez les choses avec les yeux d'un enfant qui ne sait pas encore qu'elles sont impossibles.",
       image: "/images/achille-castiglioni.jpg",
+    },
+    {
+      slug: "pier-giacomo-castiglioni",
+      firstName: "Pier Giacomo",
+      lastName: "Castiglioni",
+      birthDate: new Date("1913-04-22"),
+      deathDate: new Date("1968-11-27"),
+      nationality: "Italienne",
+      biography: `Pier Giacomo Castiglioni est l'un des designers les plus influents de design italien et parmi les plus célèbres
+      dans le monde, considéré par Dino Gavina comme l'un des dix plus grands designers au monde. Ses œuvres sont exposées et 
+      conservées dans les collections des musées les plus importants de la conception industrielle et de l'art contemporain dans 
+      le monde, du Musée d'art moderne de New York à la Triennale Design Museum de Milan.`,
+      quote:
+        "Regardez les choses avec les yeux d'un enfant qui ne sait pas encore qu'elles sont impossibles.",
+      image: "/images/pier-giacomo-castiglioni.jpg",
     },
     {
       slug: "ludwig-mies-van-der-rohe",
@@ -171,7 +201,9 @@ async function main() {
   const designers = Object.fromEntries(
     await Promise.all(
       designerDefs.map(async (d) => {
-        const portrait = d.image ? await image(d.image, `Portrait de ${d.firstName} ${d.lastName}`) : null;
+        const portrait = d.image
+          ? await image(d.image, `Portrait de ${d.firstName} ${d.lastName}`)
+          : null;
         const designer = await prisma.designer.create({
           data: {
             slug: d.slug,
@@ -242,6 +274,20 @@ async function main() {
       history: `Collectif fondé à Milan en 1981 par Ettore Sottsass et un groupe de jeunes designers, Memphis a bouleversé les codes du design en assumant la couleur, le motif et l'ironie contre le fonctionnalisme ambiant.
       Son héritage irrigue encore la création contemporaine la plus audacieuse.`,
     },
+    {
+      slug: "flos",
+      name: "Flos",
+      country: "Italie",
+      website: "https://flos.com/",
+      history: `Flos luminaires fondée en 1962 à Merano, Flos est une entreprise internationale qui offre une gamme de produits 
+      et systèmes d’éclairage destinés au secteur résidentiel et architectural. Célèbre pour ses luminaires design et innovants, 
+      la société dispose d’un catalogue riche en produits emblématiques, des lampes iconiques, des luminaires intemprelles qui ont 
+      été conçus par des légendes dans l’histoire du design, telles qu’ Achille Castiglioni, Philippe Starck, Antonio Citterio, 
+      Marcel Wanders, Konstantin Grcic, Jasper Morrison, Patricia Urquiola, Ron Gilad, Ronan et Erwan Bouroullec et beaucoup 
+      d’autres architectes ou designers. En effet en 1988, la société "flash" sur un certain Philippe Starck, de là, la lampe 
+      Ara naît de cette collaboration qui dure maintenant depuis plus de 20 ans. Flos fait preuve d’un engagement permanent dans 
+      la recherche et l’innovation technologique, et témoigne d’une extraordinaire capacité à trouver de nouveaux talents créatifs. `,
+    },
   ];
 
   const manufacturers = Object.fromEntries(
@@ -262,55 +308,76 @@ async function main() {
   );
 
   // ---------------------------------------------------------------------
-  // Styles (aka "movements" in the homepage UI)
+  // Movements (aka "styles" — shown as "Browse by movement" on the homepage)
   // ---------------------------------------------------------------------
-  const styleDefs = [
+  const movementDefs = [
     {
       slug: "bauhaus",
       name: "Bauhaus",
-      description: "Fusion de l'art, de l'artisanat et de la fonction, sans ornement superflu.",
-      image: "/images/styles/bauhaus.webp",
+      description:
+        "Le Bauhaus a été fondé par Walter Gropius en 1919 à Weimar, en Allemagne. L'école Bauhaus a été créée avec l'idée révolutionnaire de réunir l'artisanat, l'art et la technologie. Walter Gropius voulait éliminer la distinction entre les beaux-arts et les arts appliqués. Cette approche novatrice a permis au Bauhaus de devenir un creuset de nouvelles idées et de pratiques avant-gardistes.",
+      startDate: new Date("1919-01-01"),
+      endDate: new Date("1933-01-01"),
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785933605/pento/movements/bauhaus.webp",
     },
     {
       slug: "mid-century",
       name: "Mid-Century",
-      description: "Lignes organiques et fonctionnalité optimiste de l'après-guerre.",
-      image: "/images/styles/mid-century.jpg",
-    },
-    {
-      slug: "scandinave",
-      name: "Scandinave",
-      description: "Bois clair, fonctionnalité et douceur minimaliste.",
-      image: "/images/styles/scandinavian.jpeg",
+      description:
+        "Apparu dans les années 40 aux Etats-Unis, le mid-century modern émerge d’abord dans le domaine de l’architecture avec de grands noms comme Frank Lloyd Wright et Richard Neutra, puis influence ensuite le monde du design. Ce style épuré se veut une réaction aux intérieurs opulents et chargés des décennies qui l’ont précédé, et tire notamment son inspiration du courant artistique Bauhaus et du mouvement moderne.",
+      startDate: new Date("1945-01-01"),
+      endDate: new Date("1970-01-01"),
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785934984/pento/movements/mid-century.webp",
     },
     {
       slug: "memphis-milano",
       name: "Memphis Milano",
-      description: "Couleurs vives, motifs audacieux et formes ludiques.",
-      image: "/images/styles/memphis-milano.jpg",
+      description:
+        "Fondée en 1981 par Ettore Sottsass et d'autres designers, Memphis Milano a révolutionné le design avec ses créations colorées et excentriques, symboles de l'Anti-design des années 1980. Aujourd'hui, la marque continue de produire artisanalement des pièces emblématiques recherchées par des collectionneurs et exposées dans des musées prestigieux.",
+      startDate: new Date("1981-01-01"),
+      endDate: new Date("1988-12-31"),
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785916034/pento/movements/memphis-design.webp",
     },
     {
-      slug: "art-deco",
-      name: "Art Déco",
-      description: "Lignes géométriques, matériaux luxueux et symétrie affirmée.",
-      image: "/images/styles/art-deco.jpg",
+      slug: "postmodernism",
+      name: "Postmodernisme",
+      description:
+        "Le mobilier conçu par les designers postmodernes se caractérise par des surfaces de couleur chaude, à fort motifs, généralement en plastique ; des proportions étranges et des angles non conventionnels et une relation éloignée entre la forme et la fonction de l'objet. Les critiques ont tourné en dérision le design postmoderne en présentant le mobilier comme étant uniquement distractif mais n'amenant pas de valeur ajoutée au mobilier. Le fait est que, trente ans plus tard, le design postmoderne a toujours le pouvoir de provoquer des étonnements et cela prouve que les critiques n'étaient pas tout à fait fondées.",
+      startDate: new Date("1960-01-01"),
+      endDate: null,
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785933360/pento/movements/postmodernism.jpg",
     },
     {
-      slug: "minimalisme-japonais",
-      name: "Minimalisme japonais",
-      description: "Simplicité, matières naturelles et sens du vide.",
-      image: "/images/styles/minimalisme-japonais.jpg",
+      slug: "organic-design",
+      name: "Design Organique",
+      description:
+        "Avec leurs courbes asymétriques, le mouvement presque naturel des pièces organiques rompt avec les lignes et angles droits traditionnels. Dans un intérieur, elles appellent à une esthétique plus harmonieuse, entre minimalisme et caractère.L’organique s’impose subtilement dans l’espace. Tandis que les miroirs ondulés apportent une douceur visuelle à l'espace, les canapés arrondis invitent à la convivialité et les meubles boisés rendent le lieu plus chaleureux, presque imposant.",
+      startDate: null,
+      endDate: null,
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785915349/pento/movements/design-organique.jpg",
     },
   ];
 
-  const styles = Object.fromEntries(
+  const movements = Object.fromEntries(
     await Promise.all(
-      styleDefs.map(async (s) => {
-        const cover = await image(s.image, s.name);
-        const style = await prisma.style.create({
-          data: { slug: s.slug, name: s.name, description: s.description, coverImageId: cover.id },
+      movementDefs.map(async (m) => {
+        const cover = await image(m.image, m.name);
+        const movement = await prisma.movement.create({
+          data: {
+            slug: m.slug,
+            name: m.name,
+            description: m.description,
+            startDate: m.startDate,
+            endDate: m.endDate,
+            coverImageId: cover.id,
+          },
         });
-        return [s.slug, style] as const;
+        return [m.slug, movement] as const;
       }),
     ),
   );
@@ -323,12 +390,14 @@ async function main() {
     {
       slug: "chene-massif",
       name: "Chêne massif",
-      description: "Bois noble et durable, prisé pour sa résistance et le veinage chaleureux qu'il révèle avec le temps.",
+      description:
+        "Bois noble et durable, prisé pour sa résistance et le veinage chaleureux qu'il révèle avec le temps.",
     },
     {
       slug: "acier-inoxydable-poli",
       name: "Acier inoxydable poli",
-      description: "Structure fine et résistante à la corrosion, pour un fini miroir d'une grande précision.",
+      description:
+        "Structure fine et résistante à la corrosion, pour un fini miroir d'une grande précision.",
     },
     {
       slug: "cuir-pleine-fleur",
@@ -338,17 +407,20 @@ async function main() {
     {
       slug: "velours",
       name: "Velours",
-      description: "Tissu au toucher soyeux et à la teinte profonde, pour une assise à la fois cosy et élégante.",
+      description:
+        "Tissu au toucher soyeux et à la teinte profonde, pour une assise à la fois cosy et élégante.",
     },
     {
       slug: "marbre-de-carrare",
       name: "Marbre de Carrare",
-      description: "Pierre italienne d'exception aux veinures uniques, symbole intemporel de raffinement.",
+      description:
+        "Pierre italienne d'exception aux veinures uniques, symbole intemporel de raffinement.",
     },
     {
       slug: "rotin-naturel",
       name: "Rotin naturel",
-      description: "Fibre végétale tressée à la main, légère et aérienne, pour une allure naturelle et estivale.",
+      description:
+        "Fibre végétale tressée à la main, légère et aérienne, pour une allure naturelle et estivale.",
     },
     {
       slug: "laiton-brosse",
@@ -358,7 +430,20 @@ async function main() {
     {
       slug: "laine-bouclee",
       name: "Laine bouclée",
-      description: "Fibre naturelle isolante et texturée, pour un confort enveloppant toute l'année.",
+      description:
+        "Fibre naturelle isolante et texturée, pour un confort enveloppant toute l'année.",
+    },
+    {
+      slug: "metal-laque",
+      name: "Métal laqué",
+      description:
+        "Métal recouvert d'une laque colorée brillante, pour une finition graphique et durable.",
+    },
+    {
+      slug: "verre",
+      name: "Verre",
+      description:
+        "Matière translucide et précise, souvent associée au métal pour un rendu à la fois léger et technique.",
     },
   ];
 
@@ -391,204 +476,66 @@ async function main() {
       weight: 32,
       category: "armchairs",
       manufacturer: "knoll",
-      style: "bauhaus",
+      movement: "bauhaus",
       designers: ["ludwig-mies-van-der-rohe"],
       materials: ["cuir-pleine-fleur", "acier-inoxydable-poli"],
       tags: ["Iconique", "Bestseller"],
-      image: "/images/armchairs.png",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785876690/pento/products/barcelona-chair.jpg",
       imageAlt: "Fauteuil Barcelona en cuir capitonné sur piètement en acier inoxydable",
     },
     {
-      slug: "fauteuil-oeuf",
-      sku: "FH-EGG-001",
-      name: "Fauteuil Œuf",
-      description: `Conçu en 1958 pour le hall du Royal Hotel de Copenhague, le Fauteuil Œuf enveloppe son occupant dans une coque sculpturale moulée d'une seule pièce.
-      Son piètement pivotant en aluminium et son assise généreusement rembourrée en font un cocon d'intimité au cœur même des espaces ouverts.
-      Pièce maîtresse du design scandinave, elle continue d'incarner l'équilibre parfait entre audace formelle et confort absolu.`,
-      price: 6900,
-      stock: 2,
-      salesCount: 41,
-      featured: true,
-      width: 86,
-      height: 107,
-      depth: 86,
-      weight: 28,
-      category: "armchairs",
-      manufacturer: "fritz-hansen",
-      style: "scandinave",
-      designers: ["arne-jacobsen"],
-      materials: ["laine-bouclee"],
-      tags: ["Iconique", "Bestseller"],
-      image: "/images/egg-chair.jpg",
-      imageAlt: "Fauteuil Œuf tapissé de laine bouclée sur piètement pivotant en aluminium",
-    },
-    {
-      slug: "fauteuil-groovy",
-      sku: "ART-GRV-001",
-      name: "Fauteuil Groovy",
-      description: `Imaginé par Pierre Paulin pour Artifort au début des années 1970, le Groovy tend un jersey de velours sur une coque de mousse aux courbes fluides.
-      Sa silhouette basse et enveloppante invite à s'y lover plutôt qu'à s'y asseoir, dans le plus pur esprit du design organique de l'époque.
-      Disponible dans une palette de coloris affirmés, il apporte une touche résolument pop à tout intérieur.`,
-      price: 2100,
-      stock: 6,
-      salesCount: 22,
-      featured: false,
-      width: 75,
-      height: 70,
-      depth: 80,
-      weight: 18,
-      category: "armchairs",
-      manufacturer: "artifort",
-      style: "mid-century",
-      designers: ["pierre-paulin"],
-      materials: ["velours"],
-      tags: ["Iconique"],
-      image: "/images/armchairs.png",
-      imageAlt: "Fauteuil Groovy à coque tendue de velours et structure tubulaire",
-    },
-    {
-      slug: "canape-panton",
-      sku: "VTR-PAN-001",
-      name: "Canapé Panton",
-      description: `Ce canapé associe une assise profonde et un dossier généreusement galbé pour un confort enveloppant au quotidien.
-      Sa structure en bois massif et son piètement fuselé rappellent les lignes optimistes du mobilier des années 1950.
-      Habillé de velours, il s'impose comme la pièce centrale d'un salon contemporain sans jamais sacrifier la chaleur d'un intérieur habité.`,
-      price: 3200,
-      stock: 3,
-      salesCount: 35,
-      featured: true,
-      width: 210,
-      height: 78,
-      depth: 95,
-      weight: 65,
-      category: "sofas",
-      manufacturer: "vitra",
-      style: "mid-century",
-      designers: [],
-      materials: ["velours"],
-      tags: ["Bestseller"],
-      image: "/images/sofa.png",
-      imageAlt: "Canapé trois places tapissé de velours sur piètement en bois",
-    },
-    {
-      slug: "table-bauhaus",
-      sku: "KNL-TBL-001",
-      name: "Table Bauhaus",
-      description: `Un plateau de marbre de Carrare posé sur un piètement croisé en acier chromé : la table Bauhaus incarne à elle seule la rencontre entre matière brute et rigueur géométrique.
-      Héritière directe des principes fonctionnalistes de l'école allemande, elle refuse tout artifice pour ne garder que l'essentiel.
-      Une pièce de caractère, pensée pour traverser les décennies sans prendre une ride.`,
-      price: 1890,
-      stock: 5,
-      salesCount: 14,
-      featured: false,
-      width: 120,
-      height: 40,
-      depth: 120,
-      weight: 55,
-      category: "tables",
-      manufacturer: "knoll",
-      style: "bauhaus",
-      designers: ["ludwig-mies-van-der-rohe"],
-      materials: ["marbre-de-carrare", "acier-inoxydable-poli"],
-      tags: ["Iconique"],
-      image: "/images/tables.png",
-      imageAlt: "Table basse carrée en marbre de Carrare sur piètement croisé en acier",
-    },
-    {
-      slug: "chaise-castiglioni",
-      sku: "CAS-CHR-001",
-      name: "Chaise Castiglioni",
-      description: `Fidèle à la démarche d'Achille Castiglioni, cette chaise en chêne massif réduit la forme à sa plus stricte fonction sans jamais sacrifier l'élégance.
-      Son assise légèrement galbée et ses pieds fuselés témoignent d'un souci du détail hérité de décennies d'observation des usages.
-      Fabriquée à la main en Italie, elle incarne un design intemporel pensé pour durer.`,
-      price: 640,
-      stock: 12,
-      salesCount: 19,
-      featured: false,
-      width: 48,
-      height: 82,
-      depth: 52,
-      weight: 6,
-      category: "chairs",
-      manufacturer: "cassina",
-      style: "mid-century",
-      designers: ["achille-castiglioni"],
-      materials: ["chene-massif"],
-      tags: ["Fait main"],
-      image: "/images/chairs.png",
-      imageAlt: "Chaise en chêne massif à l'assise galbée et aux pieds fuselés",
-    },
-    {
-      slug: "lampe-sottsass",
-      sku: "MMP-LMP-001",
-      name: "Lampe Sottsass",
-      description: `Manifeste du mouvement Memphis, cette lampe assemble volumes géométriques et couleurs franches dans une composition résolument ludique.
-      Signée Ettore Sottsass, elle rejette les codes du design fonctionnaliste pour affirmer une esthétique libre et joyeuse.
-      Éditée en série limitée, elle transforme chaque intérieur en terrain d'expression artistique.`,
-      price: 980,
-      stock: 7,
-      salesCount: 9,
-      featured: false,
-      width: 30,
-      height: 55,
-      depth: 30,
-      weight: 4,
-      category: "lighting",
-      manufacturer: "memphis-milano",
-      style: "memphis-milano",
-      designers: ["ettore-sottsass"],
-      materials: ["laiton-brosse"],
-      tags: ["Édition limitée", "Iconique"],
-      image: "/images/lighting.png",
-      imageAlt: "Lampe sculpturale en laiton brossé aux formes géométriques colorées",
-    },
-    {
-      slug: "console-putman",
-      sku: "PUT-CNS-001",
-      name: "Console Putman",
-      description: `Andrée Putman revisite ici les codes de l'Art déco avec une console aux lignes strictes, rehaussée de fins liserés de laiton.
-      Le chêne massif, sobre et chaleureux, contraste avec la précision géométrique du dessin pour un résultat résolument parisien.
-      Une pièce d'entrée ou de salon qui conjugue élégance graphique et savoir-faire artisanal.`,
-      price: 1560,
+      slug: "mr-chair",
+      sku: "KNL-BAR-002",
+      name: "MR Chair",
+      description: `La MR Chair, imaginée par Ludwig Mies van der Rohe à la fin des années 1920, est l'une des expressions
+      les plus emblématiques du mouvement moderniste. Inspirée des fauteuils en acier utilisés dans les premiers meubles cantilever, 
+      elle se distingue par sa structure en acier tubulaire courbé qui semble défier la gravité tout en offrant une assise d'un grand confort.
+       Son dessin épuré, dépourvu de tout ornement superflu, reflète parfaitement la philosophie de Mies van der Rohe : « Less is more. »
+        Aujourd'hui encore, la MR Chair séduit par son élégance intemporelle et sa capacité à s'intégrer aussi naturellement dans 
+        un intérieur contemporain que dans un espace au caractère plus classique.`,
+      price: 2780,
       stock: 4,
-      salesCount: 3,
-      featured: false,
-      width: 140,
-      height: 78,
-      depth: 40,
-      weight: 38,
-      category: "tables",
-      manufacturer: null,
-      style: "art-deco",
-      designers: ["andree-putman"],
-      materials: ["chene-massif", "laiton-brosse"],
-      tags: ["Nouveauté"],
-      image: "/images/tables.png",
-      imageAlt: "Console en chêne massif rehaussée de laiton, aux lignes géométriques Art déco",
+      salesCount: 128,
+      featured: true,
+      width: 49,
+      height: 69,
+      depth: 79,
+      weight: 9,
+      category: "chairs",
+      manufacturer: "knoll",
+      movement: "bauhaus",
+      designers: ["ludwig-mies-van-der-rohe"],
+      materials: ["cuir-pleine-fleur", "acier-inoxydable-poli"],
+      tags: ["Iconique", "Bestseller"],
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785879904/pento/products/mr-chair.webp",
+      imageAlt: "Chaise MR",
     },
     {
-      slug: "chauffeuse-aisslinger",
-      sku: "VTR-CHF-001",
-      name: "Chauffeuse Aisslinger",
-      description: `Werner Aisslinger explore ici les vertus du rotin naturel, matière vivante et durable, tressée à la main sur une structure légère.
-      Ses lignes épurées et son assise aérienne invitent à repenser le confort loin du superflu, dans un dialogue permanent avec la matière brute.
-      Une pièce pensée pour vieillir avec grâce, aussi à l'aise en intérieur que sur une terrasse abritée.`,
-      price: 890,
-      stock: 8,
-      salesCount: 6,
-      featured: false,
-      width: 68,
-      height: 75,
-      depth: 70,
-      weight: 9,
-      category: "armchairs",
-      manufacturer: "vitra",
-      style: "minimalisme-japonais",
-      designers: ["werner-aisslinger"],
-      materials: ["rotin-naturel"],
-      tags: ["Durable", "Nouveauté"],
-      image: "/images/armchairs.png",
-      imageAlt: "Chauffeuse en rotin tressé à la structure légère et épurée",
+      slug: "snoopy-lamp",
+      sku: "FLO-SNP-001",
+      name: "Snoopy Lamp",
+      description: `Imaginée en 1967 par Achille et Pier Giacomo Castiglioni, la Snoopy Lamp est devenue une véritable icône du design italien. Son abat-jour émaillé aux courbes généreuses, évoquant le célèbre personnage de bande dessinée, contraste élégamment avec son imposant socle en marbre blanc de Carrare.
+  À la fois sculpturale et fonctionnelle, cette lampe de table diffuse une lumière directe idéale pour un bureau, une bibliothèque ou une table d'appoint. Le mariage du métal laqué et de la pierre naturelle met en valeur le savoir-faire italien tout en offrant une présence graphique forte.
+  Plus de cinquante ans après sa création, la Snoopy Lamp demeure une référence incontournable du design, appréciée pour son esthétique audacieuse, la qualité de ses matériaux et son caractère intemporel.`,
+      price: 1280,
+      stock: 6,
+      salesCount: 74,
+      featured: true,
+      width: 39.4,
+      height: 36.9,
+      depth: 39.4,
+      weight: 7.9,
+      category: "lighting",
+      manufacturer: "flos",
+      movement: "mid-century", // was a dangling "modernism" reference before the rename; closest existing fit chronologically (1967)
+      designers: ["achille-castiglioni", "pier-giacomo-castiglioni"],
+      materials: ["marbre-de-carrare", "metal-laque", "verre"],
+      tags: ["Iconique", "Design italien", "Éclairage"],
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785876690/pento/products/snoopy-lamp.jpg",
+      imageAlt: "Lampe Snoopy de Flos avec abat-jour noir et socle en marbre blanc de Carrare",
     },
   ];
 
@@ -609,7 +556,7 @@ async function main() {
         weight: p.weight,
         categoryId: categories[p.category].id,
         manufacturerId: p.manufacturer ? manufacturers[p.manufacturer].id : null,
-        styleId: styles[p.style].id,
+        movementId: movements[p.movement].id,
       },
     });
 
@@ -619,10 +566,14 @@ async function main() {
 
     await Promise.all([
       ...p.designers.map((slug) =>
-        prisma.productDesigner.create({ data: { productId: product.id, designerId: designers[slug].id } }),
+        prisma.productDesigner.create({
+          data: { productId: product.id, designerId: designers[slug].id },
+        }),
       ),
       ...p.materials.map((slug) =>
-        prisma.productMaterial.create({ data: { productId: product.id, materialId: materials[slug].id } }),
+        prisma.productMaterial.create({
+          data: { productId: product.id, materialId: materials[slug].id },
+        }),
       ),
       ...p.tags.map((name) =>
         prisma.productTag.create({ data: { productId: product.id, tagId: tags[name].id } }),

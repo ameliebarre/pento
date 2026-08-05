@@ -115,7 +115,7 @@ model Image {
 
   designer         Designer?
   manufacturerLogo Manufacturer?
-  style            Style?
+  movement         Movement?
   material         Material?
 
   createdAt DateTime @default(now())
@@ -185,11 +185,13 @@ model Manufacturer {
   @@index([countryId])
 }
 
-model Style {
-  id          String @id @default(cuid())
-  slug        String @unique
-  name        String @unique
-  description String @db.Text
+model Movement {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String    @unique
+  description String    @db.Text
+  startDate   DateTime?
+  endDate     DateTime?
 
   coverImageId String? @unique
   coverImage   Image?  @relation(fields: [coverImageId], references: [id], onDelete: SetNull)
@@ -248,8 +250,8 @@ model Product {
   manufacturerId String?
   manufacturer   Manufacturer? @relation(fields: [manufacturerId], references: [id])
 
-  styleId String?
-  style   Style?  @relation(fields: [styleId], references: [id])
+  movementId String?
+  movement   Movement? @relation(fields: [movementId], references: [id])
 
   images    Image[]
   designers ProductDesigner[]
@@ -264,7 +266,7 @@ model Product {
 
   @@index([categoryId])
   @@index([manufacturerId])
-  @@index([styleId])
+  @@index([movementId])
 }
 
 // --- Explicit join tables for Product's many-to-many relations -------------
