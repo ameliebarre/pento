@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -95,14 +94,6 @@ model RateLimitBucket {
   count   Int      @default(1)
   resetAt DateTime
 }
-
-// ---------------------------------------------------------------------------
-// Media — one shared table so every image carries alt text (WCAG requirement,
-// see CLAUDE.md accessibility rules), instead of bare URL strings scattered
-// across models. Product uses it as a gallery (one-to-many, ordered via
-// `position`); every other model uses it as a single cover/portrait/logo
-// image (one-to-one, FK lives on the owning model).
-// ---------------------------------------------------------------------------
 
 model Image {
   id  String @id @default(cuid())
