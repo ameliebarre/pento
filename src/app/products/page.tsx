@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/product-card";
 export default async function ShopAllPage() {
   const products = await prisma.product.findMany({
     include: {
-      images: { take: 1, orderBy: { position: "asc" } },
+      images: { take: 1, orderBy: { createdAt: "asc" } },
       designers: { include: { designer: true } },
     },
     orderBy: { createdAt: "desc" },

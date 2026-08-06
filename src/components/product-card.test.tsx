@@ -27,7 +27,7 @@ function buildProduct(overrides: Partial<ProductWithImage> = {}): ProductWithIma
     movementId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    images: [{ id: "img_1", url: "/images/armchairs.png", alt: "Barcelona Chair", productId: "product_1", position: 0, createdAt: new Date() }],
+    images: [{ id: "img_1", url: "/images/armchairs.png", alt: "Barcelona Chair", productId: "product_1", createdAt: new Date() }],
     designers: [],
     ...overrides,
   };

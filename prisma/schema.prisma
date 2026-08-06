@@ -102,8 +102,8 @@ model Image {
 
   productId String?
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  position  Int?
 
+  category         Category?
   designer         Designer?
   manufacturerLogo Manufacturer?
   movement         Movement?
@@ -123,6 +123,9 @@ model Category {
   name     String
   slug     String    @unique
   products Product[]
+
+  coverImageId String? @unique
+  coverImage   Image?  @relation(fields: [coverImageId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -229,28 +232,22 @@ model Product {
   salesCount  Int     @default(0)
   featured    Boolean @default(false)
 
-  // Dimensions in centimeters, weight in kilograms.
-  width  Float?
-  height Float?
-  depth  Float?
-  weight Float?
-
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-
+  width          Float?
+  height         Float?
+  depth          Float?
+  weight         Float?
+  categoryId     String?
+  category       Category?         @relation(fields: [categoryId], references: [id])
   manufacturerId String?
-  manufacturer   Manufacturer? @relation(fields: [manufacturerId], references: [id])
-
-  movementId String?
-  movement   Movement? @relation(fields: [movementId], references: [id])
-
-  images    Image[]
-  designers ProductDesigner[]
-  materials ProductMaterial[]
-  tags      ProductTag[]
-
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  manufacturer   Manufacturer?     @relation(fields: [manufacturerId], references: [id])
+  movementId     String?
+  movement       Movement?         @relation(fields: [movementId], references: [id])
+  images         Image[]
+  designers      ProductDesigner[]
+  materials      ProductMaterial[]
+  tags           ProductTag[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

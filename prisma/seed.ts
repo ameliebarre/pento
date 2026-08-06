@@ -33,15 +33,52 @@ async function main() {
   // Categories
   // ---------------------------------------------------------------------
   const categoryDefs = [
-    { name: "Chairs", slug: "chairs" },
-    { name: "Armchairs", slug: "armchairs" },
-    { name: "Sofas", slug: "sofas" },
-    { name: "Tables", slug: "tables" },
-    { name: "Lighting", slug: "lighting" },
+    {
+      name: "Chairs",
+      slug: "chairs",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785966873/pento/categories/chairs.webp",
+    },
+    {
+      name: "Armchairs",
+      slug: "armchairs",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785966961/pento/categories/armchairs.jpg",
+    },
+    {
+      name: "Sofas",
+      slug: "sofas",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785965914/pento/categories/sofas_ek6cls.jpg",
+    },
+    {
+      name: "Tables",
+      slug: "tables",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785966060/pento/categories/tables.png",
+    },
+    {
+      name: "Lighting",
+      slug: "lighting",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785966756/pento/categories/lighting.webp",
+    },
+    {
+      name: "Accessoiries",
+      slug: "accessoiries",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1785966133/pento/categories/accessoiries_z3hmd2.jpg",
+    },
   ];
   const categories = Object.fromEntries(
     await Promise.all(
-      categoryDefs.map(async (c) => [c.slug, await prisma.category.create({ data: c })] as const),
+      categoryDefs.map(async (c) => {
+        const cover = await image(c.image, c.name);
+        const category = await prisma.category.create({
+          data: { name: c.name, slug: c.slug, coverImageId: cover.id },
+        });
+        return [c.slug, category] as const;
+      }),
     ),
   );
 
@@ -69,15 +106,16 @@ async function main() {
   // Tags (used by search/filtering)
   // ---------------------------------------------------------------------
   const tagNames = [
-    "Bestseller",
-    "Édition limitée",
-    "Nouveauté",
-    "Iconique",
-    "Fait main",
-    "Extérieur",
-    "Durable",
-    "Design italien",
-    "Éclairage",
+    "bestseller",
+    "armchairs",
+    "chairs",
+    "sofas",
+    "lighting",
+    "accessoiries",
+    "outdoor",
+    "italian design",
+    "nordic design",
+    "japanese design",
   ];
   const tags = Object.fromEntries(
     await Promise.all(
@@ -479,7 +517,22 @@ async function main() {
       movement: "bauhaus",
       designers: ["ludwig-mies-van-der-rohe"],
       materials: ["cuir-pleine-fleur", "acier-inoxydable-poli"],
-      tags: ["Iconique", "Bestseller"],
+      tags: [
+        "Bauhaus",
+        "Modernisme",
+        "Fauteuil lounge",
+        "Design iconique",
+        "Mobilier du XXe siècle",
+        "Acier chromé",
+        "Cuir",
+        "Minimalisme",
+        "Luxe",
+        "Intemporel",
+        "Knoll",
+        "Salon",
+        "Architecture",
+        "Less is more",
+      ],
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785876690/pento/products/barcelona-chair.jpg",
       imageAlt: "Fauteuil Barcelona en cuir capitonné sur piètement en acier inoxydable",
@@ -507,7 +560,22 @@ async function main() {
       movement: "bauhaus",
       designers: ["ludwig-mies-van-der-rohe"],
       materials: ["cuir-pleine-fleur", "acier-inoxydable-poli"],
-      tags: ["Iconique", "Bestseller"],
+      tags: [
+        "Bauhaus",
+        "Modernisme",
+        "Chaise cantilever",
+        "Acier tubulaire",
+        "Minimalisme",
+        "Design iconique",
+        "Mobilier du XXe siècle",
+        "Architecture",
+        "Ligne épurée",
+        "Intemporel",
+        "Salon",
+        "Salle à manger",
+        "Knoll",
+        "Less is more",
+      ],
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785879904/pento/products/mr-chair.webp",
       imageAlt: "Chaise MR",
@@ -529,12 +597,27 @@ async function main() {
       weight: 7.9,
       category: "lighting",
       manufacturer: "flos",
-      movement: "mid-century", // was a dangling "modernism" reference before the rename; closest existing fit chronologically (1967)
+      movement: "mid-century",
       designers: ["achille-castiglioni", "pier-giacomo-castiglioni"],
       materials: ["marbre-de-carrare", "metal-laque", "verre"],
-      tags: ["Iconique", "Design italien", "Éclairage"],
+      tags: [
+        "Lampe de table",
+        "Design italien",
+        "Mid-Century",
+        "Marbre",
+        "Métal émaillé",
+        "Éclairage",
+        "Flos",
+        "Design iconique",
+        "Sculptural",
+        "Élégance",
+        "Bureau",
+        "Salon",
+        "Luxe",
+        "Collection",
+      ],
       image:
-        "https://res.cloudinary.com/dasujyncc/image/upload/v1785876690/pento/products/snoopy-lamp.jpg",
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786016899/pento/products/snoopy-lamp_jggznu.jpg",
       imageAlt: "Lampe Snoopy de Flos avec abat-jour noir et socle en marbre blanc de Carrare",
     },
   ];
@@ -561,7 +644,7 @@ async function main() {
     });
 
     await prisma.image.create({
-      data: { url: p.image, alt: p.imageAlt, productId: product.id, position: 0 },
+      data: { url: p.image, alt: p.imageAlt, productId: product.id },
     });
 
     await Promise.all([
