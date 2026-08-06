@@ -96,4 +96,37 @@ describe("MobileNav", () => {
       expect(screen.queryByRole("navigation", { name: "Menu" })).not.toBeInTheDocument();
     });
   });
+
+  it("moves focus to the close button when the panel opens", async () => {
+    const user = userEvent.setup();
+    render(<MobileNav />);
+
+    await user.click(screen.getByRole("button", { name: "Ouvrir le menu" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Fermer le menu" })).toHaveFocus();
+    });
+  });
+
+  it("returns focus to the trigger button when the panel closes", async () => {
+    const user = userEvent.setup();
+    render(<MobileNav />);
+
+    const trigger = screen.getByRole("button", { name: "Ouvrir le menu" });
+    await user.click(trigger);
+    await user.click(screen.getByRole("button", { name: "Fermer le menu" }));
+
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it("also returns focus to the trigger button when closing via Escape", async () => {
+    const user = userEvent.setup();
+    render(<MobileNav />);
+
+    const trigger = screen.getByRole("button", { name: "Ouvrir le menu" });
+    await user.click(trigger);
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
 });

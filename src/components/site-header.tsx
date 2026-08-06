@@ -35,6 +35,7 @@ export async function SiteHeader() {
           {session?.user ? (
             <Link
               href="/profile"
+              aria-label="Mon profil"
               className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
               <span className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-medium">

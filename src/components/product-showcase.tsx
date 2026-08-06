@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
 const SHOWCASE_ITEMS = [
@@ -33,7 +33,12 @@ function ShowcaseSlide({ name, image, alt, href }: (typeof SHOWCASE_ITEMS)[numbe
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+  const shouldReduceMotion = useReducedMotion();
+  const y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? ["0%", "0%"] : ["-8%", "8%"],
+  );
 
   return (
     <div ref={ref} className="relative h-screen w-full overflow-hidden">

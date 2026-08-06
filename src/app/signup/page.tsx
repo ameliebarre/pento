@@ -16,7 +16,9 @@ export default function SignupPage() {
     <div className="flex min-h-full items-center justify-center">
       <Card className="w-full max-w-sm ring-0">
         <CardHeader>
-          <CardTitle className="pb-8 text-center text-4xl">Créer un compte</CardTitle>
+          <CardTitle as="h1" className="pb-8 text-center text-4xl">
+            Créer un compte
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {state?.success ? (
@@ -69,7 +71,11 @@ export default function SignupPage() {
                   className="h-10 rounded-[6px]"
                 />
               </div>
-              {state?.error && <p className="text-destructive text-sm">{state.error}</p>}
+              {state?.error && (
+                <p role="alert" className="text-destructive text-sm">
+                  {state.error}
+                </p>
+              )}
               <Button type="submit" disabled={pending} className="h-10 rounded-[6px]">
                 {pending ? "Création..." : "Créer mon compte"}
               </Button>

@@ -16,7 +16,9 @@ export default function LoginPage() {
     <div className="flex min-h-full items-center justify-center">
       <Card className="w-full max-w-sm ring-0">
         <CardHeader>
-          <CardTitle className="pb-8 text-center text-4xl">Se connecter</CardTitle>
+          <CardTitle as="h1" className="pb-8 text-center text-4xl">
+            Se connecter
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form action={formAction} className="flex flex-col gap-4">
@@ -42,7 +44,11 @@ export default function LoginPage() {
                 className="h-10 rounded-[6px]"
               />
             </div>
-            {state?.error && <p className="text-destructive text-sm">{state.error}</p>}
+            {state?.error && (
+              <p role="alert" className="text-destructive text-sm">
+                {state.error}
+              </p>
+            )}
             <Button type="submit" disabled={pending} className="h-10 cursor-pointer rounded-[6px]">
               {pending ? "Signing in..." : "Sign in"}
             </Button>

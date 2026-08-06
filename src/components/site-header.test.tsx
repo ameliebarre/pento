@@ -30,8 +30,9 @@ describe("SiteHeader", () => {
 
     render(await SiteHeader());
 
-    const profileLink = screen.getByRole("link", { name: "A" });
+    const profileLink = screen.getByRole("link", { name: "Mon profil" });
     expect(profileLink).toHaveAttribute("href", "/profile");
+    expect(profileLink).toHaveTextContent("A");
   });
 
   it("falls back to the email's initial when there is no first name", async () => {
@@ -42,7 +43,9 @@ describe("SiteHeader", () => {
 
     render(await SiteHeader());
 
-    expect(screen.getByRole("link", { name: "Z" })).toHaveAttribute("href", "/profile");
+    const profileLink = screen.getByRole("link", { name: "Mon profil" });
+    expect(profileLink).toHaveAttribute("href", "/profile");
+    expect(profileLink).toHaveTextContent("Z");
   });
 
   it("always shows a link to the cart", async () => {

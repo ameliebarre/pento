@@ -12,6 +12,7 @@ export default async function ShopAllPage() {
 
   return (
     <div className="flex flex-col gap-6 pt-8">
+      <h1 className="text-2xl font-semibold">Shop All</h1>
       {products.length === 0 ? (
         <p className="text-muted-foreground text-sm">Aucun produit disponible pour le moment.</p>
       ) : (
