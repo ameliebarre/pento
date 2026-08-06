@@ -34,19 +34,19 @@ async function main() {
   // ---------------------------------------------------------------------
   const categoryDefs = [
     {
-      name: "Chairs",
+      name: "Chaises",
       slug: "chairs",
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785966873/pento/categories/chairs.webp",
     },
     {
-      name: "Armchairs",
+      name: "Fauteuils",
       slug: "armchairs",
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785966961/pento/categories/armchairs.jpg",
     },
     {
-      name: "Sofas",
+      name: "Canapés",
       slug: "sofas",
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785965914/pento/categories/sofas_ek6cls.jpg",
@@ -58,13 +58,13 @@ async function main() {
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785966060/pento/categories/tables.png",
     },
     {
-      name: "Lighting",
+      name: "Luminaire",
       slug: "lighting",
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785966756/pento/categories/lighting.webp",
     },
     {
-      name: "Accessoiries",
+      name: "Accessoires",
       slug: "accessoiries",
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785966133/pento/categories/accessoiries_z3hmd2.jpg",
@@ -135,6 +135,16 @@ async function main() {
     "Fauteuil lounge",
     "Acier chromé",
     "Cuir",
+    "Table de repas",
+    "Design scandinave",
+    "Scandinavian Modern",
+    "Bois massif",
+    "Chêne",
+    "Mobilier danois",
+    "Hans J. Wegner",
+    "Carl Hansen & Søn",
+    "Fabrication artisanale",
+    "Made in Denmark",
   ];
   const tags = Object.fromEntries(
     await Promise.all(
@@ -157,7 +167,8 @@ async function main() {
       Guidé par la recherche du confort absolu, il transforme fauteuils et canapés en véritables sculptures où l'ergonomie rencontre l'audace.
       Ses créations, devenues iconiques, incarnent un design à la fois chaleureux, innovant et résolument intemporel.`,
       quote: "Le confort est une émotion avant d'être une posture.",
-      image: "/images/pierre-paulin.jpg",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786029579/pento/designers/pierre-paulin.jpg",
     },
     {
       slug: "werner-aisslinger",
@@ -170,20 +181,22 @@ async function main() {
       À travers ses créations, il imagine un mobilier contemporain où fonctionnalité et poésie dialoguent avec des matériaux innovants.
       Son approche expérimentale transforme les objets du quotidien en expériences sensibles, pensées pour accompagner les modes de vie d'aujourd'hui.`,
       quote: "La matière doit raconter une histoire avant même d'être touchée.",
-      image: "/images/werner-aisslinger.jpg",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786029045/pento/designers/werner-aisslinger.jpg",
     },
     {
-      slug: "andree-putman",
-      firstName: "Andrée",
-      lastName: "Putman",
-      birthDate: new Date("1925-12-23"),
-      deathDate: new Date("2013-01-19"),
-      nationality: "Française",
-      biography: `Figure emblématique du design français, Andrée Putman a marqué son époque par son approche minimaliste, sophistiquée et intemporelle.
-      Entre lignes épurées, contrastes graphiques et amour des matières nobles, elle a créé des espaces et des objets où le luxe se révèle dans la simplicité.
-      Son regard unique a donné naissance à une esthétique reconnaissable entre toutes, mêlant modernité et héritage parisien.`,
-      quote: "Le luxe, c'est l'espace et la lumière — jamais l'accumulation.",
-      image: "/images/andree-putman.jpg",
+      slug: "hans-j-wegner",
+      firstName: "Hans J.",
+      lastName: "Wegner",
+      birthDate: new Date("1914-04-02"),
+      deathDate: new Date("2007-01-26"),
+      nationality: "Danoise",
+      biography: `Considéré comme l'un des plus grands maîtres du design scandinave, Hans J. Wegner a consacré sa carrière à sublimer le travail du bois à travers des créations d'une élégante simplicité.
+      Ébéniste de formation, il imaginait des meubles où chaque courbe, chaque assemblage et chaque détail répondaient à une exigence de confort, de fonctionnalité et de perfection artisanale.
+      Auteur de plus de 500 sièges, dont la célèbre Wishbone Chair, il a profondément marqué l'histoire du mobilier en faisant dialoguer tradition danoise et modernité avec une intemporalité remarquable.`,
+      quote: "Une chaise ne doit pas avoir de dos. Elle doit être belle sous tous les angles.",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786028988/pento/designers/hans-wegner.webp",
     },
     {
       slug: "ettore-sottsass",
@@ -196,7 +209,8 @@ async function main() {
       Fondateur du mouvement Memphis, il célèbre les couleurs vives, les formes géométriques et la liberté créative, loin des conventions du design moderniste.
       Ses pièces iconiques continuent d'inspirer une vision joyeuse, audacieuse et profondément expressive du design contemporain.`,
       quote: "Le design devrait aussi être une manière de discuter de la vie.",
-      image: "/images/ettore-sottsass.jpg",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786029671/pento/designers/ettore-sottsass.webp",
     },
     {
       slug: "achille-castiglioni",
@@ -210,7 +224,8 @@ async function main() {
       Des luminaires aux assises, ses créations illustrent un design intemporel, pensé pour durer et enrichir le quotidien.`,
       quote:
         "Regardez les choses avec les yeux d'un enfant qui ne sait pas encore qu'elles sont impossibles.",
-      image: "/images/achille-castiglioni.jpg",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786029774/pento/designers/achille-castiglione.webp",
     },
     {
       slug: "pier-giacomo-castiglioni",
@@ -225,7 +240,8 @@ async function main() {
       le monde, du Musée d'art moderne de New York à la Triennale Design Museum de Milan.`,
       quote:
         "Regardez les choses avec les yeux d'un enfant qui ne sait pas encore qu'elles sont impossibles.",
-      image: "/images/pier-giacomo-castiglioni.jpg",
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786029957/pento/designers/pier_giacomo_castiglioni.jpg",
     },
     {
       slug: "ludwig-mies-van-der-rohe",
@@ -238,7 +254,8 @@ async function main() {
       Son credo, « less is more », traverse toute son œuvre : des lignes pures, une structure apparente et un refus total de l'ornement superflu.
       Créé pour le pavillon allemand de l'Exposition universelle de Barcelone en 1929, son fauteuil éponyme reste aujourd'hui l'une des icônes absolues du design du XXᵉ siècle.`,
       quote: "Less is more.",
-      image: null,
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786030054/pento/designers/ludwig_mies_van_der_rohe.jpg",
     },
     {
       slug: "arne-jacobsen",
@@ -251,7 +268,8 @@ async function main() {
       Conçu à l'origine pour le hall du Royal Hotel de Copenhague, son fauteuil Œuf enveloppe le corps dans une coque sculpturale qui a redéfini la notion de confort dans un espace ouvert.
       Son travail, entre rigueur fonctionnaliste et sensualité des formes, continue d'incarner l'excellence du design danois à travers le monde.`,
       quote: "Une chaise n'a pas de dos à cacher : sa beauté doit se voir sous tous les angles.",
-      image: null,
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786030129/pento/designers/arne-jacobsen.png",
     },
   ];
 
@@ -345,6 +363,14 @@ async function main() {
       Ara naît de cette collaboration qui dure maintenant depuis plus de 20 ans. Flos fait preuve d’un engagement permanent dans 
       la recherche et l’innovation technologique, et témoigne d’une extraordinaire capacité à trouver de nouveaux talents créatifs. `,
     },
+    {
+      slug: "carl-hansen-son",
+      name: "Carl Hansen & Søn",
+      country: "Danemark",
+      website: "https://www.carlhansen.com/en",
+      history:
+        "Carl Hansen & Søn est une entreprise familiale danoise spécialisée dans le mobilier, située sur l'île de Fionie au Danemark. L'entreprise est à l'origine de nombreux meubles classiques du mouvement Danish modern et collabore également avec des designers contemporains. Knud Erik Hansen, actuel propriétaire et directeur général, est le petit-fils du fondateur.",
+    },
   ];
 
   const manufacturers = Object.fromEntries(
@@ -418,12 +444,22 @@ async function main() {
       image:
         "https://res.cloudinary.com/dasujyncc/image/upload/v1785915349/pento/movements/design-organique.jpg",
     },
+    {
+      slug: "scandinavian-modern",
+      name: "Scandinavian Modern",
+      description:
+        "Né dans les pays nordiques au milieu du XXᵉ siècle, le Scandinavian Modern célèbre la simplicité fonctionnelle, le bois clair et le savoir-faire artisanal. Porté par des designers comme Hans J. Wegner ou Arne Jacobsen, ce mouvement a imposé une esthétique chaleureuse et épurée, pensée pour la vie quotidienne, qui continue d'influencer le design contemporain.",
+      startDate: new Date("1930-01-01"),
+      endDate: new Date("1970-01-01"),
+      image:
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786047453/pento/movements/scandinavian-modern.webp",
+    },
   ];
 
   const movements = Object.fromEntries(
     await Promise.all(
       movementDefs.map(async (m) => {
-        const cover = await image(m.image, m.name);
+        const cover = m.image ? await image(m.image, m.name) : null;
         const movement = await prisma.movement.create({
           data: {
             slug: m.slug,
@@ -431,7 +467,7 @@ async function main() {
             description: m.description,
             startDate: m.startDate,
             endDate: m.endDate,
-            coverImageId: cover.id,
+            coverImageId: cover?.id,
           },
         });
         return [m.slug, movement] as const;
@@ -600,44 +636,44 @@ async function main() {
       imageAlt: "Chaise MR",
     },
     {
-      slug: "snoopy-lamp",
-      sku: "FLO-SNP-001",
-      name: "Snoopy Lamp",
-      description: `Imaginée en 1967 par Achille et Pier Giacomo Castiglioni, la Snoopy Lamp est devenue une véritable icône du design italien. Son abat-jour émaillé aux courbes généreuses, évoquant le célèbre personnage de bande dessinée, contraste élégamment avec son imposant socle en marbre blanc de Carrare.
-  À la fois sculpturale et fonctionnelle, cette lampe de table diffuse une lumière directe idéale pour un bureau, une bibliothèque ou une table d'appoint. Le mariage du métal laqué et de la pierre naturelle met en valeur le savoir-faire italien tout en offrant une présence graphique forte.
-  Plus de cinquante ans après sa création, la Snoopy Lamp demeure une référence incontournable du design, appréciée pour son esthétique audacieuse, la qualité de ses matériaux et son caractère intemporel.`,
-      price: 1280,
-      stock: 6,
-      salesCount: 74,
+      slug: "ch327-dining-table",
+      sku: "CHS-CH327-001",
+      name: "CH327 Dining Table",
+      description: `Dessinée par Hans J. Wegner en 1962, la CH327 Dining Table incarne toute l'élégance du design scandinave. Avec son plateau aux bords délicatement affinés et ses pieds fuselés en bois massif, elle illustre le savoir-faire exceptionnel de l'ébénisterie danoise et la recherche permanente de simplicité chère à son créateur.
+  Pensée pour accompagner les assises emblématiques de Wegner, notamment la Wishbone Chair, cette table de repas séduit par ses proportions harmonieuses et sa silhouette légère. Sa structure robuste assure une excellente stabilité tout en laissant le bois s'exprimer avec naturel grâce à des assemblages d'une grande finesse.
+  Plus de soixante ans après sa création, la CH327 demeure une référence du mobilier contemporain. Son design intemporel, la noblesse de ses matériaux et sa fabrication artisanale en font une pièce durable, capable de traverser les générations sans jamais perdre de son élégance.`,
+      price: 5195,
+      stock: 4,
+      salesCount: 36,
       featured: true,
-      width: 39.4,
-      height: 36.9,
-      depth: 39.4,
-      weight: 7.9,
-      category: "lighting",
-      manufacturer: "flos",
-      movement: "mid-century",
-      designers: ["achille-castiglioni", "pier-giacomo-castiglioni"],
-      materials: ["marbre-de-carrare", "metal-laque", "verre"],
+      width: 190,
+      height: 72,
+      depth: 95,
+      weight: 45,
+      category: "tables",
+      manufacturer: "carl-hansen-son",
+      movement: "scandinavian-modern",
+      designers: ["hans-j-wegner"],
+      materials: ["chene-massif"],
       tags: [
-        "Lampe de table",
-        "Design italien",
-        "Mid-Century",
-        "Marbre",
-        "Métal émaillé",
-        "Éclairage",
-        "Flos",
+        "Table de repas",
+        "Design scandinave",
+        "Scandinavian Modern",
+        "Bois massif",
+        "Chêne",
+        "Mobilier danois",
+        "Hans J. Wegner",
+        "Carl Hansen & Søn",
+        "Minimalisme",
+        "Fabrication artisanale",
+        "Salle à manger",
         "Design iconique",
-        "Sculptural",
-        "Élégance",
-        "Bureau",
-        "Salon",
-        "Luxe",
-        "Collection",
+        "Intemporel",
+        "Made in Denmark",
       ],
       image:
-        "https://res.cloudinary.com/dasujyncc/image/upload/v1786016899/pento/products/snoopy-lamp_jggznu.jpg",
-      imageAlt: "Lampe Snoopy de Flos avec abat-jour noir et socle en marbre blanc de Carrare",
+        "https://res.cloudinary.com/dasujyncc/image/upload/v1786028698/pento/products/ch327_table.jpg",
+      imageAlt: "Table CH327 de Hans J. Wegner en chêne massif éditée par Carl Hansen & Søn",
     },
   ];
 
