@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { BrowseByMovement } from "@/components/browse-by-movement";
+import { BrowseByMovement } from "@/features/home/browse-by-movement";
 import { prisma } from "@/lib/prisma";
 
 describe("BrowseByMovement", () => {

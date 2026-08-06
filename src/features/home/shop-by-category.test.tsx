@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { ShopByCategory } from "@/components/shop-by-category";
+import { ShopByCategory } from "@/features/home/shop-by-category";
 import { prisma } from "@/lib/prisma";
 
 describe("ShopByCategory", () => {

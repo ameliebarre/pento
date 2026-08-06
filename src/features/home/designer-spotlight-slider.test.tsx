@@ -7,7 +7,7 @@ import userEvent from "@testing-library/user-event";
 import {
   DesignerSpotlightSlider,
   type DesignerSlide,
-} from "@/components/designer-spotlight-slider";
+} from "@/features/home/designer-spotlight-slider";
 
 const SLIDES: DesignerSlide[] = [
   { name: "Pierre Paulin", image: "/images/pierre-paulin.jpg", title: "Titre 1", description: "Description 1" },

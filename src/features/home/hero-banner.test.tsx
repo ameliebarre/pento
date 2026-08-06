@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { HeroBanner } from "@/components/hero-banner";
+import { HeroBanner } from "@/features/home/hero-banner";
 
 describe("HeroBanner", () => {
   it("renders the heading, tagline and a link to the shop", () => {

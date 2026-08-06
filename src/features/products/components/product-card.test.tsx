@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { ProductCard, type ProductWithImage } from "@/components/product-card";
+import { ProductCard, type ProductWithImage } from "@/features/products/components/product-card";
 import { Prisma } from "@/generated/prisma/client";
 
 function buildProduct(overrides: Partial<ProductWithImage> = {}): ProductWithImage {
@@ -27,7 +27,15 @@ function buildProduct(overrides: Partial<ProductWithImage> = {}): ProductWithIma
     movementId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    images: [{ id: "img_1", url: "/images/armchairs.png", alt: "Barcelona Chair", productId: "product_1", createdAt: new Date() }],
+    images: [
+      {
+        id: "img_1",
+        url: "/images/armchairs.png",
+        alt: "Barcelona Chair",
+        productId: "product_1",
+        createdAt: new Date(),
+      },
+    ],
     designers: [],
     ...overrides,
   };
@@ -58,7 +66,9 @@ describe("ProductCard", () => {
   it("does not show a designer line when the product has no designer", () => {
     render(<ProductCard product={buildProduct()} />);
 
-    expect(screen.queryByText(/./, { selector: ".text-muted-foreground.text-xs" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/./, { selector: ".text-muted-foreground.text-xs" }),
+    ).not.toBeInTheDocument();
   });
 
   it("shows a single designer's full name", () => {

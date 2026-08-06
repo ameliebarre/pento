@@ -1,7 +1,7 @@
 import {
   DesignerSpotlightSlider,
   type DesignerSlide,
-} from "@/components/designer-spotlight-slider";
+} from "@/features/home/designer-spotlight-slider";
 
 const SLIDES: DesignerSlide[] = [
   {

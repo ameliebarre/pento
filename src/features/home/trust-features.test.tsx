@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { TrustFeatures } from "@/components/trust-features";
+import { TrustFeatures } from "@/features/home/trust-features";
 
 describe("TrustFeatures", () => {
   it("renders all four trust features with their titles", () => {
