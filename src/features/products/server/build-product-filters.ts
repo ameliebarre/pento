@@ -24,5 +24,12 @@ export function buildProductWhere(filters: ProductFilters): ProductWhereInput {
     };
   }
 
+  if (filters.minPrice !== null || filters.maxPrice !== null) {
+    where.price = {
+      ...(filters.minPrice !== null ? { gte: filters.minPrice } : {}),
+      ...(filters.maxPrice !== null ? { lte: filters.maxPrice } : {}),
+    };
+  }
+
   return where;
 }

@@ -20,7 +20,7 @@ const MANY_DESIGNERS = Array.from({ length: 8 }, (_, index) => ({
 }));
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], ...overrides };
+  return { categories: [], designers: [], minPrice: null, maxPrice: null, ...overrides };
 }
 
 let location: { href: string };

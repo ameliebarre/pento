@@ -6,10 +6,16 @@ import { render, screen } from "@testing-library/react";
 import ShopAllPage from "@/app/products/page";
 import { prisma } from "@/lib/prisma";
 
-function renderPage(category?: string | string[], designer?: string | string[]) {
+function renderPage(
+  category?: string | string[],
+  designer?: string | string[],
+  price?: { min?: number; max?: number },
+) {
   const params: Record<string, string | string[]> = {};
   if (category) params.category = category;
   if (designer) params.designer = designer;
+  if (price?.min !== undefined) params.minPrice = String(price.min);
+  if (price?.max !== undefined) params.maxPrice = String(price.max);
   return ShopAllPage({ searchParams: Promise.resolve(params) });
 }
 
@@ -18,9 +24,10 @@ async function createProduct(
   name: string,
   categoryId?: string,
   designerId?: string,
+  price = 100,
 ) {
   const product = await prisma.product.create({
-    data: { name, slug, description: "desc", price: 100, categoryId },
+    data: { name, slug, description: "desc", price, categoryId },
   });
   if (designerId) {
     await prisma.productDesigner.create({ data: { productId: product.id, designerId } });
@@ -155,5 +162,47 @@ describe("ShopAllPage", () => {
       link.getAttribute("href")?.startsWith("/products?designer"),
     );
     expect(categoryReset).toHaveAttribute("href", "/products?designer=hans-j-wegner");
+  });
+
+  it("shows the price slider bounded by the catalog's actual min and max price", async () => {
+    await createProduct("shop-all-cheap", "Petite lampe", undefined, undefined, 100);
+    await createProduct("shop-all-expensive", "Grand canapé", undefined, undefined, 3000);
+
+    render(await renderPage());
+
+    expect(screen.getByRole("slider", { name: "Prix minimum" })).toHaveAttribute(
+      "aria-valuenow",
+      "100",
+    );
+    expect(screen.getByRole("slider", { name: "Prix maximum" })).toHaveAttribute(
+      "aria-valuenow",
+      "3000",
+    );
+  });
+
+  it("only shows products within the selected price range", async () => {
+    await createProduct("shop-all-cheap", "Petite lampe", undefined, undefined, 100);
+    await createProduct("shop-all-mid", "Chaise Test", undefined, undefined, 1000);
+    await createProduct("shop-all-expensive", "Grand canapé", undefined, undefined, 3000);
+
+    render(await renderPage(undefined, undefined, { min: 500, max: 1500 }));
+
+    expect(screen.getByText("Chaise Test")).toBeInTheDocument();
+    expect(screen.queryByText("Petite lampe")).not.toBeInTheDocument();
+    expect(screen.queryByText("Grand canapé")).not.toBeInTheDocument();
+  });
+
+  it("combines a price filter with a category filter", async () => {
+    const chairs = await createCategory("chairs", "Chairs");
+    const tables = await createCategory("tables", "Tables");
+    await createProduct("shop-all-matching", "Chaise Test", chairs.id, undefined, 1000);
+    await createProduct("shop-all-wrong-category", "Table Test", tables.id, undefined, 1000);
+    await createProduct("shop-all-wrong-price", "Chaise Chère", chairs.id, undefined, 3000);
+
+    render(await renderPage("chairs", undefined, { min: 500, max: 1500 }));
+
+    expect(screen.getByText("Chaise Test")).toBeInTheDocument();
+    expect(screen.queryByText("Table Test")).not.toBeInTheDocument();
+    expect(screen.queryByText("Chaise Chère")).not.toBeInTheDocument();
   });
 });

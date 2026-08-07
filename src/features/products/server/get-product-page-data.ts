@@ -3,6 +3,23 @@ import { prisma } from "@/lib/prisma";
 import { ProductFilters } from "../types";
 import { buildProductWhere } from "./build-product-filters";
 
+export type PriceBounds = {
+  min: number;
+  max: number;
+};
+
+async function getPriceBounds(): Promise<PriceBounds> {
+  const { _min, _max } = await prisma.product.aggregate({
+    _min: { price: true },
+    _max: { price: true },
+  });
+
+  return {
+    min: _min.price ? Math.floor(_min.price.toNumber()) : 0,
+    max: _max.price ? Math.ceil(_max.price.toNumber()) : 0,
+  };
+}
+
 export async function getProductPageData(filters: ProductFilters) {
   return Promise.all([
     prisma.product.findMany({
@@ -34,5 +51,6 @@ export async function getProductPageData(filters: ProductFilters) {
         lastName: "asc",
       },
     }),
+    getPriceBounds(),
   ]);
 }

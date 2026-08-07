@@ -1,6 +1,9 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { buildClearFilterHref, buildToggleFilterHref } from "@/features/products/utils/build-filter-href";
+import {
+  buildClearFilterHref,
+  buildToggleFilterHref,
+} from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
 import type { Category } from "@/generated/prisma/client";
 
@@ -18,7 +21,7 @@ export function CategoryFilters({ categories, filters }: CategoryFiltersProps) {
   return (
     <div role="group" aria-label="Catégories" className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold uppercase">Catégories</h3>
+        <h3 className="text-xs font-semibold uppercase">Catégories</h3>
         {resetHref && (
           <a
             href={resetHref}
