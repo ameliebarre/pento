@@ -10,6 +10,7 @@ describe("getProductFilters", () => {
       materials: [],
       minPrice: null,
       maxPrice: null,
+      sort: null,
     });
   });
 
@@ -22,6 +23,7 @@ describe("getProductFilters", () => {
       materials: ["cuir"],
       minPrice: null,
       maxPrice: null,
+      sort: null,
     });
   });
 
@@ -43,5 +45,14 @@ describe("getProductFilters", () => {
 
     expect(filters.minPrice).toBeNull();
     expect(filters.maxPrice).toBe(2000);
+  });
+
+  it("parses a valid sort value", () => {
+    expect(getProductFilters({ sort: "price-asc" }).sort).toBe("price-asc");
+    expect(getProductFilters({ sort: "price-desc" }).sort).toBe("price-desc");
+  });
+
+  it("ignores an invalid sort value", () => {
+    expect(getProductFilters({ sort: "not-a-real-sort" }).sort).toBeNull();
   });
 });

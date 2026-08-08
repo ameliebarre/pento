@@ -10,7 +10,7 @@ import type { ProductFilters } from "@/features/products/types";
 const BOUNDS = { min: 0, max: 1000 };
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, ...overrides };
+  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 let location: { href: string };

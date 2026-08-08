@@ -42,17 +42,14 @@ export function MaterialFilters({ materials, filters }: MaterialFiltersProps) {
 
   return (
     <div role="group" aria-label="Matériaux" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs font-semibold uppercase">Matériaux</h3>
-        {filters.materials.length > 0 && (
-          <a
-            href={buildClearFilterHref(filters, "materials")}
-            className="text-muted-foreground text-xs underline-offset-2 hover:underline"
-          >
-            Réinitialiser
-          </a>
-        )}
-      </div>
+      {filters.materials.length > 0 && (
+        <a
+          href={buildClearFilterHref(filters, "materials")}
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+        >
+          Réinitialiser
+        </a>
+      )}
 
       <ul className="flex flex-col gap-2.5">
         {visibleMaterials.map((material) => {

@@ -12,7 +12,7 @@ const CATEGORIES = [
 ];
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, ...overrides };
+  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 describe("CategoryFilters", () => {

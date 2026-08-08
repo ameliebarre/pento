@@ -17,17 +17,14 @@ export function CategoryFilters({ categories, filters }: CategoryFiltersProps) {
 
   return (
     <div role="group" aria-label="Catégories" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs font-semibold uppercase">Catégories</h3>
-        {resetHref && (
-          <a
-            href={resetHref}
-            className="text-muted-foreground text-xs underline-offset-2 hover:underline"
-          >
-            Réinitialiser
-          </a>
-        )}
-      </div>
+      {resetHref && (
+        <a
+          href={resetHref}
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+        >
+          Réinitialiser
+        </a>
+      )}
       <div className="grid grid-cols-2 gap-2">
         {categories.map((category) => {
           const isSelected = filters.categories.includes(category.slug);

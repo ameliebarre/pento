@@ -1,4 +1,4 @@
-import { ProductFilters } from "../types";
+import { ProductFilters, SortOrder } from "../types";
 
 type ToggleDimension = "categories" | "designers" | "materials";
 
@@ -20,6 +20,7 @@ function toHref(filters: ProductFilters): string {
 
   if (filters.minPrice !== null) params.set("minPrice", String(filters.minPrice));
   if (filters.maxPrice !== null) params.set("maxPrice", String(filters.maxPrice));
+  if (filters.sort !== null) params.set("sort", filters.sort);
 
   const query = params.toString();
   return query ? `/products?${query}` : "/products";
@@ -46,12 +47,19 @@ export function buildPriceFilterHref(
   return toHref({ ...filters, minPrice, maxPrice });
 }
 
+export function buildSortHref(filters: ProductFilters, sort: SortOrder): string {
+  return toHref({ ...filters, sort });
+}
+
 export function buildClearFilterHref(
   filters: ProductFilters,
-  dimension: ToggleDimension | "price",
+  dimension: ToggleDimension | "price" | "sort",
 ): string {
   if (dimension === "price") {
     return toHref({ ...filters, minPrice: null, maxPrice: null });
+  }
+  if (dimension === "sort") {
+    return toHref({ ...filters, sort: null });
   }
   return toHref({ ...filters, [dimension]: [] });
 }

@@ -2,6 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import ShopAllPage from "@/app/products/page";
 import { prisma } from "@/lib/prisma";
@@ -11,14 +12,20 @@ function renderPage(
   designer?: string | string[],
   price?: { min?: number; max?: number },
   material?: string | string[],
+  extra?: Record<string, string | string[]>,
 ) {
-  const params: Record<string, string | string[]> = {};
+  const params: Record<string, string | string[]> = { ...extra };
   if (category) params.category = category;
   if (designer) params.designer = designer;
   if (price?.min !== undefined) params.minPrice = String(price.min);
   if (price?.max !== undefined) params.maxPrice = String(price.max);
   if (material) params.material = material;
   return ShopAllPage({ searchParams: Promise.resolve(params) });
+}
+
+async function expandSection(name: string) {
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("button", { name }));
 }
 
 async function createProduct(
@@ -93,7 +100,8 @@ describe("ShopAllPage", () => {
     await createCategory("chairs", "Chairs");
     await createCategory("tables", "Tables");
 
-    render(await renderPage());
+    render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
+    await expandSection("Catégories");
 
     expect(screen.getByRole("button", { name: "Chairs" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tables" })).toBeInTheDocument();
@@ -105,7 +113,7 @@ describe("ShopAllPage", () => {
     await createProduct("shop-all-chair", "Chaise Test", chairs.id);
     await createProduct("shop-all-table", "Table Test", tables.id);
 
-    render(await renderPage("chairs"));
+    render(await renderPage("chairs", undefined, undefined, undefined, { showFilters: "1" }));
 
     expect(screen.getByText("Chaise Test")).toBeInTheDocument();
     expect(screen.queryByText("Table Test")).not.toBeInTheDocument();
@@ -130,7 +138,8 @@ describe("ShopAllPage", () => {
   it("lists every designer as a filter checkbox", async () => {
     await createDesigner("hans-j-wegner", "Hans J.", "Wegner");
 
-    render(await renderPage());
+    render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
+    await expandSection("Designers");
 
     expect(screen.getByRole("checkbox", { name: "Hans J. Wegner" })).toBeInTheDocument();
   });
@@ -141,7 +150,9 @@ describe("ShopAllPage", () => {
     await createProduct("shop-all-wegner", "Wishbone Chair", undefined, wegner.id);
     await createProduct("shop-all-jacobsen", "Egg Chair", undefined, jacobsen.id);
 
-    render(await renderPage(undefined, "hans-j-wegner"));
+    render(
+      await renderPage(undefined, "hans-j-wegner", undefined, undefined, { showFilters: "1" }),
+    );
 
     expect(screen.getByText("Wishbone Chair")).toBeInTheDocument();
     expect(screen.queryByText("Egg Chair")).not.toBeInTheDocument();
@@ -165,7 +176,9 @@ describe("ShopAllPage", () => {
     await createCategory("chairs", "Chairs");
     await createDesigner("hans-j-wegner", "Hans J.", "Wegner");
 
-    render(await renderPage("chairs", "hans-j-wegner"));
+    render(
+      await renderPage("chairs", "hans-j-wegner", undefined, undefined, { showFilters: "1" }),
+    );
 
     const resetLinks = screen.getAllByRole("link", { name: "Réinitialiser" });
     const categoryReset = resetLinks.find((link) =>
@@ -178,7 +191,8 @@ describe("ShopAllPage", () => {
     await createProduct("shop-all-cheap", "Petite lampe", undefined, undefined, 100);
     await createProduct("shop-all-expensive", "Grand canapé", undefined, undefined, 3000);
 
-    render(await renderPage());
+    render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
+    await expandSection("Prix");
 
     expect(screen.getByRole("slider", { name: "Prix minimum" })).toHaveAttribute(
       "aria-valuenow",
@@ -220,7 +234,8 @@ describe("ShopAllPage", () => {
     await createMaterial("cuir", "Cuir");
     await createMaterial("chene-massif", "Chêne massif");
 
-    render(await renderPage());
+    render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
+    await expandSection("Matériaux");
 
     expect(screen.getByRole("checkbox", { name: "Cuir" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Chêne massif" })).toBeInTheDocument();
@@ -232,7 +247,7 @@ describe("ShopAllPage", () => {
     await createProduct("shop-all-leather", "Fauteuil Cuir", undefined, undefined, 100, leather.id);
     await createProduct("shop-all-oak", "Table Chêne", undefined, undefined, 100, oak.id);
 
-    render(await renderPage(undefined, undefined, undefined, "cuir"));
+    render(await renderPage(undefined, undefined, undefined, "cuir", { showFilters: "1" }));
 
     expect(screen.getByText("Fauteuil Cuir")).toBeInTheDocument();
     expect(screen.queryByText("Table Chêne")).not.toBeInTheDocument();
@@ -250,5 +265,64 @@ describe("ShopAllPage", () => {
 
     expect(screen.getByText("Fauteuil Cuir")).toBeInTheDocument();
     expect(screen.queryByText("Table Cuir")).not.toBeInTheDocument();
+  });
+
+  it("sorts products by price ascending", async () => {
+    await createProduct("shop-all-mid", "Milieu", undefined, undefined, 1000);
+    await createProduct("shop-all-cheap", "Pas cher", undefined, undefined, 100);
+    await createProduct("shop-all-expensive", "Cher", undefined, undefined, 3000);
+
+    render(await renderPage(undefined, undefined, undefined, undefined, { sort: "price-asc" }));
+
+    const links = screen.getAllByRole("link");
+    const order = ["Pas cher", "Milieu", "Cher"].map((name) =>
+      links.findIndex((link) => link.textContent?.includes(name)),
+    );
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+  });
+
+  it("sorts products by price descending", async () => {
+    await createProduct("shop-all-mid", "Milieu", undefined, undefined, 1000);
+    await createProduct("shop-all-cheap", "Pas cher", undefined, undefined, 100);
+    await createProduct("shop-all-expensive", "Cher", undefined, undefined, 3000);
+
+    render(await renderPage(undefined, undefined, undefined, undefined, { sort: "price-desc" }));
+
+    const links = screen.getAllByRole("link");
+    const order = ["Cher", "Milieu", "Pas cher"].map((name) =>
+      links.findIndex((link) => link.textContent?.includes(name)),
+    );
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+  });
+
+  it("hides the filters column and shows an 'Afficher les filtres' link by default", async () => {
+    render(await renderPage());
+
+    expect(screen.queryByLabelText("Filtres")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Afficher les filtres" })).toHaveAttribute(
+      "href",
+      "/products?showFilters=1",
+    );
+  });
+
+  it("shows the filters column and a 'Masquer les filtres' link when showFilters=1", async () => {
+    render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
+
+    expect(screen.getByLabelText("Filtres")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Masquer les filtres" })).toHaveAttribute(
+      "href",
+      "/products",
+    );
+  });
+
+  it("keeps other filters when toggling the filters column visibility", async () => {
+    await createCategory("chairs", "Chairs");
+
+    render(await renderPage("chairs"));
+
+    expect(screen.getByRole("link", { name: "Afficher les filtres" })).toHaveAttribute(
+      "href",
+      "/products?category=chairs&showFilters=1",
+    );
   });
 });

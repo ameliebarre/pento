@@ -42,17 +42,14 @@ export function PriceFilters({ bounds, filters }: PriceFiltersProps) {
 
   return (
     <div role="group" aria-label="Prix" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-xs font-semibold uppercase">Prix</h3>
-        {isActive && (
-          <a
-            href={buildClearFilterHref(filters, "price")}
-            className="text-muted-foreground text-xs underline-offset-2 hover:underline"
-          >
-            Réinitialiser
-          </a>
-        )}
-      </div>
+      {isActive && (
+        <a
+          href={buildClearFilterHref(filters, "price")}
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+        >
+          Réinitialiser
+        </a>
+      )}
 
       <div className="flex items-center justify-between text-sm font-medium">
         <span>{formatPrice(range[0])}</span>

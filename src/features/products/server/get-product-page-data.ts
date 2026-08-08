@@ -8,6 +8,12 @@ export type PriceBounds = {
   max: number;
 };
 
+function buildProductOrderBy(filters: ProductFilters) {
+  if (filters.sort === "price-asc") return { price: "asc" as const };
+  if (filters.sort === "price-desc") return { price: "desc" as const };
+  return { createdAt: "desc" as const };
+}
+
 async function getPriceBounds(): Promise<PriceBounds> {
   const { _min, _max } = await prisma.product.aggregate({
     _min: { price: true },
@@ -37,9 +43,7 @@ export async function getProductPageData(filters: ProductFilters) {
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: buildProductOrderBy(filters),
     }),
     prisma.category.findMany({
       orderBy: {

@@ -52,17 +52,14 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
 
   return (
     <div role="group" aria-label="Designers" className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold uppercase">Designers</h3>
-        {filters.designers.length > 0 && (
-          <a
-            href={buildClearFilterHref(filters, "designers")}
-            className="text-muted-foreground text-xs underline-offset-2 hover:underline"
-          >
-            Réinitialiser
-          </a>
-        )}
-      </div>
+      {filters.designers.length > 0 && (
+        <a
+          href={buildClearFilterHref(filters, "designers")}
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+        >
+          Réinitialiser
+        </a>
+      )}
 
       <div className="relative">
         <Search

@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 import {
   buildClearFilterHref,
   buildPriceFilterHref,
+  buildSortHref,
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, ...overrides };
+  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 describe("buildToggleFilterHref", () => {
@@ -77,6 +78,20 @@ describe("buildPriceFilterHref", () => {
   });
 });
 
+describe("buildSortHref", () => {
+  it("sets the sort order, preserving other filters", () => {
+    expect(buildSortHref(filters({ categories: ["chairs"] }), "price-asc")).toBe(
+      "/products?category=chairs&sort=price-asc",
+    );
+  });
+
+  it("overwrites an already-set sort order", () => {
+    expect(buildSortHref(filters({ sort: "price-asc" }), "price-desc")).toBe(
+      "/products?sort=price-desc",
+    );
+  });
+});
+
 describe("buildClearFilterHref", () => {
   it("clears only the given dimension, preserving the other one", () => {
     expect(
@@ -96,6 +111,12 @@ describe("buildClearFilterHref", () => {
         filters({ categories: ["chairs"], minPrice: 500, maxPrice: 2000 }),
         "price",
       ),
+    ).toBe("/products?category=chairs");
+  });
+
+  it("clears only the sort order, preserving other filters", () => {
+    expect(
+      buildClearFilterHref(filters({ categories: ["chairs"], sort: "price-asc" }), "sort"),
     ).toBe("/products?category=chairs");
   });
 });
