@@ -26,7 +26,13 @@ export async function SiteHeader() {
           <MobileNav />
           <div className="flex items-center gap-8">
             <Link href="/">
-              <Image src="/logo.svg" alt="Pento" className="max-w-24" width={124} height={30} />
+              <Image
+                src="/logo-pento.svg"
+                alt="Pento"
+                className="max-w-64"
+                width={220}
+                height={40}
+              />
             </Link>
             <ProductsNav />
           </div>
