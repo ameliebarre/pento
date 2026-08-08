@@ -4,6 +4,7 @@ export type ProductFilters = {
   categories: string[];
   designers: string[];
   materials: string[];
+  movements: string[];
   minPrice: number | null;
   maxPrice: number | null;
   sort: SortOrder | null;

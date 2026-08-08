@@ -6,6 +6,7 @@ import { CategoryFilters } from "@/features/products/components/category-filters
 import { DesignerFilters } from "@/features/products/components/designer-filters";
 import { FilterAccordionSection } from "@/features/products/components/filter-accordion-section";
 import { MaterialFilters } from "@/features/products/components/material-filters";
+import { MovementFilters } from "@/features/products/components/movement-filters";
 import { PriceFilters } from "@/features/products/components/price-filters";
 import { PriceSortFilter } from "@/features/products/components/price-sort-filter";
 import { SearchParams } from "@/features/products/types";
@@ -22,7 +23,7 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
   const filters = getProductFilters(rawParams);
   const filtersVisible = rawParams.showFilters === "1";
 
-  const [products, categories, designers, materials, priceBounds] =
+  const [products, categories, designers, materials, movements, priceBounds] =
     await getProductPageData(filters);
 
   // Auto-expand a section whenever it already has an active selection —
@@ -33,6 +34,7 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
     filters.categories.length > 0 && "categories",
     filters.designers.length > 0 && "designers",
     filters.materials.length > 0 && "materials",
+    filters.movements.length > 0 && "movements",
     (filters.minPrice !== null || filters.maxPrice !== null) && "price",
   ].filter((section): section is string => Boolean(section));
 
@@ -61,6 +63,9 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
               </FilterAccordionSection>
               <FilterAccordionSection value="materials" title="Matériaux">
                 <MaterialFilters materials={materials} filters={filters} />
+              </FilterAccordionSection>
+              <FilterAccordionSection value="movements" title="Mouvements">
+                <MovementFilters movements={movements} filters={filters} />
               </FilterAccordionSection>
               <FilterAccordionSection value="price" title="Prix">
                 <PriceFilters bounds={priceBounds} filters={filters} />

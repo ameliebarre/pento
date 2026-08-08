@@ -23,6 +23,7 @@ export function getProductFilters(params: SearchParams): ProductFilters {
     categories: toSlugArray(params.category),
     designers: toSlugArray(params.designer),
     materials: toSlugArray(params.material),
+    movements: toSlugArray(params.movement),
     minPrice: toNullableNumber(params.minPrice),
     maxPrice: toNullableNumber(params.maxPrice),
     sort: toSortOrder(params.sort),

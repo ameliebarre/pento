@@ -36,6 +36,14 @@ export function buildProductWhere(filters: ProductFilters): ProductWhereInput {
     };
   }
 
+  if (filters.movements.length > 0) {
+    where.movement = {
+      slug: {
+        in: filters.movements,
+      },
+    };
+  }
+
   if (filters.minPrice !== null || filters.maxPrice !== null) {
     where.price = {
       ...(filters.minPrice !== null ? { gte: filters.minPrice } : {}),

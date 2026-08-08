@@ -19,7 +19,7 @@ const MANY_MATERIALS = Array.from({ length: 14 }, (_, index) => ({
 }));
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
+  return { categories: [], designers: [], materials: [], movements: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 let location: { href: string };
@@ -62,7 +62,7 @@ describe("MaterialFilters", () => {
 
     await user.click(screen.getByRole("checkbox", { name: "Cuir" }));
 
-    expect(location.href).toBe("/products?category=chairs&material=cuir");
+    expect(location.href).toBe("/products?category=chairs&material=cuir&showFilters=1");
   });
 
   it("navigates to remove an already-selected material", async () => {
@@ -71,7 +71,7 @@ describe("MaterialFilters", () => {
 
     await user.click(screen.getByRole("checkbox", { name: "Cuir" }));
 
-    expect(location.href).toBe("/products");
+    expect(location.href).toBe("/products?showFilters=1");
   });
 
   it("only shows the first 12 materials with a 'Voir plus' button beyond that", () => {
@@ -119,7 +119,7 @@ describe("MaterialFilters", () => {
 
     expect(screen.getByRole("link", { name: "Réinitialiser" })).toHaveAttribute(
       "href",
-      "/products?category=chairs",
+      "/products?category=chairs&showFilters=1",
     );
   });
 });

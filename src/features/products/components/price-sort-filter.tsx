@@ -2,10 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Radio, RadioGroup } from "@/components/ui/radio-group";
-import {
-  buildClearFilterHref,
-  buildSortHref,
-} from "@/features/products/utils/build-filter-href";
+import { buildClearFilterHref, buildSortHref } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters, SortOrder } from "@/features/products/types";
 
 type PriceSortFilterProps = {
@@ -29,7 +26,7 @@ export function PriceSortFilter({ filters }: PriceSortFilterProps) {
       {filters.sort !== null && (
         <a
           href={buildClearFilterHref(filters, "sort")}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground cursor:pointer self-start text-xs underline-offset-2 hover:underline"
         >
           Réinitialiser
         </a>

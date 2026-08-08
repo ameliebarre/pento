@@ -12,7 +12,7 @@ const CATEGORIES = [
 ];
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
+  return { categories: [], designers: [], materials: [], movements: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 describe("CategoryFilters", () => {
@@ -33,7 +33,7 @@ describe("CategoryFilters", () => {
 
     const chairs = screen.getByRole("button", { name: "Chairs" });
     expect(chairs).toHaveAttribute("aria-pressed", "false");
-    expect(chairs).toHaveAttribute("href", "/products?category=chairs");
+    expect(chairs).toHaveAttribute("href", "/products?category=chairs&showFilters=1");
   });
 
   it("marks a selected category as pressed, linking to remove it from the filter", () => {
@@ -41,7 +41,7 @@ describe("CategoryFilters", () => {
 
     const chairs = screen.getByRole("button", { name: "Chairs" });
     expect(chairs).toHaveAttribute("aria-pressed", "true");
-    expect(chairs).toHaveAttribute("href", "/products");
+    expect(chairs).toHaveAttribute("href", "/products?showFilters=1");
   });
 
   it("keeps an already-selected designer filter when toggling a category", () => {
@@ -54,7 +54,7 @@ describe("CategoryFilters", () => {
 
     expect(screen.getByRole("button", { name: "Chairs" })).toHaveAttribute(
       "href",
-      "/products?category=chairs&designer=hans-j-wegner",
+      "/products?category=chairs&designer=hans-j-wegner&showFilters=1",
     );
   });
 
@@ -68,7 +68,7 @@ describe("CategoryFilters", () => {
 
     expect(screen.getByRole("link", { name: "Réinitialiser" })).toHaveAttribute(
       "href",
-      "/products?designer=hans-j-wegner",
+      "/products?designer=hans-j-wegner&showFilters=1",
     );
   });
 });

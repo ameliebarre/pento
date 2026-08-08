@@ -35,9 +35,10 @@ async function createProduct(
   designerId?: string,
   price = 100,
   materialId?: string,
+  movementId?: string,
 ) {
   const product = await prisma.product.create({
-    data: { name, slug, description: "desc", price, categoryId },
+    data: { name, slug, description: "desc", price, categoryId, movementId },
   });
   if (designerId) {
     await prisma.productDesigner.create({ data: { productId: product.id, designerId } });
@@ -60,6 +61,10 @@ async function createDesigner(slug: string, firstName: string, lastName: string)
 
 async function createMaterial(slug: string, name: string) {
   return prisma.material.create({ data: { name, slug } });
+}
+
+async function createMovement(slug: string, name: string) {
+  return prisma.movement.create({ data: { name, slug, description: "" } });
 }
 
 describe("ShopAllPage", () => {
@@ -184,7 +189,10 @@ describe("ShopAllPage", () => {
     const categoryReset = resetLinks.find((link) =>
       link.getAttribute("href")?.startsWith("/products?designer"),
     );
-    expect(categoryReset).toHaveAttribute("href", "/products?designer=hans-j-wegner");
+    expect(categoryReset).toHaveAttribute(
+      "href",
+      "/products?designer=hans-j-wegner&showFilters=1",
+    );
   });
 
   it("shows the price slider bounded by the catalog's actual min and max price", async () => {
@@ -265,6 +273,80 @@ describe("ShopAllPage", () => {
 
     expect(screen.getByText("Fauteuil Cuir")).toBeInTheDocument();
     expect(screen.queryByText("Table Cuir")).not.toBeInTheDocument();
+  });
+
+  it("lists every movement as a filter checkbox", async () => {
+    await createMovement("bauhaus", "Bauhaus");
+    await createMovement("mid-century", "Mid-Century");
+
+    render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
+    await expandSection("Mouvements");
+
+    expect(screen.getByRole("checkbox", { name: "Bauhaus" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Mid-Century" })).toBeInTheDocument();
+  });
+
+  it("only shows products with the selected movement", async () => {
+    const bauhaus = await createMovement("bauhaus", "Bauhaus");
+    const midCentury = await createMovement("mid-century", "Mid-Century");
+    await createProduct(
+      "shop-all-bauhaus",
+      "Chaise Bauhaus",
+      undefined,
+      undefined,
+      100,
+      undefined,
+      bauhaus.id,
+    );
+    await createProduct(
+      "shop-all-mid-century",
+      "Chaise Mid-Century",
+      undefined,
+      undefined,
+      100,
+      undefined,
+      midCentury.id,
+    );
+
+    render(
+      await renderPage(undefined, undefined, undefined, undefined, {
+        movement: "bauhaus",
+        showFilters: "1",
+      }),
+    );
+
+    expect(screen.getByText("Chaise Bauhaus")).toBeInTheDocument();
+    expect(screen.queryByText("Chaise Mid-Century")).not.toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Bauhaus" })).toBeChecked();
+  });
+
+  it("combines a movement filter with a category filter", async () => {
+    const chairs = await createCategory("chairs", "Chairs");
+    const tables = await createCategory("tables", "Tables");
+    const bauhaus = await createMovement("bauhaus", "Bauhaus");
+    await createProduct(
+      "shop-all-matching",
+      "Chaise Bauhaus",
+      chairs.id,
+      undefined,
+      100,
+      undefined,
+      bauhaus.id,
+    );
+    await createProduct(
+      "shop-all-wrong-category",
+      "Table Bauhaus",
+      tables.id,
+      undefined,
+      100,
+      undefined,
+      bauhaus.id,
+    );
+
+    render(await renderPage("chairs", undefined, undefined, undefined, { movement: "bauhaus" }));
+
+    expect(screen.getByText("Chaise Bauhaus")).toBeInTheDocument();
+    expect(screen.queryByText("Table Bauhaus")).not.toBeInTheDocument();
   });
 
   it("sorts products by price ascending", async () => {

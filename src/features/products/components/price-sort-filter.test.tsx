@@ -12,6 +12,7 @@ function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
     categories: [],
     designers: [],
     materials: [],
+    movements: [],
     minPrice: null,
     maxPrice: null,
     sort: null,
@@ -60,7 +61,7 @@ describe("PriceSortFilter", () => {
 
     await user.click(screen.getByRole("radio", { name: "Prix : - au +" }));
 
-    expect(location.href).toBe("/products?category=chairs&sort=price-asc");
+    expect(location.href).toBe("/products?category=chairs&sort=price-asc&showFilters=1");
   });
 
   it("navigates to descending sort when the other option is chosen", async () => {
@@ -69,7 +70,7 @@ describe("PriceSortFilter", () => {
 
     await user.click(screen.getByRole("radio", { name: "Prix : + au -" }));
 
-    expect(location.href).toBe("/products?sort=price-desc");
+    expect(location.href).toBe("/products?sort=price-desc&showFilters=1");
   });
 
   it("does not show a reset link when no sort is active", () => {
@@ -83,7 +84,7 @@ describe("PriceSortFilter", () => {
 
     expect(screen.getByRole("link", { name: "Réinitialiser" })).toHaveAttribute(
       "href",
-      "/products?category=chairs",
+      "/products?category=chairs&showFilters=1",
     );
   });
 });

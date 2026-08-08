@@ -4,7 +4,7 @@ import { buildProductWhere } from "@/features/products/server/build-product-filt
 import type { ProductFilters } from "@/features/products/types";
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
+  return { categories: [], designers: [], materials: [], movements: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 describe("buildProductWhere", () => {
@@ -30,6 +30,12 @@ describe("buildProductWhere", () => {
     });
   });
 
+  it("filters by movement slug", () => {
+    expect(buildProductWhere(filters({ movements: ["bauhaus"] }))).toEqual({
+      movement: { slug: { in: ["bauhaus"] } },
+    });
+  });
+
   it("filters by a minimum price only", () => {
     expect(buildProductWhere(filters({ minPrice: 500 }))).toEqual({
       price: { gte: 500 },
@@ -48,13 +54,14 @@ describe("buildProductWhere", () => {
     });
   });
 
-  it("combines category, designer, material, and price filters", () => {
+  it("combines category, designer, material, movement, and price filters", () => {
     expect(
       buildProductWhere(
         filters({
           categories: ["chairs"],
           designers: ["hans-j-wegner"],
           materials: ["cuir"],
+          movements: ["bauhaus"],
           minPrice: 500,
           maxPrice: 2000,
         }),
@@ -63,6 +70,7 @@ describe("buildProductWhere", () => {
       category: { slug: { in: ["chairs"] } },
       designers: { some: { designer: { slug: { in: ["hans-j-wegner"] } } } },
       materials: { some: { material: { slug: { in: ["cuir"] } } } },
+      movement: { slug: { in: ["bauhaus"] } },
       price: { gte: 500, lte: 2000 },
     });
   });

@@ -60,6 +60,11 @@ export async function getProductPageData(filters: ProductFilters) {
         name: "asc",
       },
     }),
+    prisma.movement.findMany({
+      orderBy: {
+        name: "asc",
+      },
+    }),
     getPriceBounds(),
   ]);
 }

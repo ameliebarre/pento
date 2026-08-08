@@ -1,11 +1,12 @@
 import { ProductFilters, SortOrder } from "../types";
 
-type ToggleDimension = "categories" | "designers" | "materials";
+type ToggleDimension = "categories" | "designers" | "materials" | "movements";
 
 const TOGGLE_PARAM_NAMES: Record<ToggleDimension, string> = {
   categories: "category",
   designers: "designer",
   materials: "material",
+  movements: "movement",
 };
 
 function toHref(filters: ProductFilters): string {
@@ -22,8 +23,13 @@ function toHref(filters: ProductFilters): string {
   if (filters.maxPrice !== null) params.set("maxPrice", String(filters.maxPrice));
   if (filters.sort !== null) params.set("sort", filters.sort);
 
-  const query = params.toString();
-  return query ? `/products?${query}` : "/products";
+  // Every caller of this function (toggle links, checkboxes, the price
+  // slider, sort radios, and their "Réinitialiser" links) only ever renders
+  // inside the already-visible filters panel — so the panel must stay open
+  // across the navigation, or it silently collapses on every filter click.
+  params.set("showFilters", "1");
+
+  return `/products?${params.toString()}`;
 }
 
 export function buildToggleFilterHref(

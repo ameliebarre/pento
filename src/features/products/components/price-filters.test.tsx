@@ -10,7 +10,7 @@ import type { ProductFilters } from "@/features/products/types";
 const BOUNDS = { min: 0, max: 1000 };
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
+  return { categories: [], designers: [], materials: [], movements: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 let location: { href: string };
@@ -75,7 +75,7 @@ describe("PriceFilters", () => {
 
     expect(screen.getByRole("link", { name: "Réinitialiser" })).toHaveAttribute(
       "href",
-      "/products?category=chairs",
+      "/products?category=chairs&showFilters=1",
     );
   });
 
@@ -98,6 +98,8 @@ describe("PriceFilters", () => {
     minThumb.focus();
     await user.keyboard("{ArrowRight}");
 
-    expect(location.href).toBe("/products?category=chairs&minPrice=10&maxPrice=1000");
+    expect(location.href).toBe(
+      "/products?category=chairs&minPrice=10&maxPrice=1000&showFilters=1",
+    );
   });
 });

@@ -20,7 +20,7 @@ const MANY_DESIGNERS = Array.from({ length: 8 }, (_, index) => ({
 }));
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
+  return { categories: [], designers: [], materials: [], movements: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
 let location: { href: string };
@@ -67,7 +67,7 @@ describe("DesignerFilters", () => {
 
     await user.click(screen.getByRole("checkbox", { name: "Hans J. Wegner" }));
 
-    expect(location.href).toBe("/products?category=chairs&designer=hans-j-wegner");
+    expect(location.href).toBe("/products?category=chairs&designer=hans-j-wegner&showFilters=1");
   });
 
   it("navigates to remove an already-selected designer", async () => {
@@ -78,7 +78,7 @@ describe("DesignerFilters", () => {
 
     await user.click(screen.getByRole("checkbox", { name: "Hans J. Wegner" }));
 
-    expect(location.href).toBe("/products");
+    expect(location.href).toBe("/products?showFilters=1");
   });
 
   it("filters the list as the user types in the search box", async () => {
@@ -145,7 +145,7 @@ describe("DesignerFilters", () => {
 
     expect(screen.getByRole("link", { name: "Réinitialiser" })).toHaveAttribute(
       "href",
-      "/products?category=chairs",
+      "/products?category=chairs&showFilters=1",
     );
   });
 });
