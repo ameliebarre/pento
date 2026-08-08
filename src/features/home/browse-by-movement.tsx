@@ -48,7 +48,7 @@ export async function BrowseByMovement() {
               )}
               <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
               <div className="absolute inset-x-4 bottom-4 flex items-end justify-between text-white">
-                <h3 className="uppercase">{movement.name}</h3>
+                <h3 className="text-sm uppercase">{movement.name}</h3>
                 <span className="shrink-0 pb-0.5 text-xs whitespace-nowrap">
                   {movement._count.products} pièce{movement._count.products > 1 ? "s" : ""}
                 </span>

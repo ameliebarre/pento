@@ -11,14 +11,11 @@ export async function ShopByCategory() {
   });
 
   return (
-    <section
-      aria-labelledby="shop-by-category-heading"
-      className="flex flex-col gap-2 py-16 lg:flex-row lg:items-start lg:gap-6"
-    >
+    <section aria-labelledby="shop-by-category-heading" className="flex flex-col gap-2 py-16">
       <h2 id="shop-by-category-heading" className="shrink-0 text-sm font-semibold uppercase">
         Shop by categories
       </h2>
-      <ul className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-5">
+      <ul className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         {categories.map((category) => (
           <li key={category.slug}>
             <Link
@@ -41,7 +38,7 @@ export async function ShopByCategory() {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
-                <span className="absolute inset-x-2 bottom-2 inline-flex items-center gap-1 text-xs whitespace-nowrap text-white">
+                <span className="absolute inset-x-4 bottom-4 inline-flex items-center gap-1 text-sm font-medium whitespace-nowrap text-white uppercase">
                   {category.name}
                   <ArrowRight
                     aria-hidden="true"

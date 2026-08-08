@@ -30,7 +30,7 @@ export async function SiteHeader() {
                 src="/logo-pento.svg"
                 alt="Pento"
                 className="max-w-64"
-                width={220}
+                width={150}
                 height={40}
               />
             </Link>

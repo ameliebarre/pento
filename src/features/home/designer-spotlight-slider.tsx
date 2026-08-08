@@ -88,9 +88,9 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
             aria-label={`${slide.name} — diapositive ${index + 1} sur ${slides.length}`}
             className="flex w-full flex-col items-start gap-3"
           >
-            <h3 className="font-semibold text-[#AD7D56]">{slide.name}</h3>
+            <h3 className="text-sm font-normal text-[#AD7D56] uppercase">{slide.name}</h3>
             <div className="flex w-full flex-col justify-between sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <h4 className="font-heading min-w-0 text-3xl md:text-4xl">{slide.title}</h4>
+              <h4 className="font-heading min-w-0 text-3xl">{slide.title}</h4>
               <div
                 aria-hidden="true"
                 className="flex shrink-0 items-center gap-1.5 text-sm tabular-nums sm:pt-3"
