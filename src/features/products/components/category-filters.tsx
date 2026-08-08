@@ -1,9 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  buildClearFilterHref,
-  buildToggleFilterHref,
-} from "@/features/products/utils/build-filter-href";
+import { buildClearFilterHref, buildToggleFilterHref } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
 import type { Category } from "@/generated/prisma/client";
 

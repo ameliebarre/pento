@@ -8,7 +8,7 @@ import {
 import type { ProductFilters } from "@/features/products/types";
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
-  return { categories: [], designers: [], minPrice: null, maxPrice: null, ...overrides };
+  return { categories: [], designers: [], materials: [], minPrice: null, maxPrice: null, ...overrides };
 }
 
 describe("buildToggleFilterHref", () => {
@@ -50,6 +50,16 @@ describe("buildToggleFilterHref", () => {
     expect(
       buildToggleFilterHref(filters({ minPrice: 500, maxPrice: 2000 }), "categories", "chairs"),
     ).toBe("/products?category=chairs&minPrice=500&maxPrice=2000");
+  });
+
+  it("toggles a material, preserving categories and designers", () => {
+    expect(
+      buildToggleFilterHref(
+        filters({ categories: ["chairs"], designers: ["hans-j-wegner"] }),
+        "materials",
+        "cuir",
+      ),
+    ).toBe("/products?category=chairs&designer=hans-j-wegner&material=cuir");
   });
 });
 

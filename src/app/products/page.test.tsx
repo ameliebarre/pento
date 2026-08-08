@@ -10,12 +10,14 @@ function renderPage(
   category?: string | string[],
   designer?: string | string[],
   price?: { min?: number; max?: number },
+  material?: string | string[],
 ) {
   const params: Record<string, string | string[]> = {};
   if (category) params.category = category;
   if (designer) params.designer = designer;
   if (price?.min !== undefined) params.minPrice = String(price.min);
   if (price?.max !== undefined) params.maxPrice = String(price.max);
+  if (material) params.material = material;
   return ShopAllPage({ searchParams: Promise.resolve(params) });
 }
 
@@ -25,12 +27,16 @@ async function createProduct(
   categoryId?: string,
   designerId?: string,
   price = 100,
+  materialId?: string,
 ) {
   const product = await prisma.product.create({
     data: { name, slug, description: "desc", price, categoryId },
   });
   if (designerId) {
     await prisma.productDesigner.create({ data: { productId: product.id, designerId } });
+  }
+  if (materialId) {
+    await prisma.productMaterial.create({ data: { productId: product.id, materialId } });
   }
   return product;
 }
@@ -43,6 +49,10 @@ async function createDesigner(slug: string, firstName: string, lastName: string)
   return prisma.designer.create({
     data: { slug, firstName, lastName, biography: "" },
   });
+}
+
+async function createMaterial(slug: string, name: string) {
+  return prisma.material.create({ data: { name, slug } });
 }
 
 describe("ShopAllPage", () => {
@@ -204,5 +214,41 @@ describe("ShopAllPage", () => {
     expect(screen.getByText("Chaise Test")).toBeInTheDocument();
     expect(screen.queryByText("Table Test")).not.toBeInTheDocument();
     expect(screen.queryByText("Chaise Chère")).not.toBeInTheDocument();
+  });
+
+  it("lists every material as a filter checkbox", async () => {
+    await createMaterial("cuir", "Cuir");
+    await createMaterial("chene-massif", "Chêne massif");
+
+    render(await renderPage());
+
+    expect(screen.getByRole("checkbox", { name: "Cuir" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Chêne massif" })).toBeInTheDocument();
+  });
+
+  it("only shows products with the selected material", async () => {
+    const leather = await createMaterial("cuir", "Cuir");
+    const oak = await createMaterial("chene-massif", "Chêne massif");
+    await createProduct("shop-all-leather", "Fauteuil Cuir", undefined, undefined, 100, leather.id);
+    await createProduct("shop-all-oak", "Table Chêne", undefined, undefined, 100, oak.id);
+
+    render(await renderPage(undefined, undefined, undefined, "cuir"));
+
+    expect(screen.getByText("Fauteuil Cuir")).toBeInTheDocument();
+    expect(screen.queryByText("Table Chêne")).not.toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Cuir" })).toBeChecked();
+  });
+
+  it("combines a material filter with a category filter", async () => {
+    const chairs = await createCategory("chairs", "Chairs");
+    const tables = await createCategory("tables", "Tables");
+    const leather = await createMaterial("cuir", "Cuir");
+    await createProduct("shop-all-matching", "Fauteuil Cuir", chairs.id, undefined, 100, leather.id);
+    await createProduct("shop-all-wrong-category", "Table Cuir", tables.id, undefined, 100, leather.id);
+
+    render(await renderPage("chairs", undefined, undefined, "cuir"));
+
+    expect(screen.getByText("Fauteuil Cuir")).toBeInTheDocument();
+    expect(screen.queryByText("Table Cuir")).not.toBeInTheDocument();
   });
 });

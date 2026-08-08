@@ -7,21 +7,25 @@ describe("getProductFilters", () => {
     expect(getProductFilters({})).toEqual({
       categories: [],
       designers: [],
+      materials: [],
       minPrice: null,
       maxPrice: null,
     });
   });
 
-  it("wraps a single category or designer value into an array", () => {
-    expect(getProductFilters({ category: "chairs", designer: "hans-j-wegner" })).toEqual({
+  it("wraps a single category, designer, or material value into an array", () => {
+    expect(
+      getProductFilters({ category: "chairs", designer: "hans-j-wegner", material: "cuir" }),
+    ).toEqual({
       categories: ["chairs"],
       designers: ["hans-j-wegner"],
+      materials: ["cuir"],
       minPrice: null,
       maxPrice: null,
     });
   });
 
-  it("keeps multiple category or designer values as an array", () => {
+  it("keeps multiple category, designer, or material values as an array", () => {
     const filters = getProductFilters({ category: ["chairs", "tables"] });
 
     expect(filters.categories).toEqual(["chairs", "tables"]);

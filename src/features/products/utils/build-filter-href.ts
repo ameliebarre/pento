@@ -1,10 +1,11 @@
 import { ProductFilters } from "../types";
 
-type ToggleDimension = "categories" | "designers";
+type ToggleDimension = "categories" | "designers" | "materials";
 
 const TOGGLE_PARAM_NAMES: Record<ToggleDimension, string> = {
   categories: "category",
   designers: "designer",
+  materials: "material",
 };
 
 function toHref(filters: ProductFilters): string {

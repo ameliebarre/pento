@@ -24,6 +24,18 @@ export function buildProductWhere(filters: ProductFilters): ProductWhereInput {
     };
   }
 
+  if (filters.materials.length > 0) {
+    where.materials = {
+      some: {
+        material: {
+          slug: {
+            in: filters.materials,
+          },
+        },
+      },
+    };
+  }
+
   if (filters.minPrice !== null || filters.maxPrice !== null) {
     where.price = {
       ...(filters.minPrice !== null ? { gte: filters.minPrice } : {}),

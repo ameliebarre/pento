@@ -17,6 +17,7 @@ export function getProductFilters(params: SearchParams): ProductFilters {
   return {
     categories: toSlugArray(params.category),
     designers: toSlugArray(params.designer),
+    materials: toSlugArray(params.material),
     minPrice: toNullableNumber(params.minPrice),
     maxPrice: toNullableNumber(params.maxPrice),
   };

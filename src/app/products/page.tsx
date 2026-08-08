@@ -1,6 +1,7 @@
 import { ProductCard } from "@/features/products/components/product-card";
 import { CategoryFilters } from "@/features/products/components/category-filters";
 import { DesignerFilters } from "@/features/products/components/designer-filters";
+import { MaterialFilters } from "@/features/products/components/material-filters";
 import { PriceFilters } from "@/features/products/components/price-filters";
 import { SearchParams } from "@/features/products/types";
 import { getProductFilters } from "@/features/products/utils/get-product-filters";
@@ -13,7 +14,8 @@ type ShopAllPageProps = {
 export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
   const filters = getProductFilters(await searchParams);
 
-  const [products, categories, designers, priceBounds] = await getProductPageData(filters);
+  const [products, categories, designers, materials, priceBounds] =
+    await getProductPageData(filters);
 
   return (
     <div className="flex flex-col gap-8 pt-8 lg:flex-row lg:items-start lg:gap-10">
@@ -24,6 +26,8 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
           <CategoryFilters categories={categories} filters={filters} />
           <hr className="border-t border-gray-300" />
           <DesignerFilters designers={designers} filters={filters} />
+          <hr className="border-t border-gray-300" />
+          <MaterialFilters materials={materials} filters={filters} />
           <hr className="border-t border-gray-300" />
           <PriceFilters bounds={priceBounds} filters={filters} />
         </div>
