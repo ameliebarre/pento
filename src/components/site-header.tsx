@@ -24,15 +24,24 @@ export async function SiteHeader() {
       <div className="mx-auto flex items-center justify-between px-4 py-6 sm:px-8 md:px-6">
         <div className="flex items-center gap-4">
           <MobileNav />
-          <Link href="/">
-            <Image src="/logo.svg" alt="Pento" className="max-w-24" width={124} height={30} />
-          </Link>
+          <div className="flex items-center gap-8">
+            <Link href="/">
+              <Image
+                src="/logo-pento.svg"
+                alt="Pento"
+                className="max-w-64"
+                width={150}
+                height={40}
+              />
+            </Link>
+            <ProductsNav />
+          </div>
         </div>
-        <ProductsNav />
         <nav aria-label="Compte et panier" className="flex items-center gap-2">
           {session?.user ? (
             <Link
               href="/profile"
+              aria-label="Mon profil"
               className="flex items-center gap-2 transition-opacity hover:opacity-80"
             >
               <span className="bg-primary text-primary-foreground flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-medium">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
@@ -28,12 +28,25 @@ const linkVariants = {
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  function close() {
+    setOpen(false);
+    // Restore focus to the button that opened the panel rather than leaving
+    // it on a now-hidden element.
+    toggleButtonRef.current?.focus();
+  }
 
   useEffect(() => {
     if (!open) return;
 
+    // Move focus into the panel as soon as it opens, so keyboard/screen-reader
+    // users land somewhere inside it instead of on whatever was behind it.
+    closeButtonRef.current?.focus();
+
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") close();
     }
 
     document.addEventListener("keydown", handleKeyDown);
@@ -43,6 +56,7 @@ export function MobileNav() {
   return (
     <>
       <button
+        ref={toggleButtonRef}
         type="button"
         aria-expanded={open}
         aria-controls="mobile-nav-panel"
@@ -62,7 +76,7 @@ export function MobileNav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              onClick={() => setOpen(false)}
+              onClick={close}
               aria-hidden="true"
               className="fixed inset-0 z-40 bg-black/50 md:hidden"
             />
@@ -77,18 +91,19 @@ export function MobileNav() {
               className="bg-background fixed inset-y-0 left-0 z-50 flex w-md flex-col gap-1 p-6 shadow-xl md:hidden"
             >
               <button
+                ref={closeButtonRef}
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={close}
                 aria-label="Fermer le menu"
                 className="mb-6 flex size-8 items-center justify-center self-end"
               >
                 <X aria-hidden="true" className="size-5" />
               </button>
               {PRODUCT_LINKS.map((link) => (
-                <motion.div key={link.href} variants={linkVariants}>
+                <motion.div key={link.label} variants={linkVariants}>
                   <Link
                     href={link.href}
-                    onClick={() => setOpen(false)}
+                    onClick={close}
                     className="font-heading block py-3 text-4xl"
                   >
                     {link.label}

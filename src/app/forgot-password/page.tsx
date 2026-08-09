@@ -16,7 +16,9 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-full items-center justify-center">
       <Card className="w-full max-w-sm ring-0">
         <CardHeader>
-          <CardTitle className="pb-4 text-center text-4xl">Mot de passe oublié</CardTitle>
+          <CardTitle as="h1" className="pb-4 text-center text-4xl">
+            Mot de passe oublié
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {state?.success ? (
@@ -41,7 +43,11 @@ export default function ForgotPasswordPage() {
                   className="h-10 rounded-[6px]"
                 />
               </div>
-              {state?.error && <p className="text-destructive text-sm">{state.error}</p>}
+              {state?.error && (
+                <p role="alert" className="text-destructive text-sm">
+                  {state.error}
+                </p>
+              )}
               <Button type="submit" disabled={pending} className="h-10 rounded-[6px]">
                 {pending ? "Envoi..." : "Envoyer le lien"}
               </Button>

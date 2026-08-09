@@ -23,7 +23,9 @@ export default async function ProfilePage({
     <div className="flex min-h-full items-center justify-center">
       <Card className="w-full max-w-sm ring-0">
         <CardHeader>
-          <CardTitle className="pb-8 text-center text-4xl">Mon profil</CardTitle>
+          <CardTitle as="h1" className="pb-8 text-center text-4xl">
+            Mon profil
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">

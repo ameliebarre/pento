@@ -3,6 +3,7 @@ import { DM_Sans, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
       className={`${dmSans.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="flex h-full flex-col overflow-x-hidden">
+        <SmoothScroll />
         <SiteHeader />
         <main id="main-content" className="mx-auto w-full flex-1 px-6">
           {children}

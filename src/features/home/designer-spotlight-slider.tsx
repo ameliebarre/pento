@@ -86,10 +86,11 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
             role="group"
             aria-roledescription="slide"
             aria-label={`${slide.name} — diapositive ${index + 1} sur ${slides.length}`}
-            className="flex w-full flex-col items-start gap-5.5"
+            className="flex w-full flex-col items-start gap-3"
           >
-            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <h3 className="font-heading min-w-0 text-3xl md:text-4xl">{slide.title}</h3>
+            <h3 className="text-sm font-normal text-[#AD7D56] uppercase">{slide.name}</h3>
+            <div className="flex w-full flex-col justify-between sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <h4 className="font-heading min-w-0 text-3xl">{slide.title}</h4>
               <div
                 aria-hidden="true"
                 className="flex shrink-0 items-center gap-1.5 text-sm tabular-nums sm:pt-3"
@@ -119,13 +120,17 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
                 className="group inline-flex items-center gap-2 text-sm font-medium"
               >
                 Découvrir son histoire
-                <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                />
               </Link>
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex shrink-0 items-center gap-4">
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
+                  className="cursor-pointer rounded-full border border-black/15 hover:border-black/30"
                   onClick={() => goTo(index - 1)}
                   disabled={isFirst}
                   aria-label="Designer précédent"
@@ -136,6 +141,7 @@ export function DesignerSpotlightSlider({ slides }: { slides: DesignerSlide[] })
                   type="button"
                   variant="ghost"
                   size="icon"
+                  className="cursor-pointer rounded-full border border-black/15 hover:border-black/30"
                   onClick={() => goTo(index + 1)}
                   disabled={isLast}
                   aria-label="Designer suivant"
