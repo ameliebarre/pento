@@ -2,6 +2,7 @@ import { CollectionConfig } from "payload";
 
 export const Products: CollectionConfig = {
   slug: "products",
+  access: { read: () => true },
   fields: [
     {
       name: "name",
@@ -63,6 +64,10 @@ export const Products: CollectionConfig = {
       type: "number",
     },
     {
+      name: "creationDate",
+      type: "date",
+    },
+    {
       name: "featured",
       type: "checkbox",
       defaultValue: false,
@@ -71,6 +76,40 @@ export const Products: CollectionConfig = {
       name: "category",
       type: "relationship",
       relationTo: "categories",
+    },
+    {
+      name: "manufacturer",
+      type: "relationship",
+      relationTo: "manufacturers",
+    },
+    {
+      name: "movement",
+      type: "relationship",
+      relationTo: "movements",
+    },
+    {
+      name: "designers",
+      type: "relationship",
+      relationTo: "designers",
+      hasMany: true,
+    },
+    {
+      name: "images",
+      type: "relationship",
+      relationTo: "media",
+      hasMany: true,
+    },
+    {
+      name: "tags",
+      type: "relationship",
+      relationTo: "tags",
+      hasMany: true,
+    },
+    {
+      name: "materials",
+      type: "relationship",
+      relationTo: "materials",
+      hasMany: true,
     },
   ],
 };

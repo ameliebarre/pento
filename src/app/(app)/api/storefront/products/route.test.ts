@@ -1,10 +1,10 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 
-import { GET } from "@/app/(app)/api/products/route";
+import { GET } from "@/app/(app)/api/storefront/products/route";
 import { prisma } from "@/lib/prisma";
 
-describe("GET /api/products", () => {
+describe("GET /api/storefront/products", () => {
   it("returns every product when no category filter is given", async () => {
     await prisma.product.create({
       data: { name: "Chaise", slug: "api-chaise", description: "desc", price: 100 },
@@ -13,7 +13,7 @@ describe("GET /api/products", () => {
       data: { name: "Table", slug: "api-table", description: "desc", price: 200 },
     });
 
-    const response = await GET(new NextRequest("http://localhost/api/products"));
+    const response = await GET(new NextRequest("http://localhost/api/storefront/products"));
     const body = await response.json();
 
     expect(body.products).toHaveLength(2);
@@ -35,7 +35,7 @@ describe("GET /api/products", () => {
     });
 
     const response = await GET(
-      new NextRequest("http://localhost/api/products?category=api-chairs"),
+      new NextRequest("http://localhost/api/storefront/products?category=api-chairs"),
     );
     const body = await response.json();
 
@@ -48,7 +48,7 @@ describe("GET /api/products", () => {
     await prisma.category.create({ data: { name: "Empty", slug: "api-empty-category" } });
 
     const response = await GET(
-      new NextRequest("http://localhost/api/products?category=api-empty-category"),
+      new NextRequest("http://localhost/api/storefront/products?category=api-empty-category"),
     );
     const body = await response.json();
 

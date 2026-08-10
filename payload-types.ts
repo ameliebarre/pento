@@ -67,7 +67,14 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    media: Media;
+    countries: Country;
     categories: Category;
+    designers: Designer;
+    manufacturers: Manufacturer;
+    movements: Movement;
+    materials: Material;
+    tags: Tag;
     products: Product;
     'payload-kv': PayloadKv;
     users: User;
@@ -77,7 +84,14 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    media: MediaSelect<false> | MediaSelect<true>;
+    countries: CountriesSelect<false> | CountriesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    designers: DesignersSelect<false> | DesignersSelect<true>;
+    manufacturers: ManufacturersSelect<false> | ManufacturersSelect<true>;
+    movements: MovementsSelect<false> | MovementsSelect<true>;
+    materials: MaterialsSelect<false> | MaterialsSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -121,6 +135,35 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "countries".
+ */
+export interface Country {
+  id: number;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
@@ -128,6 +171,75 @@ export interface Category {
   title?: string | null;
   slug?: string | null;
   position?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "designers".
+ */
+export interface Designer {
+  id: number;
+  slug: string;
+  firstName: string;
+  lastName: string;
+  birthDate?: string | null;
+  deathDate?: string | null;
+  nationality?: string | null;
+  biography: string;
+  quote?: string | null;
+  image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "manufacturers".
+ */
+export interface Manufacturer {
+  id: number;
+  slug: string;
+  name: string;
+  history?: string | null;
+  website?: string | null;
+  logo?: (number | null) | Media;
+  country?: (number | null) | Country;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "movements".
+ */
+export interface Movement {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  coverImage?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "materials".
+ */
+export interface Material {
+  id: number;
+  slug: string;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: number;
+  name: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -163,8 +275,15 @@ export interface Product {
   height?: number | null;
   depth?: number | null;
   weight?: number | null;
+  creationDate?: string | null;
   featured?: boolean | null;
   category?: (number | null) | Category;
+  manufacturer?: (number | null) | Manufacturer;
+  movement?: (number | null) | Movement;
+  designers?: (number | Designer)[] | null;
+  images?: (number | Media)[] | null;
+  tags?: (number | Tag)[] | null;
+  materials?: (number | Material)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -218,8 +337,36 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'countries';
+        value: number | Country;
+      } | null)
+    | ({
         relationTo: 'categories';
         value: number | Category;
+      } | null)
+    | ({
+        relationTo: 'designers';
+        value: number | Designer;
+      } | null)
+    | ({
+        relationTo: 'manufacturers';
+        value: number | Manufacturer;
+      } | null)
+    | ({
+        relationTo: 'movements';
+        value: number | Movement;
+      } | null)
+    | ({
+        relationTo: 'materials';
+        value: number | Material;
+      } | null)
+    | ({
+        relationTo: 'tags';
+        value: number | Tag;
       } | null)
     | ({
         relationTo: 'products';
@@ -273,12 +420,103 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "countries_select".
+ */
+export interface CountriesSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories_select".
  */
 export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   position?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "designers_select".
+ */
+export interface DesignersSelect<T extends boolean = true> {
+  slug?: T;
+  firstName?: T;
+  lastName?: T;
+  birthDate?: T;
+  deathDate?: T;
+  nationality?: T;
+  biography?: T;
+  quote?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "manufacturers_select".
+ */
+export interface ManufacturersSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  history?: T;
+  website?: T;
+  logo?: T;
+  country?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "movements_select".
+ */
+export interface MovementsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  description?: T;
+  startDate?: T;
+  endDate?: T;
+  coverImage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "materials_select".
+ */
+export interface MaterialsSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  name?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -299,8 +537,15 @@ export interface ProductsSelect<T extends boolean = true> {
   height?: T;
   depth?: T;
   weight?: T;
+  creationDate?: T;
   featured?: T;
   category?: T;
+  manufacturer?: T;
+  movement?: T;
+  designers?: T;
+  images?: T;
+  tags?: T;
+  materials?: T;
   updatedAt?: T;
   createdAt?: T;
 }

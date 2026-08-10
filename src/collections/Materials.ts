@@ -1,24 +1,22 @@
 import { CollectionConfig } from "payload";
 
-export const Categories: CollectionConfig = {
-  slug: "categories",
+export const Materials: CollectionConfig = {
+  slug: "materials",
   access: { read: () => true },
   admin: {
-    useAsTitle: "title",
+    useAsTitle: "name",
   },
   fields: [
     {
-      name: "title",
-      type: "text",
-    },
-    {
       name: "slug",
       type: "text",
+      required: true,
       unique: true,
     },
     {
-      name: "position",
-      type: "number",
+      name: "name",
+      type: "text",
+      required: true,
       unique: true,
     },
   ],
