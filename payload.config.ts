@@ -1,8 +1,11 @@
 import { buildConfig } from "payload";
 import { postgresAdapter } from "@payloadcms/db-postgres";
 
+import { Categories } from "@/collections/Categories";
+
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "",
+  collections: [Categories],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL,

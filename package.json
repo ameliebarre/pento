@@ -17,7 +17,8 @@
     "db:test:migrate": "DATABASE_URL=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" prisma migrate deploy",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "payload": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts payload"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
