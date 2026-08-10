@@ -21,5 +21,10 @@ export const Categories: CollectionConfig = {
       type: "number",
       unique: true,
     },
+    {
+      name: "image",
+      type: "relationship",
+      relationTo: "media",
+    },
   ],
 };

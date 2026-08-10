@@ -171,6 +171,7 @@ export interface Category {
   title?: string | null;
   slug?: string | null;
   position?: number | null;
+  image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -453,6 +454,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   position?: T;
+  image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
