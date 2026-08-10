@@ -25,7 +25,7 @@ vi.mock("next/navigation", () => ({
 }));
 
 import { getSession } from "@/lib/get-session";
-import ProfilePage from "@/app/profile/page";
+import ProfilePage from "@/app/(app)/profile/page";
 
 const mockedGetSession = vi.mocked(getSession);
 

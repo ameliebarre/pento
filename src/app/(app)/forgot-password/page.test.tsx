@@ -15,7 +15,7 @@ vi.mock("@/actions/auth", () => ({
 }));
 
 import { requestPasswordResetAction } from "@/actions/auth";
-import ForgotPasswordPage from "@/app/forgot-password/page";
+import ForgotPasswordPage from "@/app/(app)/forgot-password/page";
 
 const mockedAction = vi.mocked(requestPasswordResetAction);
 

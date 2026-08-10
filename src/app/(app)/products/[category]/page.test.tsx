@@ -11,7 +11,7 @@ vi.mock("next/navigation", () => ({
   notFound: () => mockNotFound(),
 }));
 
-import CategoryPage from "@/app/products/[category]/page";
+import CategoryPage from "@/app/(app)/products/[category]/page";
 
 describe("CategoryPage", () => {
   it("renders the category label as the heading for a known category", async () => {

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { describe, expect, it } from "vitest";
 
-import { GET } from "@/app/api/products/route";
+import { GET } from "@/app/(app)/api/products/route";
 import { prisma } from "@/lib/prisma";
 
 describe("GET /api/products", () => {

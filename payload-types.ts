@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     categories: Category;
+    products: Product;
     'payload-kv': PayloadKv;
     users: User;
     'payload-locked-documents': PayloadLockedDocument;
@@ -77,6 +78,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -126,6 +128,43 @@ export interface Category {
   title?: string | null;
   slug?: string | null;
   position?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  sku?: string | null;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  price: number;
+  currency?: string | null;
+  stock: number;
+  salesCount: number;
+  width?: number | null;
+  height?: number | null;
+  depth?: number | null;
+  weight?: number | null;
+  featured?: boolean | null;
+  category?: (number | null) | Category;
   updatedAt: string;
   createdAt: string;
 }
@@ -183,6 +222,10 @@ export interface PayloadLockedDocument {
         value: number | Category;
       } | null)
     | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null);
@@ -236,6 +279,28 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   position?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  sku?: T;
+  description?: T;
+  price?: T;
+  currency?: T;
+  stock?: T;
+  salesCount?: T;
+  width?: T;
+  height?: T;
+  depth?: T;
+  weight?: T;
+  featured?: T;
+  category?: T;
   updatedAt?: T;
   createdAt?: T;
 }
