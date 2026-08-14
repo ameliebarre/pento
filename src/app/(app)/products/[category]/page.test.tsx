@@ -3,6 +3,10 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+vi.mock("@/lib/get-session", () => ({
+  getSession: vi.fn().mockResolvedValue(null),
+}));
+
 const notFoundSentinel = new Error("NEXT_NOT_FOUND");
 const mockNotFound = vi.fn(() => {
   throw notFoundSentinel;

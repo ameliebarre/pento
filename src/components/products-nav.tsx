@@ -7,11 +7,19 @@ export const PRODUCT_LINKS = [
   { label: "Contact", href: "contact" },
 ];
 
-export function ProductsNav() {
+type ProductsNavProps = {
+  theme?: "light" | "dark";
+};
+
+export function ProductsNav({ theme = "light" }: ProductsNavProps = {}) {
   return (
     <nav aria-label="Catégories de produits" className="hidden items-center gap-4 text-sm md:flex">
       {PRODUCT_LINKS.map((link) => (
-        <Link key={link.label} href={link.href} className="text-sm leading-4 uppercase">
+        <Link
+          key={link.label}
+          href={link.href}
+          className={`text-sm leading-4 uppercase ${theme === "dark" ? "text-white" : "text-foreground"}`}
+        >
           {link.label}
         </Link>
       ))}

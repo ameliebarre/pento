@@ -1,5 +1,6 @@
 import { SlidersHorizontal } from "lucide-react";
 
+import { SiteHeader } from "@/components/site-header";
 import { Accordion } from "@/components/ui/accordion";
 import { ProductCard } from "@/features/products/components/product-card";
 import { CategoryFilters } from "@/features/products/components/category-filters";
@@ -40,6 +41,7 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
 
   return (
     <div className="flex flex-col gap-6 pt-8">
+      {await SiteHeader({ theme: "light" })}
       <a
         href={buildFiltersVisibilityHref(rawParams, !filtersVisible)}
         className="flex items-center gap-1 self-start text-sm font-medium underline-offset-2 hover:underline"

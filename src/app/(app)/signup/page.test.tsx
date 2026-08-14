@@ -15,7 +15,7 @@ vi.mock("@/actions/auth", () => ({
 }));
 
 import { signupAction } from "@/actions/auth";
-import SignupPage from "@/app/(app)/signup/page";
+import { SignupForm as SignupPage } from "@/app/(app)/signup/signup-form";
 
 const mockedSignupAction = vi.mocked(signupAction);
 

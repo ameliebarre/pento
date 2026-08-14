@@ -14,7 +14,7 @@ export async function ShopByCategory() {
 
   return (
     <section aria-labelledby="shop-by-category-heading" className="flex flex-col gap-2 py-16">
-      <h2 id="shop-by-category-heading" className="shrink-0 text-sm font-semibold uppercase">
+      <h2 id="shop-by-category-heading" className="shrink-0 text-sm uppercase">
         Shop by categories
       </h2>
       <ul className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
@@ -43,7 +43,7 @@ export async function ShopByCategory() {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/15 to-transparent" />
-                  <span className="absolute inset-x-4 bottom-4 inline-flex items-center gap-1 text-sm font-medium whitespace-nowrap text-white uppercase">
+                  <span className="absolute inset-x-4 bottom-4 inline-flex items-center gap-1 text-xs whitespace-nowrap text-white uppercase">
                     {category.title}
                     <ArrowRight
                       aria-hidden="true"

@@ -1,8 +1,12 @@
 // @vitest-environment jsdom
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+
+vi.mock("@/lib/get-session", () => ({
+  getSession: vi.fn().mockResolvedValue(null),
+}));
 
 import ShopAllPage from "@/app/(app)/products/page";
 import { prisma } from "@/lib/prisma";

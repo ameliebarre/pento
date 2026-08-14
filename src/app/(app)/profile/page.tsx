@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 
 import { auth } from "@/auth";
 import { getSession } from "@/lib/get-session";
+import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -21,6 +22,7 @@ export default async function ProfilePage({
 
   return (
     <div className="flex min-h-full items-center justify-center">
+      {await SiteHeader({ theme: "light" })}
       <Card className="w-full max-w-sm ring-0">
         <CardHeader>
           <CardTitle as="h1" className="pb-8 text-center text-4xl">

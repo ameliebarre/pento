@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 
+import { SiteHeader } from "@/components/site-header";
+
 const CATEGORY_LABELS: Record<string, string> = {
   sofas: "Sofas",
   armchairs: "Armchairs",
@@ -22,6 +24,7 @@ export default async function CategoryPage({
 
   return (
     <div className="flex flex-col gap-6">
+      {await SiteHeader({ theme: "light" })}
       <h1 className="text-2xl font-semibold">{label}</h1>
     </div>
   );
