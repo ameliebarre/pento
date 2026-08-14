@@ -58,6 +58,7 @@ beforeEach(async () => {
       payload.tags,
       payload.countries,
       payload.media,
+      payload.hero_banner,
       payload.users_sessions,
       payload.users
     RESTART IDENTITY CASCADE;

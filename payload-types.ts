@@ -103,8 +103,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'hero-banner': HeroBanner;
+  };
+  globalsSelect: {
+    'hero-banner': HeroBannerSelect<false> | HeroBannerSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -612,6 +616,42 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-banner".
+ */
+export interface HeroBanner {
+  id: number;
+  backgroundImage: number | Media;
+  /**
+   * Première ligne du titre, affichée en blanc.
+   */
+  heading: string;
+  /**
+   * Deuxième ligne du titre, affichée en italique doré.
+   */
+  headingAccent: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "hero-banner_select".
+ */
+export interface HeroBannerSelect<T extends boolean = true> {
+  backgroundImage?: T;
+  heading?: T;
+  headingAccent?: T;
+  description?: T;
+  ctaLabel?: T;
+  ctaHref?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

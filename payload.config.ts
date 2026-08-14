@@ -11,6 +11,7 @@ import { Media } from "@/collections/Media";
 import { Movements } from "@/collections/Movements";
 import { Products } from "@/collections/Products";
 import { Tags } from "@/collections/Tags";
+import { HeroBanner } from "@/globals/HeroBanner";
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "",
@@ -25,6 +26,7 @@ export default buildConfig({
     Tags,
     Products,
   ],
+  globals: [HeroBanner],
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: {
