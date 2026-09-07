@@ -2,6 +2,7 @@
   "name": "pento",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,10 +17,14 @@
     "db:test:migrate": "DATABASE_URL=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" prisma migrate deploy",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "payload": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts payload"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@payloadcms/db-postgres": "^3.87.1",
+    "@payloadcms/next": "^3.87.1",
+    "@payloadcms/richtext-lexical": "^3.87.1",
     "@prisma/client": "^6.19.3",
     "better-auth": "^1.6.25",
     "class-variance-authority": "^0.7.1",
@@ -29,6 +34,7 @@
     "motion": "^12.43.0",
     "next": "16.2.12",
     "next-cloudinary": "^6.17.5",
+    "payload": "^3.87.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.18.1",

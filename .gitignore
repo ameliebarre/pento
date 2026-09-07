@@ -44,4 +44,7 @@ next-env.d.ts
 
 /src/generated/prisma
 
+# Payload local media uploads
+/media
+
 claude.md
