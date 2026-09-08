@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { HeroBanner } from "@/features/home/hero-banner";
 import { ShopByCategory } from "@/features/home/shop-by-category";
-import { DesignerSpotlight } from "@/features/home/designer-spotlight";
+import { CuratedSelection } from "@/features/home/curated-selection";
 import { BrowseByMovement } from "@/features/home/browse-by-movement";
 import { Newsletter } from "@/features/home/newsletter";
 import { TrustFeatures } from "@/features/home/trust-features";
@@ -12,7 +12,7 @@ export default async function HomePage() {
       <SiteHeader theme="dark" />
       <HeroBanner />
       <ShopByCategory />
-      <DesignerSpotlight />
+      <CuratedSelection />
       <BrowseByMovement />
       <Newsletter />
       <TrustFeatures />
