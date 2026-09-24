@@ -105,9 +105,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'hero-banner': HeroBanner;
+    'passion-for-design': PassionForDesign;
   };
   globalsSelect: {
     'hero-banner': HeroBannerSelect<false> | HeroBannerSelect<true>;
+    'passion-for-design': PassionForDesignSelect<false> | PassionForDesignSelect<true>;
   };
   locale: null;
   widgets: {
@@ -640,6 +642,34 @@ export interface HeroBanner {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passion-for-design".
+ */
+export interface PassionForDesign {
+  id: number;
+  image: number | Media;
+  eyebrow: string;
+  /**
+   * Première ligne du titre, affichée en blanc.
+   */
+  heading: string;
+  /**
+   * Deuxième ligne du titre, affichée en italique doré.
+   */
+  headingAccent: string;
+  /**
+   * Un ou deux paragraphes, séparés par une ligne vide.
+   */
+  description: string;
+  values: {
+    title: string;
+    description: string;
+    id?: string | null;
+  }[];
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "hero-banner_select".
  */
 export interface HeroBannerSelect<T extends boolean = true> {
@@ -649,6 +679,27 @@ export interface HeroBannerSelect<T extends boolean = true> {
   description?: T;
   ctaLabel?: T;
   ctaHref?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passion-for-design_select".
+ */
+export interface PassionForDesignSelect<T extends boolean = true> {
+  image?: T;
+  eyebrow?: T;
+  heading?: T;
+  headingAccent?: T;
+  description?: T;
+  values?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
