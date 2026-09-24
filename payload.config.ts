@@ -12,6 +12,7 @@ import { Movements } from "@/collections/Movements";
 import { Products } from "@/collections/Products";
 import { Tags } from "@/collections/Tags";
 import { HeroBanner } from "@/globals/HeroBanner";
+import { PassionForDesign } from "@/globals/PassionForDesign";
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "",
@@ -26,7 +27,7 @@ export default buildConfig({
     Tags,
     Products,
   ],
-  globals: [HeroBanner],
+  globals: [HeroBanner, PassionForDesign],
   editor: lexicalEditor(),
   db: postgresAdapter({
     pool: {
