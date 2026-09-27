@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { ProductCard, type ProductWithImage } from "@/features/products/components/product-card";
-import { Prisma } from "@/generated/prisma/client";
+import { Prisma } from "@prisma/client";
 
 function buildProduct(overrides: Partial<ProductWithImage> = {}): ProductWithImage {
   return {

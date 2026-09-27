@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
+    "vercel-build": "PAYLOAD_CONFIG_PATH=payload.config.ts payload migrate && prisma migrate deploy && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
@@ -14,7 +15,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "prisma db seed",
-    "db:test:migrate": "DATABASE_URL=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" prisma migrate deploy",
+    "db:test:migrate": "DATABASE_URL=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" DATABASE_URL_UNPOOLED=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" prisma migrate deploy",
     "test": "vitest run",
     "test:watch": "vitest",
     "postinstall": "prisma generate",

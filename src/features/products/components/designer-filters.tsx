@@ -11,7 +11,7 @@ import {
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Designer } from "@/generated/prisma/client";
+import type { Designer } from "@prisma/client";
 
 const VISIBLE_COUNT = 6;
 
