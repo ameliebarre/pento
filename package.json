@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "vercel-build": "PAYLOAD_CONFIG_PATH=payload.config.ts payload migrate && prisma migrate deploy && next build --webpack",
+    "vercel-build": "tsx scripts/wait-for-db.ts && PAYLOAD_CONFIG_PATH=payload.config.ts payload migrate && prisma migrate deploy && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
