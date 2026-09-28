@@ -19,8 +19,10 @@ export default async function HomePage() {
         <PassionForDesign />
       </div>
       <TheMasters />
-      <Testimonials />
-      <Newsletter />
+      <div className="flex flex-col">
+        <Testimonials />
+        <Newsletter />
+      </div>
       <TrustFeatures />
     </div>
   );
