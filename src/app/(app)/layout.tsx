@@ -3,6 +3,7 @@ import { DM_Sans, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { Footer } from "@/components/footer";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -39,6 +40,7 @@ export default function RootLayout({
         <main id="main-content" className="mx-auto w-full flex-1 px-24">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );
