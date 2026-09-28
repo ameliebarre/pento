@@ -23,8 +23,10 @@ export const Categories: CollectionConfig = {
     },
     {
       name: "image",
-      type: "relationship",
-      relationTo: "media",
+      type: "text",
+      admin: {
+        description: "URL Cloudinary de l'image.",
+      },
     },
   ],
 };

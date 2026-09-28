@@ -1,9 +1,9 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight, ImageOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { getPayloadClient } from "@/lib/payload";
+import { ProductImage } from "@/components/product-image";
 
 // Curated 3x3 mosaic: each column is 3 grid rows tall. "large" tiles span
 // 2 rows (a 1x2 cell, ~3:4 once cropped) and sit above a "small" 1-row tile
@@ -56,7 +56,6 @@ export async function ShopByCategory() {
               !!category.slug && category.slug in CATEGORY_LAYOUT,
           )
           .map((category) => {
-            const image = typeof category.image === "object" ? category.image : null;
             const layout = CATEGORY_LAYOUT[category.slug];
 
             return (
@@ -71,10 +70,10 @@ export async function ShopByCategory() {
                       "aspect-4/3 lg:aspect-auto lg:h-full",
                     )}
                   >
-                    {image?.url ? (
-                      <Image
-                        src={image.url}
-                        alt={image.alt}
+                    {category.image ? (
+                      <ProductImage
+                        src={category.image}
+                        alt={category.title ?? ""}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"

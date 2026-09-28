@@ -5,23 +5,8 @@ import { render, screen } from "@testing-library/react";
 
 import { ShopByCategory } from "@/features/home/shop-by-category";
 import { getPayloadClient } from "@/lib/payload";
-import { prisma } from "@/lib/prisma";
 
-// Inserted directly rather than through Payload's Local API: its upload
-// validation pulls in `file-type`, whose Node/browser dual build resolves
-// to the browser build under Vitest's jsdom environment and can't read a
-// real Node Buffer there. This test is about ShopByCategory's rendering,
-// not Payload's upload pipeline, so a raw row is the more direct fixture.
-async function createTestImage(alt: string) {
-  const rows = await prisma.$queryRaw<{ id: number }[]>`
-    INSERT INTO payload.media (alt, url, filename, mime_type, filesize, width, height)
-    VALUES (${alt}, ${"/api/media/file/test.png"}, ${"test.png"}, ${"image/png"}, 90, 1, 1)
-    RETURNING id;
-  `;
-  return rows[0];
-}
-
-async function createCategory(data: { title: string; slug: string; position: number; image?: number }) {
+async function createCategory(data: { title: string; slug: string; position: number; image?: string }) {
   const payload = await getPayloadClient();
   return payload.create({ collection: "categories", data });
 }
@@ -61,12 +46,16 @@ describe("ShopByCategory", () => {
   });
 
   it("shows the cover image when one is set", async () => {
-    const image = await createTestImage("Une chaise design");
-    await createCategory({ title: "Chaises", slug: "chairs", position: 1, image: image.id });
+    await createCategory({
+      title: "Chaises",
+      slug: "chairs",
+      position: 1,
+      image: "https://res.cloudinary.com/dasujyncc/image/upload/v1/pento/categories/chairs.webp",
+    });
 
     render(await ShopByCategory());
 
-    expect(screen.getByRole("img", { name: "Une chaise design" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Chaises" })).toBeInTheDocument();
   });
 
   it("shows a fallback when a category has no cover image", async () => {

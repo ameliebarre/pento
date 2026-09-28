@@ -177,7 +177,10 @@ export interface Category {
   title?: string | null;
   slug?: string | null;
   position?: number | null;
-  image?: (number | null) | Media;
+  /**
+   * URL Cloudinary de l'image.
+   */
+  image?: string | null;
   updatedAt: string;
   createdAt: string;
 }
