@@ -1,8 +1,8 @@
-import { ProductWhereInput } from "@/generated/prisma/models";
+import { Prisma } from "@prisma/client";
 import { ProductFilters } from "../types";
 
-export function buildProductWhere(filters: ProductFilters): ProductWhereInput {
-  const where: ProductWhereInput = {};
+export function buildProductWhere(filters: ProductFilters): Prisma.ProductWhereInput {
+  const where: Prisma.ProductWhereInput = {};
 
   if (filters.categories.length > 0) {
     where.category = {

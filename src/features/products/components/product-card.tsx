@@ -3,7 +3,7 @@ import { ImageOff, ShoppingCart } from "lucide-react";
 
 import { ProductImage } from "@/components/product-image";
 import { formatPrice } from "@/lib/utils";
-import type { Prisma } from "@/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 
 export type ProductWithImage = Prisma.ProductGetPayload<{
   include: {

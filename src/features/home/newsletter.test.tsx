@@ -10,9 +10,11 @@ describe("Newsletter", () => {
   it("renders the heading and the email form", () => {
     render(<Newsletter />);
 
-    expect(screen.getByRole("heading", { name: "Restez inspiré" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "First access to new arrivals" }),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Adresse e-mail")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "S'inscrire" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Subscribe" })).toBeInTheDocument();
   });
 
   it("lets the user type their email", async () => {
@@ -30,7 +32,7 @@ describe("Newsletter", () => {
     render(<Newsletter />);
 
     await user.type(screen.getByLabelText("Adresse e-mail"), "user@example.com");
-    await user.click(screen.getByRole("button", { name: "S'inscrire" }));
+    await user.click(screen.getByRole("button", { name: "Subscribe" }));
 
     expect(
       await screen.findByText("Merci ! Votre inscription a bien été prise en compte."),
@@ -42,7 +44,7 @@ describe("Newsletter", () => {
     const user = userEvent.setup();
     render(<Newsletter />);
 
-    await user.click(screen.getByRole("button", { name: "S'inscrire" }));
+    await user.click(screen.getByRole("button", { name: "Subscribe" }));
 
     expect(
       screen.queryByText("Merci ! Votre inscription a bien été prise en compte."),

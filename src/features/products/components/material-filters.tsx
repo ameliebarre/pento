@@ -9,7 +9,7 @@ import {
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Material } from "@/generated/prisma/client";
+import type { Material } from "@prisma/client";
 
 const VISIBLE_COUNT = 12;
 

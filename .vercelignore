@@ -1,0 +1,6 @@
+.env
+.env.test
+.claude
+claude.md
+media
+tsconfig.tsbuildinfo
