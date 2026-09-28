@@ -34,7 +34,7 @@ export async function CuratedSelection() {
         </p>
       </div>
 
-      <ul className="mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-x-4 gap-y-8 px-6 sm:mt-12 sm:grid-cols-2 sm:gap-x-3 lg:grid-cols-3">
+      <ul className="mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-x-4 gap-y-8 sm:mt-12 sm:grid-cols-2 sm:gap-x-3 lg:grid-cols-3">
         {products.map((product) => {
           const image = product.images?.find((item) => typeof item === "object") ?? null;
           const designers = Array.isArray(product.designers)
@@ -67,9 +67,7 @@ export async function CuratedSelection() {
               <div className="flex items-start justify-between gap-4 pt-4">
                 <div className="flex flex-col gap-0.5">
                   <p className="font-heading text-lg">{product.name}</p>
-                  {caption ? (
-                    <p className="text-muted-foreground text-xs">{caption}</p>
-                  ) : null}
+                  {caption ? <p className="text-muted-foreground text-xs">{caption}</p> : null}
                 </div>
                 <p className="shrink-0 text-sm font-medium whitespace-nowrap">
                   {formatPrice(product.price, product.currency ?? "EUR")}

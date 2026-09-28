@@ -46,8 +46,15 @@ export const Designers: CollectionConfig = {
     },
     {
       name: "image",
-      type: "relationship",
-      relationTo: "media",
+      type: "text",
+      admin: {
+        description: "URL Cloudinary de l'image (portrait).",
+      },
+    },
+    {
+      name: "featured",
+      type: "checkbox",
+      defaultValue: false,
     },
   ],
 };

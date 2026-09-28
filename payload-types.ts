@@ -195,7 +195,11 @@ export interface Designer {
   nationality?: string | null;
   biography: string;
   quote?: string | null;
-  image?: (number | null) | Media;
+  /**
+   * URL Cloudinary de l'image (portrait).
+   */
+  image?: string | null;
+  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -478,6 +482,7 @@ export interface DesignersSelect<T extends boolean = true> {
   biography?: T;
   quote?: T;
   image?: T;
+  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }

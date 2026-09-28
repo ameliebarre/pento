@@ -3,7 +3,7 @@ import { HeroBanner } from "@/features/home/hero-banner";
 import { ShopByCategory } from "@/features/home/shop-by-category";
 import { CuratedSelection } from "@/features/home/curated-selection";
 import { PassionForDesign } from "@/features/home/passion-for-design";
-import { BrowseByMovement } from "@/features/home/browse-by-movement";
+import { TheMasters } from "@/features/home/the-masters";
 import { Newsletter } from "@/features/home/newsletter";
 import { TrustFeatures } from "@/features/home/trust-features";
 
@@ -17,7 +17,7 @@ export default async function HomePage() {
         <CuratedSelection />
         <PassionForDesign />
       </div>
-      <BrowseByMovement />
+      <TheMasters />
       <Newsletter />
       <TrustFeatures />
     </div>
