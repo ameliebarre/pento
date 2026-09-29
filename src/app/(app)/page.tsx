@@ -11,7 +11,7 @@ import { TrustFeatures } from "@/features/home/trust-features";
 export default async function HomePage() {
   return (
     <div className="flex flex-col gap-6">
-      <SiteHeader theme="dark" />
+      <SiteHeader />
       <HeroBanner />
       <ShopByCategory />
       <div className="flex flex-col">

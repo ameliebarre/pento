@@ -4,7 +4,7 @@ import { ForgotPasswordForm } from "./forgot-password-form";
 export default function ForgotPasswordPage() {
   return (
     <>
-      <SiteHeader theme="light" />
+      <SiteHeader />
       <ForgotPasswordForm />
     </>
   );

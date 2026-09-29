@@ -22,7 +22,7 @@ export default async function ProfilePage({
 
   return (
     <div className="flex min-h-full items-center justify-center">
-      {await SiteHeader({ theme: "light" })}
+      {await SiteHeader()}
       <Card className="w-full max-w-sm ring-0">
         <CardHeader>
           <CardTitle as="h1" className="pb-8 text-center text-4xl">

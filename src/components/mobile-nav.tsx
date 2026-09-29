@@ -26,11 +26,7 @@ const linkVariants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-type MobileNavProps = {
-  theme?: "light" | "dark";
-};
-
-export function MobileNav({ theme = "light" }: MobileNavProps = {}) {
+export function MobileNav() {
   const [open, setOpen] = useState(false);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -66,7 +62,7 @@ export function MobileNav({ theme = "light" }: MobileNavProps = {}) {
         aria-controls="mobile-nav-panel"
         aria-label="Ouvrir le menu"
         onClick={() => setOpen(true)}
-        className={`flex items-center justify-center md:hidden ${theme === "dark" ? "text-white" : "text-foreground"}`}
+        className="text-foreground flex items-center justify-center md:hidden"
       >
         <Menu aria-hidden="true" className="size-6" />
       </button>

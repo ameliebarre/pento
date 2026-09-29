@@ -41,7 +41,7 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
 
   return (
     <div className="flex flex-col gap-6 pt-8">
-      {await SiteHeader({ theme: "light" })}
+      {await SiteHeader()}
       <a
         href={buildFiltersVisibilityHref(rawParams, !filtersVisible)}
         className="flex items-center gap-1 self-start text-sm font-medium underline-offset-2 hover:underline"
