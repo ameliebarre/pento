@@ -8,6 +8,11 @@ vi.mock("@/lib/get-session", () => ({
   getSession: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock("next/headers", () => ({
+  headers: vi.fn().mockResolvedValue(new Headers()),
+  cookies: vi.fn().mockResolvedValue({ get: () => undefined }),
+}));
+
 import ShopAllPage from "@/app/(app)/products/page";
 import { prisma } from "@/lib/prisma";
 
