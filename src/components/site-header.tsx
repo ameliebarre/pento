@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, User } from "lucide-react";
+import { User } from "lucide-react";
 
 import { getSession } from "@/lib/get-session";
 import { Button } from "@/components/ui/button";
 import { ProductsNav } from "@/components/products-nav";
 import { MobileNav } from "@/components/mobile-nav";
+import { CartTriggerButton } from "@/features/cart/components/cart-trigger-button";
 
 export async function SiteHeader() {
   const session = await getSession();
@@ -59,15 +60,7 @@ export async function SiteHeader() {
               <User aria-hidden="true" className="size-5" />
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            render={<Link href="/cart" />}
-            nativeButton={false}
-            aria-label="Panier"
-          >
-            <ShoppingCart aria-hidden="true" className="size-5" />
-          </Button>
+          <CartTriggerButton />
         </nav>
       </div>
     </header>

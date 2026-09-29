@@ -16,11 +16,17 @@ vi.mock("next/navigation", () => ({
 }));
 
 import CategoryPage from "@/app/(app)/products/[category]/page";
+import { QueryProvider } from "@/components/query-provider";
+import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
 
 describe("CategoryPage", () => {
   it("renders the category label as the heading for a known category", async () => {
     const element = await CategoryPage({ params: Promise.resolve({ category: "armchairs" }) });
-    render(element);
+    render(
+      <QueryProvider>
+        <CartDrawerProvider>{element}</CartDrawerProvider>
+      </QueryProvider>,
+    );
 
     expect(screen.getByRole("heading", { name: "Armchairs" })).toBeInTheDocument();
   });

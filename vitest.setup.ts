@@ -32,8 +32,13 @@ beforeEach(async () => {
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
 
-  // Product catalog — deleted after `user` so any CartItem referencing a
-  // product (via a still-required, non-cascading relation) is already gone.
+  // Carts are guest-token based (no user relation), so they aren't cascaded
+  // by the user deletion above — clear them explicitly, before the product
+  // catalog, since CartItem.productId is a non-cascading relation.
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
+
+  // Product catalog.
   await prisma.product.deleteMany();
   await prisma.designer.deleteMany();
   await prisma.manufacturer.deleteMany();

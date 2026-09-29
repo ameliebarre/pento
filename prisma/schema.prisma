@@ -25,7 +25,6 @@ model User {
   accounts Account[]
   sessions Session[]
   orders   Order[]
-  cart     Cart?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -298,9 +297,8 @@ model ProductTag {
 // ---------------------------------------------------------------------------
 
 model Cart {
-  id     String @id @default(cuid())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id    String @id @default(cuid())
+  token String @unique
 
   items CartItem[]
 
