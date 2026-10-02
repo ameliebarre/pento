@@ -9,6 +9,7 @@ type ProductImageProps = {
   fill?: boolean;
   sizes?: string;
   className?: string;
+  priority?: boolean;
 };
 
 function isCloudinarySource(src: string) {
@@ -16,7 +17,7 @@ function isCloudinarySource(src: string) {
   return !src.startsWith("/") && !src.startsWith("http");
 }
 
-export function ProductImage({ src, alt, fill, sizes, className }: ProductImageProps) {
+export function ProductImage({ src, alt, fill, sizes, className, priority }: ProductImageProps) {
   if (isCloudinarySource(src)) {
     return (
       <CldImage
@@ -25,11 +26,14 @@ export function ProductImage({ src, alt, fill, sizes, className }: ProductImageP
         fill={fill}
         sizes={sizes}
         className={className}
+        priority={priority}
         crop="fill"
         gravity="auto"
       />
     );
   }
 
-  return <Image src={src} alt={alt} fill={fill} sizes={sizes} className={className} />;
+  return (
+    <Image src={src} alt={alt} fill={fill} sizes={sizes} className={className} priority={priority} />
+  );
 }

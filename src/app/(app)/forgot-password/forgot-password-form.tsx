@@ -49,7 +49,7 @@ export function ForgotPasswordForm() {
                 </p>
               )}
               <Button type="submit" disabled={pending} className="h-10 rounded-[6px]">
-                {pending ? "Envoi..." : "Envoyer le lien"}
+                {pending ? "Envoi…" : "Envoyer le lien"}
               </Button>
             </form>
           )}

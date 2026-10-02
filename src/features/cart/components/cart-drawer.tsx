@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { X } from "lucide-react";
 
@@ -16,6 +16,8 @@ export function CartDrawer() {
   const { isOpen, close, addError } = useCartDrawer();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const queryClient = useQueryClient();
+  const shouldReduceMotion = useReducedMotion();
+  const [removeMessage, setRemoveMessage] = useState("");
 
   const { data, isPending } = useQuery({
     queryKey: CART_QUERY_KEY,
@@ -24,7 +26,10 @@ export function CartDrawer() {
 
   const removeMutation = useMutation({
     mutationFn: removeFromCartAction,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+      setRemoveMessage("Article retiré du panier.");
+    },
   });
 
   useEffect(() => {
@@ -53,7 +58,7 @@ export function CartDrawer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
             onClick={close}
             aria-hidden="true"
             className="fixed inset-0 z-40 bg-black/50"
@@ -66,7 +71,7 @@ export function CartDrawer() {
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="bg-background fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col overflow-y-auto shadow-xl [overscroll-behavior:contain] sm:w-[30%] sm:min-w-[420px]"
           >
             <div className="flex items-center justify-between border-b px-6 py-5">
@@ -76,7 +81,7 @@ export function CartDrawer() {
                 type="button"
                 onClick={close}
                 aria-label="Fermer le panier"
-                className="flex size-8 items-center justify-center"
+                className="hover:bg-muted flex size-8 items-center justify-center rounded-full transition-colors"
               >
                 <X aria-hidden="true" className="size-5" />
               </button>
@@ -139,6 +144,10 @@ export function CartDrawer() {
                 </div>
               </div>
             )}
+
+            <p aria-live="polite" className="sr-only">
+              {removeMessage}
+            </p>
           </motion.aside>
         </>
       )}

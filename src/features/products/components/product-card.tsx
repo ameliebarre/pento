@@ -43,12 +43,14 @@ export function ProductCard({ product }: { product: ProductWithImage }) {
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium uppercase">{product.name}</span>
-          <span className="text-xs font-medium">
+          <span className="min-w-0 truncate text-sm font-medium uppercase">{product.name}</span>
+          <span className="shrink-0 text-xs font-medium">
             {formatPrice(product.price.toString(), product.currency)}
           </span>
         </div>
-        {designerNames && <span className="text-muted-foreground text-xs">{designerNames}</span>}
+        {designerNames && (
+          <span className="text-muted-foreground truncate text-xs">{designerNames}</span>
+        )}
       </div>
       <Link
         href={`/product/${product.slug}`}

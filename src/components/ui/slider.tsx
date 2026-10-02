@@ -37,7 +37,7 @@ function Slider({
           <SliderPrimitive.Thumb
             key={index}
             index={index}
-            aria-label={getAriaLabel?.(index)}
+            aria-label={getAriaLabel?.(index) ?? (values.length > 1 ? `Curseur ${index + 1}` : "Curseur")}
             className="border-primary bg-background block size-4 shrink-0 rounded-full border-2 shadow transition-[box-shadow] outline-none hover:ring-4 hover:ring-ring/20 focus-visible:ring-4 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
           />
         ))}

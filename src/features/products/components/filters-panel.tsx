@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 type FiltersPanelProps = {
   // The filters panel is toggled via a full navigation (see price-filters.tsx
@@ -14,12 +14,14 @@ type FiltersPanelProps = {
 };
 
 export function FiltersPanel({ shouldAnimate, children }: FiltersPanelProps) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.aside
       aria-label="Filtres"
-      initial={shouldAnimate ? { opacity: 0, x: -16 } : false}
+      initial={shouldAnimate && !shouldReduceMotion ? { opacity: 0, x: -16 } : false}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="w-full shrink-0 lg:w-56"
     >
       {children}

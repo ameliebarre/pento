@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ImageOff } from "lucide-react";
 
 import { getPayloadClient } from "@/lib/payload";
 import { ProductImage } from "@/components/product-image";
@@ -64,7 +64,12 @@ export async function TheMasters() {
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 33vw, 50vw"
                     className="object-cover"
                   />
-                ) : null}
+                ) : (
+                  <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+                    <ImageOff aria-hidden="true" className="size-8" />
+                    <span className="sr-only">Aucun portrait disponible pour {name}</span>
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/5 to-transparent" />
                 <div className="absolute inset-x-4 bottom-4">
                   <p className="font-heading text-xl text-white sm:text-2xl">{name}</p>

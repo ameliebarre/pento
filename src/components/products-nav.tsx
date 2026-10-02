@@ -4,7 +4,7 @@ export const PRODUCT_LINKS = [
   { label: "À propos", href: "/about" },
   { label: "Catalogue", href: "/products" },
   { label: "Articles", href: "/articles" },
-  { label: "Contact", href: "contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function ProductsNav() {
@@ -14,7 +14,7 @@ export function ProductsNav() {
         <Link
           key={link.label}
           href={link.href}
-          className="text-foreground text-sm leading-4 uppercase"
+          className="text-foreground hover:text-foreground/70 text-sm leading-4 uppercase transition-colors"
         >
           {link.label}
         </Link>

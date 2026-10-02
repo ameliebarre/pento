@@ -4,8 +4,8 @@ import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { getSession } from "@/lib/get-session";
 import { SiteHeader } from "@/components/site-header";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SubmitButton } from "@/app/(app)/profile/submit-button";
 
 export default async function ProfilePage({
   searchParams,
@@ -54,9 +54,12 @@ export default async function ProfilePage({
               redirect("/profile?revoked=1");
             }}
           >
-            <Button type="submit" variant="outline" className="h-10 w-full rounded-[6px]">
+            <SubmitButton
+              pendingLabel="Déconnexion…"
+              confirmMessage="Déconnecter tous les autres appareils ?"
+            >
               Déconnecter les autres appareils
-            </Button>
+            </SubmitButton>
           </form>
           <form
             action={async () => {
@@ -65,9 +68,7 @@ export default async function ProfilePage({
               redirect("/");
             }}
           >
-            <Button type="submit" variant="outline" className="h-10 w-full rounded-[6px]">
-              Se déconnecter
-            </Button>
+            <SubmitButton pendingLabel="Déconnexion…">Se déconnecter</SubmitButton>
           </form>
         </CardContent>
       </Card>

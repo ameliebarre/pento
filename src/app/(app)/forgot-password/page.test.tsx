@@ -83,7 +83,7 @@ describe("ForgotPasswordPage", () => {
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.click(screen.getByRole("button", { name: "Envoyer le lien" }));
 
-    expect(await screen.findByRole("button", { name: "Envoi..." })).toBeDisabled();
+    expect(await screen.findByRole("button", { name: "Envoi…" })).toBeDisabled();
 
     resolveAction({ success: true });
     await screen.findByText(/un lien de réinitialisation vient de lui être envoyé/i);

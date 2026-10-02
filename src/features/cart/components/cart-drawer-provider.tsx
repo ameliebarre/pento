@@ -21,10 +21,16 @@ export function CartDrawerProvider({ children }: { children: React.ReactNode }) 
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
 
+  const [liveMessage, setLiveMessage] = useState("");
+
   const mutation = useMutation({
     mutationFn: addToCartAction,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+      setLiveMessage("Produit ajouté au panier.");
+    },
+    onError: (error) => {
+      setLiveMessage(error.message);
     },
   });
 
@@ -43,7 +49,14 @@ export function CartDrawerProvider({ children }: { children: React.ReactNode }) 
     [isOpen, mutation],
   );
 
-  return <CartDrawerContext.Provider value={value}>{children}</CartDrawerContext.Provider>;
+  return (
+    <CartDrawerContext.Provider value={value}>
+      {children}
+      <p aria-live="polite" className="sr-only">
+        {liveMessage}
+      </p>
+    </CartDrawerContext.Provider>
+  );
 }
 
 export function useCartDrawer() {

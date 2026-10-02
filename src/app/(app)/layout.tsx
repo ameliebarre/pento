@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
@@ -26,6 +26,11 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: "Pento",
   description: "Boutique en ligne construite avec Next.js, Prisma et Tailwind.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  colorScheme: "light",
 };
 
 export default function RootLayout({

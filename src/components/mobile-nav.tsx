@@ -2,34 +2,42 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
 
 import { PRODUCT_LINKS } from "@/components/products-nav";
-
-const panelVariants = {
-  hidden: { x: "-100%" },
-  visible: {
-    x: 0,
-    transition: {
-      duration: 0.3,
-      ease: [0.22, 1, 0.36, 1] as const,
-      staggerChildren: 0.15,
-      delayChildren: 0.15,
-    },
-  },
-  exit: { x: "-100%", transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
-const linkVariants = {
-  hidden: { opacity: 0, x: -16 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
-};
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  const panelVariants = {
+    hidden: { x: "-100%" },
+    visible: {
+      x: 0,
+      transition: {
+        duration: shouldReduceMotion ? 0 : 0.3,
+        ease: [0.22, 1, 0.36, 1] as const,
+        staggerChildren: shouldReduceMotion ? 0 : 0.15,
+        delayChildren: shouldReduceMotion ? 0 : 0.15,
+      },
+    },
+    exit: {
+      x: "-100%",
+      transition: { duration: shouldReduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
+
+  const linkVariants = {
+    hidden: { opacity: 0, x: -16 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: shouldReduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] as const },
+    },
+  };
 
   function close() {
     setOpen(false);
@@ -75,7 +83,7 @@ export function MobileNav() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
               onClick={close}
               aria-hidden="true"
               className="fixed inset-0 z-40 bg-black/50 md:hidden"
@@ -88,7 +96,7 @@ export function MobileNav() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="bg-background fixed inset-y-0 left-0 z-50 flex w-md flex-col gap-1 p-6 shadow-xl md:hidden"
+              className="bg-background fixed inset-y-0 left-0 z-50 flex w-md flex-col gap-1 overflow-y-auto p-6 shadow-xl [overscroll-behavior:contain] md:hidden"
             >
               <button
                 ref={closeButtonRef}
