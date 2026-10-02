@@ -4,7 +4,7 @@ import { ResetPasswordPageContent } from "./reset-password-form";
 export default function ResetPasswordPage() {
   return (
     <>
-      <SiteHeader theme="light" />
+      <SiteHeader />
       <ResetPasswordPageContent />
     </>
   );

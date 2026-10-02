@@ -65,9 +65,11 @@ export async function CuratedSelection() {
                 )}
               </div>
               <div className="flex items-start justify-between gap-4 pt-4">
-                <div className="flex flex-col gap-0.5">
-                  <p className="font-heading text-lg">{product.name}</p>
-                  {caption ? <p className="text-muted-foreground text-xs">{caption}</p> : null}
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <p className="font-heading truncate text-lg">{product.name}</p>
+                  {caption ? (
+                    <p className="text-muted-foreground truncate text-xs">{caption}</p>
+                  ) : null}
                 </div>
                 <p className="shrink-0 text-sm font-medium whitespace-nowrap">
                   {formatPrice(product.price, product.currency ?? "EUR")}

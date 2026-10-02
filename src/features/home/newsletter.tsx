@@ -65,7 +65,8 @@ export function Newsletter() {
                 type="email"
                 required
                 autoComplete="email"
-                placeholder="Your email address"
+                spellCheck={false}
+                placeholder="you@example.com…"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="h-12 flex-1 border-white/40 bg-white/10 px-4 text-white placeholder:text-white/60 focus-visible:border-white/60 focus-visible:ring-white/50"

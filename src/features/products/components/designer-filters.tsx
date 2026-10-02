@@ -70,7 +70,7 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
           type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Rechercher un designer"
+          placeholder="Rechercher un designer…"
           aria-label="Rechercher un designer"
           className="rounded-[6px] pl-8"
         />

@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ImageOff, ShoppingCart } from "lucide-react";
+import { ImageOff } from "lucide-react";
 
 import { ProductImage } from "@/components/product-image";
+import { AddToCartButton } from "@/features/products/components/add-to-cart-button";
 import { formatPrice } from "@/lib/utils";
 import type { Prisma } from "@prisma/client";
 
@@ -19,7 +20,7 @@ export function ProductCard({ product }: { product: ProductWithImage }) {
     .join(", ");
 
   return (
-    <Link href={`/product/${product.slug}`} className="group flex flex-col gap-3">
+    <div className="group relative flex flex-col gap-3">
       <div className="bg-muted relative aspect-4/5 w-full overflow-hidden">
         {image ? (
           <ProductImage
@@ -35,22 +36,27 @@ export function ProductCard({ product }: { product: ProductWithImage }) {
             <span className="sr-only">Aucune image disponible pour {product.name}</span>
           </div>
         )}
-        <span
-          aria-hidden="true"
-          className="absolute right-4 bottom-4 rounded-[8px] bg-white p-2 text-black opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        >
-          <ShoppingCart className="size-4" />
-        </span>
+        <AddToCartButton
+          productId={product.id}
+          className="absolute right-4 bottom-4 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+        />
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium uppercase">{product.name}</span>
-          <span className="text-xs font-medium">
+          <span className="min-w-0 truncate text-sm font-medium uppercase">{product.name}</span>
+          <span className="shrink-0 text-xs font-medium">
             {formatPrice(product.price.toString(), product.currency)}
           </span>
         </div>
-        {designerNames && <span className="text-muted-foreground text-xs">{designerNames}</span>}
+        {designerNames && (
+          <span className="text-muted-foreground truncate text-xs">{designerNames}</span>
+        )}
       </div>
-    </Link>
+      <Link
+        href={`/product/${product.slug}`}
+        aria-label={product.name}
+        className="absolute inset-0 z-0"
+      />
+    </div>
   );
 }

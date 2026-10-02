@@ -26,7 +26,7 @@ export function PriceSortFilter({ filters }: PriceSortFilterProps) {
       {filters.sort !== null && (
         <a
           href={buildClearFilterHref(filters, "sort")}
-          className="text-muted-foreground cursor:pointer self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground cursor-pointer self-start text-xs underline-offset-2 hover:underline"
         >
           Réinitialiser
         </a>

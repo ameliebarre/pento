@@ -56,6 +56,7 @@ export function SignupForm() {
                   type="email"
                   required
                   autoComplete="email"
+                  spellCheck={false}
                   className="h-10 rounded-[6px]"
                 />
               </div>
@@ -77,7 +78,7 @@ export function SignupForm() {
                 </p>
               )}
               <Button type="submit" disabled={pending} className="h-10 rounded-[6px]">
-                {pending ? "Création..." : "Créer mon compte"}
+                {pending ? "Création…" : "Créer mon compte"}
               </Button>
               <p className="text-muted-foreground text-center text-sm">
                 Déjà un compte ?{" "}

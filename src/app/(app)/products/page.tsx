@@ -1,15 +1,18 @@
+import { cookies, headers } from "next/headers";
 import { SlidersHorizontal } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
-import { Accordion } from "@/components/ui/accordion";
 import { ProductCard } from "@/features/products/components/product-card";
 import { CategoryFilters } from "@/features/products/components/category-filters";
 import { DesignerFilters } from "@/features/products/components/designer-filters";
 import { FilterAccordionSection } from "@/features/products/components/filter-accordion-section";
+import { FiltersPanel } from "@/features/products/components/filters-panel";
 import { MaterialFilters } from "@/features/products/components/material-filters";
 import { MovementFilters } from "@/features/products/components/movement-filters";
+import { PersistentFilterAccordion } from "@/features/products/components/persistent-filter-accordion";
 import { PriceFilters } from "@/features/products/components/price-filters";
 import { PriceSortFilter } from "@/features/products/components/price-sort-filter";
+import { OPEN_FILTER_SECTIONS_COOKIE } from "@/features/products/constants";
 import { SearchParams } from "@/features/products/types";
 import { buildFiltersVisibilityHref } from "@/features/products/utils/build-page-href";
 import { getProductFilters } from "@/features/products/utils/get-product-filters";
@@ -30,7 +33,7 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
   // Auto-expand a section whenever it already has an active selection —
   // otherwise a filter applied earlier would become invisible (collapsed)
   // after a page reload, with no obvious way to tell it's still active.
-  const openSections = [
+  const sectionsWithActiveFilter = [
     filters.sort !== null && "sort",
     filters.categories.length > 0 && "categories",
     filters.designers.length > 0 && "designers",
@@ -39,9 +42,33 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
     (filters.minPrice !== null || filters.maxPrice !== null) && "price",
   ].filter((section): section is string => Boolean(section));
 
+  // A section the user opened by hand should stay open even after its last
+  // active filter is cleared — every filter click is a full navigation that
+  // remounts the accordion, so that "stay open" intent only survives if it's
+  // tracked somewhere outside the current render (see
+  // persistent-filter-accordion.tsx).
+  const manuallyOpenedSections =
+    (await cookies()).get(OPEN_FILTER_SECTIONS_COOKIE)?.value.split(",").filter(Boolean) ?? [];
+  const openSections = [...new Set([...sectionsWithActiveFilter, ...manuallyOpenedSections])];
+
+  // The filters panel should only animate in when it was just revealed —
+  // not on every subsequent filter click, which also re-renders this page
+  // from scratch. The referer tells us whether the previous page already
+  // had the panel open.
+  const referer = (await headers()).get("referer");
+  let refererShowedFilters = false;
+  if (referer) {
+    try {
+      refererShowedFilters = new URL(referer).searchParams.get("showFilters") === "1";
+    } catch {
+      refererShowedFilters = false;
+    }
+  }
+  const shouldAnimateFiltersPanel = filtersVisible && !refererShowedFilters;
+
   return (
-    <div className="flex flex-col gap-6 pt-8">
-      {await SiteHeader({ theme: "light" })}
+    <div className="flex flex-col gap-6 pt-32 pb-16">
+      {await SiteHeader()}
       <a
         href={buildFiltersVisibilityHref(rawParams, !filtersVisible)}
         className="flex items-center gap-1 self-start text-sm font-medium underline-offset-2 hover:underline"
@@ -51,9 +78,9 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
       </a>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
         {filtersVisible && (
-          <aside aria-label="Filtres" className="w-full shrink-0 lg:w-56">
+          <FiltersPanel shouldAnimate={shouldAnimateFiltersPanel}>
             <h2 className="font-heading mb-4 text-xl uppercase">Filtres</h2>
-            <Accordion multiple defaultValue={openSections}>
+            <PersistentFilterAccordion defaultValue={openSections}>
               <FilterAccordionSection value="sort" title="Trier par prix">
                 <PriceSortFilter filters={filters} />
               </FilterAccordionSection>
@@ -72,8 +99,8 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
               <FilterAccordionSection value="price" title="Prix">
                 <PriceFilters bounds={priceBounds} filters={filters} />
               </FilterAccordionSection>
-            </Accordion>
-          </aside>
+            </PersistentFilterAccordion>
+          </FiltersPanel>
         )}
         <div className="flex flex-1 flex-col gap-6">
           {products.length === 0 ? (

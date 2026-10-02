@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 import { loginAction } from "@/actions/auth";
@@ -11,6 +11,11 @@ import { Label } from "@/components/ui/label";
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, undefined);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (state?.error) errorRef.current?.focus();
+  }, [state?.error]);
 
   return (
     <div className="flex min-h-full items-center justify-center">
@@ -45,12 +50,12 @@ export function LoginForm() {
               />
             </div>
             {state?.error && (
-              <p role="alert" className="text-destructive text-sm">
+              <p ref={errorRef} role="alert" tabIndex={-1} className="text-destructive text-sm">
                 {state.error}
               </p>
             )}
             <Button type="submit" disabled={pending} className="h-10 cursor-pointer rounded-[6px]">
-              {pending ? "Signing in..." : "Sign in"}
+              {pending ? "Connexion…" : "Se connecter"}
             </Button>
             <p className="text-muted-foreground text-center text-sm">
               Pas encore de compte ?{" "}

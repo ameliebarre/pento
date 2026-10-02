@@ -1,22 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingCart, User } from "lucide-react";
+import { User } from "lucide-react";
 
 import { getSession } from "@/lib/get-session";
 import { Button } from "@/components/ui/button";
 import { ProductsNav } from "@/components/products-nav";
 import { MobileNav } from "@/components/mobile-nav";
+import { CartTriggerButton } from "@/features/cart/components/cart-trigger-button";
 
-type SiteHeaderProps = {
-  theme?: "light" | "dark";
-};
-
-export async function SiteHeader({ theme = "light" }: SiteHeaderProps = {}) {
+export async function SiteHeader() {
   const session = await getSession();
   const initial = session?.user
     ? (session.user.firstName?.trim()?.[0] ?? session.user.email?.[0] ?? "?").toUpperCase()
     : null;
-  const isDark = theme === "dark";
 
   return (
     <header className="absolute top-0 right-0 left-0 z-10">
@@ -28,18 +24,18 @@ export async function SiteHeader({ theme = "light" }: SiteHeaderProps = {}) {
       </a>
       <div className="mx-auto flex items-center justify-between px-4 py-4 sm:px-8 md:px-6">
         <div className="flex items-center gap-4">
-          <MobileNav theme={theme} />
+          <MobileNav />
           <div className="flex items-center gap-8">
             <Link href="/">
               <Image
-                src={isDark ? "/logo-pento-white.svg" : "/logo-pento.svg"}
+                src="/logo-pento.svg"
                 alt="Pento"
                 className="max-w-64"
                 width={150}
                 height={40}
               />
             </Link>
-            <ProductsNav theme={theme} />
+            <ProductsNav />
           </div>
         </div>
         <nav aria-label="Compte et panier" className="flex items-center gap-2">
@@ -60,21 +56,11 @@ export async function SiteHeader({ theme = "light" }: SiteHeaderProps = {}) {
               render={<Link href="/login" />}
               nativeButton={false}
               aria-label="Se connecter"
-              className={isDark ? "text-white hover:bg-white/10 hover:text-white" : undefined}
             >
               <User aria-hidden="true" className="size-5" />
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon-lg"
-            render={<Link href="/cart" />}
-            nativeButton={false}
-            aria-label="Panier"
-            className={isDark ? "text-white hover:bg-white/10 hover:text-white" : undefined}
-          >
-            <ShoppingCart aria-hidden="true" className="size-5" />
-          </Button>
+          <CartTriggerButton />
         </nav>
       </div>
     </header>

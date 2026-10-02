@@ -18,7 +18,7 @@ function ResetPasswordForm() {
   if (state?.success) {
     return (
       <>
-        <p className="text-muted-foreground text-center text-sm">
+        <p role="status" className="text-muted-foreground text-center text-sm">
           Votre mot de passe a bien été mis à jour.
         </p>
         <Link href="/login" className="text-center text-sm underline">
@@ -54,7 +54,7 @@ function ResetPasswordForm() {
         </p>
       )}
       <Button type="submit" disabled={pending || !token} className="h-10 rounded-[6px]">
-        {pending ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+        {pending ? "Mise à jour…" : "Mettre à jour le mot de passe"}
       </Button>
       <p className="text-center text-sm">
         <Link href="/login" className="underline">
