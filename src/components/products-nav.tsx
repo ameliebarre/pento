@@ -1,9 +1,7 @@
 import Link from "next/link";
 
 export const PRODUCT_LINKS = [
-  { label: "À propos", href: "/about" },
   { label: "Catalogue", href: "/products" },
-  { label: "Articles", href: "/articles" },
   { label: "Contact", href: "/contact" },
 ];
 

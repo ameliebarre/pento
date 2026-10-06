@@ -115,7 +115,9 @@ export function CartDrawer() {
                       </div>
                       <div className="flex flex-1 flex-col gap-1">
                         <div className="flex items-start justify-between gap-2">
-                          <span className="text-sm font-medium uppercase">{item.product.name}</span>
+                          <span className="min-w-0 truncate text-sm font-medium uppercase">
+                            {item.product.name}
+                          </span>
                           <span className="shrink-0 text-sm font-medium whitespace-nowrap">
                             {formatPrice(item.product.price, item.product.currency)}
                           </span>
