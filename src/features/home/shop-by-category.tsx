@@ -4,6 +4,7 @@ import { ArrowUpRight, ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getPayloadClient } from "@/lib/payload";
 import { ProductImage } from "@/components/product-image";
+import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
 
 // Curated 3x3 mosaic: each column is 3 grid rows tall. "large" tiles span
 // 2 rows (a 1x2 cell, ~3:4 once cropped) and sit above a "small" 1-row tile
@@ -28,28 +29,36 @@ export async function ShopByCategory() {
 
   return (
     <section aria-labelledby="shop-by-category-heading" className="flex flex-col gap-8 py-16">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
-            Browse by categories
-          </p>
-          <h2 id="shop-by-category-heading" className="font-heading max-w-xl text-3xl md:text-4xl">
-            Every corner of the home, considered.
-          </h2>
+      <ScrollReveal>
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+              Browse by categories
+            </p>
+            <h2
+              id="shop-by-category-heading"
+              className="font-heading max-w-xl text-3xl md:text-4xl"
+            >
+              Every corner of the home, considered.
+            </h2>
+          </div>
+          <Link
+            href="/products"
+            className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium whitespace-nowrap uppercase"
+          >
+            View all categories
+            <ArrowUpRight
+              aria-hidden="true"
+              className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </Link>
         </div>
-        <Link
-          href="/products"
-          className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium whitespace-nowrap uppercase"
-        >
-          View all categories
-          <ArrowUpRight
-            aria-hidden="true"
-            className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </Link>
-      </div>
+      </ScrollReveal>
 
-      <ul className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:aspect-3/2 lg:grid-cols-3 lg:grid-rows-3 lg:gap-6">
+      <ScrollRevealGroup
+        className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:aspect-3/2 lg:grid-cols-3 lg:grid-rows-3 lg:gap-6"
+        as="ul"
+      >
         {categories
           .filter(
             (category): category is typeof category & { slug: string } =>
@@ -59,8 +68,9 @@ export async function ShopByCategory() {
             const layout = CATEGORY_LAYOUT[category.slug];
 
             return (
-              <li
+              <ScrollRevealItem
                 key={category.slug}
+                as="li"
                 className={cn(layout.colStart, layout.rowStart, layout.rowSpan)}
               >
                 <Link href={`/products/${category.slug}`} className="group block h-full">
@@ -98,10 +108,10 @@ export async function ShopByCategory() {
                     </span>
                   </div>
                 </Link>
-              </li>
+              </ScrollRevealItem>
             );
           })}
-      </ul>
+      </ScrollRevealGroup>
     </section>
   );
 }

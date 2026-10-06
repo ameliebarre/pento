@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { X as XIcon } from "lucide-react";
 
 import { removeFromCartAction } from "@/actions/cart";
 import { ProductImage } from "@/components/product-image";
@@ -72,7 +72,7 @@ export function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="bg-background fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col overflow-y-auto shadow-xl [overscroll-behavior:contain] sm:w-[30%] sm:min-w-[420px]"
+            className="bg-background fixed inset-y-0 right-0 z-50 flex h-dvh w-full flex-col overflow-y-auto overscroll-contain shadow-xl sm:w-[30%] sm:min-w-105"
           >
             <div className="flex items-center justify-between border-b px-6 py-5">
               <h2 className="font-heading text-xl uppercase">Votre panier</h2>
@@ -83,7 +83,7 @@ export function CartDrawer() {
                 aria-label="Fermer le panier"
                 className="hover:bg-muted flex size-8 items-center justify-center rounded-full transition-colors"
               >
-                <X aria-hidden="true" className="size-5" />
+                <XIcon aria-hidden="true" className="size-5" />
               </button>
             </div>
 

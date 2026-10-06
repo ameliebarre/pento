@@ -3,6 +3,7 @@ import { ArrowUpRight, ImageOff } from "lucide-react";
 
 import { getPayloadClient } from "@/lib/payload";
 import { ProductImage } from "@/components/product-image";
+import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
 
 // Charles and Ray Eames are stored as two distinct Designer records (each
 // individually attributed on products), but they share a single portrait
@@ -25,36 +26,40 @@ export async function TheMasters() {
 
   return (
     <section aria-labelledby="the-masters-heading" className="flex flex-col gap-8 py-16">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">The Masters</p>
-          <h2 id="the-masters-heading" className="font-heading max-w-xl text-3xl md:text-4xl">
-            The designers behind the icons
-          </h2>
-          <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
-            Meet the visionaries whose ideas defined a century of furniture — and whose pieces we
-            are proud to carry forward.
-          </p>
+      <ScrollReveal>
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+              The Masters
+            </p>
+            <h2 id="the-masters-heading" className="font-heading max-w-xl text-3xl md:text-4xl">
+              The designers behind the icons
+            </h2>
+            <p className="text-muted-foreground max-w-xl text-sm sm:text-base">
+              Meet the visionaries whose ideas defined a century of furniture — and whose pieces we
+              are proud to carry forward.
+            </p>
+          </div>
+          <Link
+            href="/products"
+            className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium whitespace-nowrap uppercase"
+          >
+            View all designers
+            <ArrowUpRight
+              aria-hidden="true"
+              className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </Link>
         </div>
-        <Link
-          href="/products"
-          className="group inline-flex shrink-0 items-center gap-1 text-sm font-medium whitespace-nowrap uppercase"
-        >
-          View all designers
-          <ArrowUpRight
-            aria-hidden="true"
-            className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </Link>
-      </div>
+      </ScrollReveal>
 
-      <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+      <ScrollRevealGroup as="ul" className="grid grid-cols-2 gap-6 sm:grid-cols-3">
         {designers.map((designer) => {
           const name =
             DESIGNER_NAME_OVERRIDES[designer.slug] ?? `${designer.firstName} ${designer.lastName}`;
 
           return (
-            <li key={designer.id}>
+            <ScrollRevealItem key={designer.id} as="li">
               <div className="bg-muted relative aspect-3/4 w-full overflow-hidden">
                 {designer.image ? (
                   <ProductImage
@@ -78,10 +83,10 @@ export async function TheMasters() {
                   ) : null}
                 </div>
               </div>
-            </li>
+            </ScrollRevealItem>
           );
         })}
-      </ul>
+      </ScrollRevealGroup>
     </section>
   );
 }

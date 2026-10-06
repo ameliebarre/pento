@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { getPayloadClient } from "@/lib/payload";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 export async function PassionForDesign() {
   const payload = await getPayloadClient();
@@ -15,7 +16,7 @@ export async function PassionForDesign() {
       className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#1C1813]"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2">
-        <div className="relative aspect-642/695 w-full md:aspect-auto">
+        <ScrollReveal fromX={-60} className="relative aspect-642/695 w-full md:aspect-auto">
           {image?.url ? (
             <Image
               src={image.url}
@@ -27,9 +28,12 @@ export async function PassionForDesign() {
           ) : (
             <div className="bg-muted h-full w-full" />
           )}
-        </div>
+        </ScrollReveal>
 
-        <div className="flex flex-col gap-6 px-6 py-12 sm:px-10 sm:py-16 md:justify-center md:px-12 lg:px-16">
+        <ScrollReveal
+          delay={0.15}
+          className="flex flex-col gap-6 px-6 py-12 sm:px-10 sm:py-16 md:justify-center md:px-12 lg:px-16"
+        >
           <div className="flex flex-col gap-3">
             <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
               {section.eyebrow}
@@ -60,7 +64,7 @@ export async function PassionForDesign() {
               </div>
             ))}
           </dl>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

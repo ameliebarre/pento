@@ -1,5 +1,7 @@
 import { Quote } from "lucide-react";
 
+import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
+
 const TESTIMONIALS = [
   {
     quote:
@@ -27,16 +29,25 @@ export function Testimonials() {
       aria-labelledby="testimonials-heading"
       className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#EFE9DF] py-16 sm:py-20"
     >
-      <div className="mx-auto flex max-w-xl flex-col items-center gap-3 px-6 text-center">
-        <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">Kind words</p>
-        <h2 id="testimonials-heading" className="font-heading text-3xl md:text-4xl">
-          Loved by collectors worldwide
-        </h2>
-      </div>
+      <ScrollReveal>
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-3 px-6 text-center">
+          <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">Kind words</p>
+          <h2 id="testimonials-heading" className="font-heading text-3xl md:text-4xl">
+            Loved by collectors worldwide
+          </h2>
+        </div>
+      </ScrollReveal>
 
-      <ul className="mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-4 px-6 sm:mt-12 sm:grid-cols-3">
+      <ScrollRevealGroup
+        as="ul"
+        className="mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-4 px-6 sm:mt-12 sm:grid-cols-3"
+      >
         {TESTIMONIALS.map((testimonial, index) => (
-          <li key={index} className="flex flex-col gap-6 bg-[#F7F4EE] p-6 sm:p-8">
+          <ScrollRevealItem
+            key={index}
+            as="li"
+            className="flex flex-col gap-6 bg-[#F7F4EE] p-6 sm:p-8"
+          >
             <Quote aria-hidden="true" className="size-6 fill-[#c5964b] text-[#c5964b]" />
             <p className="font-heading flex-1 text-base italic sm:text-lg">
               &ldquo;{testimonial.quote}&rdquo;
@@ -45,9 +56,9 @@ export function Testimonials() {
               <p className="text-sm font-semibold">{testimonial.name}</p>
               <p className="text-muted-foreground text-sm">{testimonial.location}</p>
             </div>
-          </li>
+          </ScrollRevealItem>
         ))}
-      </ul>
+      </ScrollRevealGroup>
     </section>
   );
 }
