@@ -40,6 +40,7 @@ export function ForgotPasswordForm() {
                   type="email"
                   required
                   autoComplete="email"
+                  spellCheck={false}
                   className="h-10 rounded-[6px]"
                 />
               </div>
