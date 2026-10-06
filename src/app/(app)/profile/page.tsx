@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { getSession } from "@/lib/get-session";
 import { SiteHeader } from "@/components/site-header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthCard } from "@/components/auth-card";
 import { SubmitButton } from "@/app/(app)/profile/submit-button";
 
 export default async function ProfilePage({
@@ -21,57 +21,50 @@ export default async function ProfilePage({
   const { firstName, lastName, email } = session.user;
 
   return (
-    <div className="flex min-h-full items-center justify-center">
+    <>
       {await SiteHeader()}
-      <Card className="w-full max-w-sm ring-0">
-        <CardHeader>
-          <CardTitle as="h1" className="pb-8 text-center text-4xl">
-            Mon profil
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <span className="text-muted-foreground text-sm">Prénom</span>
-            <span className="text-sm font-medium">{firstName || "—"}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-muted-foreground text-sm">Nom</span>
-            <span className="text-sm font-medium">{lastName || "—"}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-muted-foreground text-sm">Email</span>
-            <span className="text-sm font-medium">{email}</span>
-          </div>
-          {revoked && (
-            <p role="status" className="text-muted-foreground text-center text-sm">
-              Les autres appareils ont été déconnectés.
-            </p>
-          )}
-          <form
-            action={async () => {
-              "use server";
-              await auth.api.revokeOtherSessions({ headers: await headers() });
-              redirect("/profile?revoked=1");
-            }}
+      <AuthCard title="Mon profil">
+        <div className="flex flex-col gap-1">
+          <span className="text-muted-foreground text-sm">Prénom</span>
+          <span className="text-sm font-medium">{firstName || "—"}</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-muted-foreground text-sm">Nom</span>
+          <span className="text-sm font-medium">{lastName || "—"}</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-muted-foreground text-sm">Email</span>
+          <span className="text-sm font-medium">{email}</span>
+        </div>
+        {revoked && (
+          <p role="status" className="text-muted-foreground text-center text-sm">
+            Les autres appareils ont été déconnectés.
+          </p>
+        )}
+        <form
+          action={async () => {
+            "use server";
+            await auth.api.revokeOtherSessions({ headers: await headers() });
+            redirect("/profile?revoked=1");
+          }}
+        >
+          <SubmitButton
+            pendingLabel="Déconnexion…"
+            confirmMessage="Déconnecter tous les autres appareils ?"
           >
-            <SubmitButton
-              pendingLabel="Déconnexion…"
-              confirmMessage="Déconnecter tous les autres appareils ?"
-            >
-              Déconnecter les autres appareils
-            </SubmitButton>
-          </form>
-          <form
-            action={async () => {
-              "use server";
-              await auth.api.signOut({ headers: await headers() });
-              redirect("/");
-            }}
-          >
-            <SubmitButton pendingLabel="Déconnexion…">Se déconnecter</SubmitButton>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+            Déconnecter les autres appareils
+          </SubmitButton>
+        </form>
+        <form
+          action={async () => {
+            "use server";
+            await auth.api.signOut({ headers: await headers() });
+            redirect("/");
+          }}
+        >
+          <SubmitButton pendingLabel="Déconnexion…">Se déconnecter</SubmitButton>
+        </form>
+      </AuthCard>
+    </>
   );
 }
