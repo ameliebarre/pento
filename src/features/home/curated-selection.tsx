@@ -42,7 +42,7 @@ export async function CuratedSelection() {
         className="mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-x-4 gap-y-8 sm:mt-12 sm:grid-cols-2 sm:gap-x-3 lg:grid-cols-3"
       >
         {products.map((product) => {
-          const image = product.images?.find((item) => typeof item === "object") ?? null;
+          const image = product.images?.[0] ?? null;
           const designers = Array.isArray(product.designers)
             ? product.designers.filter((designer) => typeof designer === "object")
             : [];

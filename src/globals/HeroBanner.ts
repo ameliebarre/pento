@@ -6,10 +6,12 @@ export const HeroBanner: GlobalConfig = {
   access: { read: () => true },
   fields: [
     {
-      name: "backgroundImage",
-      type: "relationship",
-      relationTo: "media",
+      name: "backgroundImageUrl",
+      type: "text",
       required: true,
+      admin: {
+        description: "URL Cloudinary de l'image de fond.",
+      },
     },
     {
       name: "heading",

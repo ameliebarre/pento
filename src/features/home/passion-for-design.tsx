@@ -5,9 +5,8 @@ import { ScrollReveal } from "@/components/scroll-reveal";
 
 export async function PassionForDesign() {
   const payload = await getPayloadClient();
-  const section = await payload.findGlobal({ slug: "passion-for-design", depth: 1 });
+  const section = await payload.findGlobal({ slug: "passion-for-design" });
 
-  const image = typeof section.image === "object" ? section.image : null;
   const paragraphs = section.description.split("\n\n").filter(Boolean);
 
   return (
@@ -17,10 +16,10 @@ export async function PassionForDesign() {
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2">
         <ScrollReveal fromX={-60} className="relative aspect-642/695 w-full md:aspect-auto">
-          {image?.url ? (
+          {section.imageUrl ? (
             <Image
-              src={image.url}
-              alt={image.alt}
+              src={section.imageUrl}
+              alt="Intérieur mettant en valeur une pièce de design emblématique"
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"

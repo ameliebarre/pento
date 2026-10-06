@@ -27,9 +27,11 @@ export const Manufacturers: CollectionConfig = {
       type: "text",
     },
     {
-      name: "logo",
-      type: "relationship",
-      relationTo: "media",
+      name: "logoUrl",
+      type: "text",
+      admin: {
+        description: "URL Cloudinary du logo.",
+      },
     },
     {
       name: "country",

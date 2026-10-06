@@ -5,19 +5,9 @@ import { render, screen } from "@testing-library/react";
 
 import { PassionForDesign } from "@/features/home/passion-for-design";
 import { getPayloadClient } from "@/lib/payload";
-import { prisma } from "@/lib/prisma";
-
-async function createTestImage(alt: string) {
-  const rows = await prisma.$queryRaw<{ id: number }[]>`
-    INSERT INTO payload.media (alt, url, filename, mime_type, filesize, width, height)
-    VALUES (${alt}, ${"/api/media/file/test.png"}, ${"test.png"}, ${"image/png"}, 90, 1, 1)
-    RETURNING id;
-  `;
-  return rows[0];
-}
 
 async function seedSection(overrides: {
-  image: number;
+  imageUrl?: string;
   eyebrow?: string;
   heading?: string;
   headingAccent?: string;
@@ -28,6 +18,7 @@ async function seedSection(overrides: {
   return payload.updateGlobal({
     slug: "passion-for-design",
     data: {
+      imageUrl: "https://res.cloudinary.com/demo/image/upload/armchair.jpg",
       eyebrow: "A passion for enduring design",
       heading: "Objects with a story.",
       headingAccent: "Pieces with a soul.",
@@ -40,8 +31,7 @@ async function seedSection(overrides: {
 
 describe("PassionForDesign", () => {
   it("renders the heading and both paragraphs", async () => {
-    const image = await createTestImage("Fauteuil design");
-    await seedSection({ image: image.id });
+    await seedSection({});
 
     render(await PassionForDesign());
 
@@ -53,20 +43,25 @@ describe("PassionForDesign", () => {
   });
 
   it("renders the background image from the Payload global", async () => {
-    const image = await createTestImage("Fauteuil en rotin dans un intérieur épuré");
-    await seedSection({ image: image.id });
+    await seedSection({
+      imageUrl: "https://res.cloudinary.com/demo/image/upload/rattan-chair.jpg",
+    });
 
     render(await PassionForDesign());
 
-    expect(
-      screen.getByRole("img", { name: "Fauteuil en rotin dans un intérieur épuré" }),
-    ).toBeInTheDocument();
+    const image = screen.getByRole("img", {
+      name: "Intérieur mettant en valeur une pièce de design emblématique",
+    });
+    expect(image).toHaveAttribute(
+      "src",
+      expect.stringContaining(
+        encodeURIComponent("https://res.cloudinary.com/demo/image/upload/rattan-chair.jpg"),
+      ),
+    );
   });
 
   it("renders every value pillar with its title and description", async () => {
-    const image = await createTestImage("Fauteuil design");
     await seedSection({
-      image: image.id,
       values: [
         { title: "Timelessness", description: "Ne se démode jamais." },
         { title: "Authenticity", description: "Chaque pièce a une histoire." },

@@ -6,15 +6,13 @@ import { getPayloadClient } from "@/lib/payload";
 
 export async function HeroBanner() {
   const payload = await getPayloadClient();
-  const banner = await payload.findGlobal({ slug: "hero-banner", depth: 1 });
-
-  const image = typeof banner.backgroundImage === "object" ? banner.backgroundImage : null;
+  const banner = await payload.findGlobal({ slug: "hero-banner" });
 
   return (
     <section className="relative right-1/2 left-1/2 mx-[-50vw] h-screen w-screen">
       <Image
-        src={image?.url ?? "/images/banner-image.png"}
-        alt={image?.alt ?? "Intérieur design mettant en scène du mobilier haut de gamme"}
+        src={banner.backgroundImageUrl || "/images/banner-image.png"}
+        alt="Intérieur design mettant en scène du mobilier haut de gamme"
         fill
         priority
         className="object-cover"

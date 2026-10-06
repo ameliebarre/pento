@@ -95,9 +95,19 @@ export const Products: CollectionConfig = {
     },
     {
       name: "images",
-      type: "relationship",
-      relationTo: "media",
-      hasMany: true,
+      type: "array",
+      fields: [
+        {
+          name: "url",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "alt",
+          type: "text",
+          required: true,
+        },
+      ],
     },
     {
       name: "tags",
