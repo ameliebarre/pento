@@ -20,5 +20,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/movement",
     },
+    {
+      resolve: "./src/modules/material",
+    },
   ],
 })
