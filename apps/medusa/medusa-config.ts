@@ -23,5 +23,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/material",
     },
+    {
+      resolve: "./src/modules/manufacturer",
+    },
   ],
 })
