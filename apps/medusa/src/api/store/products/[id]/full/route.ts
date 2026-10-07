@@ -12,6 +12,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       "handle",
       "description",
       "status",
+      "thumbnail",
+      "images.*",
       "categories.*",
       "tags.*",
       "variants.*",
