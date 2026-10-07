@@ -235,7 +235,10 @@ export interface Movement {
   description: string;
   startDate?: string | null;
   endDate?: string | null;
-  coverImage?: (number | null) | Media;
+  /**
+   * URL Cloudinary de l'image de couverture.
+   */
+  coverImageUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -522,7 +525,7 @@ export interface MovementsSelect<T extends boolean = true> {
   description?: T;
   startDate?: T;
   endDate?: T;
-  coverImage?: T;
+  coverImageUrl?: T;
   updatedAt?: T;
   createdAt?: T;
 }
