@@ -125,7 +125,11 @@ export function CartDrawer() {
                         <p className="text-muted-foreground text-xs">Quantité : {item.quantity}</p>
                         <button
                           type="button"
-                          onClick={() => removeMutation.mutate(item.id)}
+                          onClick={() => {
+                            if (window.confirm(`Retirer « ${item.product.name} » du panier ?`)) {
+                              removeMutation.mutate(item.id);
+                            }
+                          }}
                           disabled={removeMutation.isPending}
                           className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
                         >
