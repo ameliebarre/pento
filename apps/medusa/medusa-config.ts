@@ -17,5 +17,8 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/designer",
     },
+    {
+      resolve: "./src/modules/movement",
+    },
   ],
 })
