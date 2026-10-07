@@ -1,12 +1,12 @@
 import Image from "next/image";
 
 import { getPayloadClient } from "@/lib/payload";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 export async function PassionForDesign() {
   const payload = await getPayloadClient();
-  const section = await payload.findGlobal({ slug: "passion-for-design", depth: 1 });
+  const section = await payload.findGlobal({ slug: "passion-for-design" });
 
-  const image = typeof section.image === "object" ? section.image : null;
   const paragraphs = section.description.split("\n\n").filter(Boolean);
 
   return (
@@ -15,11 +15,11 @@ export async function PassionForDesign() {
       className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#1C1813]"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2">
-        <div className="relative aspect-642/695 w-full md:aspect-auto">
-          {image?.url ? (
+        <ScrollReveal fromX={-60} className="relative aspect-642/695 w-full md:aspect-auto">
+          {section.imageUrl ? (
             <Image
-              src={image.url}
-              alt={image.alt}
+              src={section.imageUrl}
+              alt="Intérieur mettant en valeur une pièce de design emblématique"
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
@@ -27,9 +27,12 @@ export async function PassionForDesign() {
           ) : (
             <div className="bg-muted h-full w-full" />
           )}
-        </div>
+        </ScrollReveal>
 
-        <div className="flex flex-col gap-6 px-6 py-12 sm:px-10 sm:py-16 md:justify-center md:px-12 lg:px-16">
+        <ScrollReveal
+          delay={0.15}
+          className="flex flex-col gap-6 px-6 py-12 sm:px-10 sm:py-16 md:justify-center md:px-12 lg:px-16"
+        >
           <div className="flex flex-col gap-3">
             <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
               {section.eyebrow}
@@ -60,7 +63,7 @@ export async function PassionForDesign() {
               </div>
             ))}
           </dl>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

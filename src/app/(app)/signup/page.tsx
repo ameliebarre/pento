@@ -4,7 +4,7 @@ import { SignupForm } from "./signup-form";
 export default function SignupPage() {
   return (
     <>
-      <SiteHeader theme="light" />
+      <SiteHeader />
       <SignupForm />
     </>
   );

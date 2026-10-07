@@ -216,7 +216,10 @@ export interface Manufacturer {
   name: string;
   history?: string | null;
   website?: string | null;
-  logo?: (number | null) | Media;
+  /**
+   * URL Cloudinary du logo.
+   */
+  logoUrl?: string | null;
   country?: (number | null) | Country;
   updatedAt: string;
   createdAt: string;
@@ -232,7 +235,10 @@ export interface Movement {
   description: string;
   startDate?: string | null;
   endDate?: string | null;
-  coverImage?: (number | null) | Media;
+  /**
+   * URL Cloudinary de l'image de couverture.
+   */
+  coverImageUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -295,7 +301,13 @@ export interface Product {
   manufacturer?: (number | null) | Manufacturer;
   movement?: (number | null) | Movement;
   designers?: (number | Designer)[] | null;
-  images?: (number | Media)[] | null;
+  images?:
+    | {
+        url: string;
+        alt: string;
+        id?: string | null;
+      }[]
+    | null;
   tags?: (number | Tag)[] | null;
   materials?: (number | Material)[] | null;
   updatedAt: string;
@@ -498,7 +510,7 @@ export interface ManufacturersSelect<T extends boolean = true> {
   name?: T;
   history?: T;
   website?: T;
-  logo?: T;
+  logoUrl?: T;
   country?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -513,7 +525,7 @@ export interface MovementsSelect<T extends boolean = true> {
   description?: T;
   startDate?: T;
   endDate?: T;
-  coverImage?: T;
+  coverImageUrl?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -559,7 +571,13 @@ export interface ProductsSelect<T extends boolean = true> {
   manufacturer?: T;
   movement?: T;
   designers?: T;
-  images?: T;
+  images?:
+    | T
+    | {
+        url?: T;
+        alt?: T;
+        id?: T;
+      };
   tags?: T;
   materials?: T;
   updatedAt?: T;
@@ -633,7 +651,10 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface HeroBanner {
   id: number;
-  backgroundImage: number | Media;
+  /**
+   * URL Cloudinary de l'image de fond.
+   */
+  backgroundImageUrl: string;
   /**
    * Première ligne du titre, affichée en blanc.
    */
@@ -654,7 +675,10 @@ export interface HeroBanner {
  */
 export interface PassionForDesign {
   id: number;
-  image: number | Media;
+  /**
+   * URL Cloudinary de l'image.
+   */
+  imageUrl: string;
   eyebrow: string;
   /**
    * Première ligne du titre, affichée en blanc.
@@ -681,7 +705,7 @@ export interface PassionForDesign {
  * via the `definition` "hero-banner_select".
  */
 export interface HeroBannerSelect<T extends boolean = true> {
-  backgroundImage?: T;
+  backgroundImageUrl?: T;
   heading?: T;
   headingAccent?: T;
   description?: T;
@@ -696,7 +720,7 @@ export interface HeroBannerSelect<T extends boolean = true> {
  * via the `definition` "passion-for-design_select".
  */
 export interface PassionForDesignSelect<T extends boolean = true> {
-  image?: T;
+  imageUrl?: T;
   eyebrow?: T;
   heading?: T;
   headingAccent?: T;

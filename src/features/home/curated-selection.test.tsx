@@ -5,22 +5,7 @@ import { render, screen } from "@testing-library/react";
 
 import { CuratedSelection } from "@/features/home/curated-selection";
 import { getPayloadClient } from "@/lib/payload";
-import { prisma } from "@/lib/prisma";
 import type { Product } from "../../../payload-types";
-
-// Inserted directly rather than through Payload's Local API: its upload
-// validation pulls in `file-type`, whose Node/browser dual build resolves
-// to the browser build under Vitest's jsdom environment and can't read a
-// real Node Buffer there. This test is about CuratedSelection's rendering,
-// not Payload's upload pipeline, so a raw row is the more direct fixture.
-async function createTestImage(alt: string) {
-  const rows = await prisma.$queryRaw<{ id: number }[]>`
-    INSERT INTO payload.media (alt, url, filename, mime_type, filesize, width, height)
-    VALUES (${alt}, ${"/api/media/file/test.png"}, ${"test.png"}, ${"image/png"}, 90, 1, 1)
-    RETURNING id;
-  `;
-  return rows[0];
-}
 
 function richText(text: string): Product["description"] {
   return {
@@ -57,7 +42,7 @@ async function createProduct(data: {
   slug: string;
   price: number;
   featured: boolean;
-  image?: number;
+  image?: { url: string; alt: string };
   designers?: number[];
   creationDate?: string;
 }) {
@@ -114,13 +99,15 @@ describe("CuratedSelection", () => {
   });
 
   it("shows the cover image when one is set", async () => {
-    const image = await createTestImage("Le fauteuil Womb Chair");
     await createProduct({
       name: "Womb Chair",
       slug: "womb-chair",
       price: 4435,
       featured: true,
-      image: image.id,
+      image: {
+        url: "https://res.cloudinary.com/demo/image/upload/womb-chair.jpg",
+        alt: "Le fauteuil Womb Chair",
+      },
     });
 
     render(await CuratedSelection());

@@ -26,11 +26,23 @@ vi.mock("next/navigation", () => ({
 
 import { getSession } from "@/lib/get-session";
 import ProfilePage from "@/app/(app)/profile/page";
+import { QueryProvider } from "@/components/query-provider";
+import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
 
 const mockedGetSession = vi.mocked(getSession);
 
 function search(params: Record<string, string> = {}) {
   return Promise.resolve(params);
+}
+
+async function renderProfilePage(searchParams: ReturnType<typeof search>) {
+  const page = await ProfilePage({ searchParams });
+
+  return render(
+    <QueryProvider>
+      <CartDrawerProvider>{page}</CartDrawerProvider>
+    </QueryProvider>,
+  );
 }
 
 describe("ProfilePage", () => {
@@ -47,7 +59,7 @@ describe("ProfilePage", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
-    render(await ProfilePage({ searchParams: search() }));
+    await renderProfilePage(search());
 
     expect(screen.getByText("Amelie")).toBeInTheDocument();
     expect(screen.getByText("Barre")).toBeInTheDocument();
@@ -64,7 +76,7 @@ describe("ProfilePage", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
-    render(await ProfilePage({ searchParams: search() }));
+    await renderProfilePage(search());
 
     expect(screen.getAllByText("—")).toHaveLength(2);
   });
@@ -75,7 +87,7 @@ describe("ProfilePage", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
-    render(await ProfilePage({ searchParams: search({ revoked: "1" }) }));
+    await renderProfilePage(search({ revoked: "1" }));
 
     expect(screen.getByRole("status")).toHaveTextContent(
       "Les autres appareils ont été déconnectés.",
@@ -88,7 +100,7 @@ describe("ProfilePage", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any);
 
-    render(await ProfilePage({ searchParams: search() }));
+    await renderProfilePage(search());
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });

@@ -33,9 +33,11 @@ export const Movements: CollectionConfig = {
       type: "date",
     },
     {
-      name: "coverImage",
-      type: "relationship",
-      relationTo: "media",
+      name: "coverImageUrl",
+      type: "text",
+      admin: {
+        description: "URL Cloudinary de l'image de couverture.",
+      },
     },
   ],
 };

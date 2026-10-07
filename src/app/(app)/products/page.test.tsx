@@ -8,10 +8,17 @@ vi.mock("@/lib/get-session", () => ({
   getSession: vi.fn().mockResolvedValue(null),
 }));
 
+vi.mock("next/headers", () => ({
+  headers: vi.fn().mockResolvedValue(new Headers()),
+  cookies: vi.fn().mockResolvedValue({ get: () => undefined }),
+}));
+
 import ShopAllPage from "@/app/(app)/products/page";
 import { prisma } from "@/lib/prisma";
+import { QueryProvider } from "@/components/query-provider";
+import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
 
-function renderPage(
+async function renderPage(
   category?: string | string[],
   designer?: string | string[],
   price?: { min?: number; max?: number },
@@ -24,7 +31,13 @@ function renderPage(
   if (price?.min !== undefined) params.minPrice = String(price.min);
   if (price?.max !== undefined) params.maxPrice = String(price.max);
   if (material) params.material = material;
-  return ShopAllPage({ searchParams: Promise.resolve(params) });
+  const page = await ShopAllPage({ searchParams: Promise.resolve(params) });
+
+  return (
+    <QueryProvider>
+      <CartDrawerProvider>{page}</CartDrawerProvider>
+    </QueryProvider>
+  );
 }
 
 async function expandSection(name: string) {
@@ -100,8 +113,12 @@ describe("ShopAllPage", () => {
     render(await renderPage());
 
     const links = screen.getAllByRole("link");
-    const newerIndex = links.findIndex((link) => link.textContent?.includes("Nouveau produit"));
-    const olderIndex = links.findIndex((link) => link.textContent?.includes("Ancien produit"));
+    const newerIndex = links.findIndex((link) =>
+      link.getAttribute("aria-label")?.includes("Nouveau produit"),
+    );
+    const olderIndex = links.findIndex((link) =>
+      link.getAttribute("aria-label")?.includes("Ancien produit"),
+    );
     expect(newerIndex).toBeLessThan(olderIndex);
   });
 
@@ -362,7 +379,7 @@ describe("ShopAllPage", () => {
 
     const links = screen.getAllByRole("link");
     const order = ["Pas cher", "Milieu", "Cher"].map((name) =>
-      links.findIndex((link) => link.textContent?.includes(name)),
+      links.findIndex((link) => link.getAttribute("aria-label")?.includes(name)),
     );
     expect(order).toEqual([...order].sort((a, b) => a - b));
   });
@@ -376,7 +393,7 @@ describe("ShopAllPage", () => {
 
     const links = screen.getAllByRole("link");
     const order = ["Cher", "Milieu", "Pas cher"].map((name) =>
-      links.findIndex((link) => link.textContent?.includes(name)),
+      links.findIndex((link) => link.getAttribute("aria-label")?.includes(name)),
     );
     expect(order).toEqual([...order].sort((a, b) => a - b));
   });

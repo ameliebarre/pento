@@ -23,8 +23,8 @@ export default async function CategoryPage({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {await SiteHeader({ theme: "light" })}
+    <div className="flex flex-col gap-6 pt-24 pb-16">
+      {await SiteHeader()}
       <h1 className="text-2xl font-semibold">{label}</h1>
     </div>
   );

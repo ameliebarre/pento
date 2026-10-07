@@ -91,7 +91,7 @@ describe("SignupPage", () => {
     await user.type(screen.getByLabelText("Mot de passe"), "password123");
     await user.click(screen.getByRole("button", { name: "Créer mon compte" }));
 
-    expect(await screen.findByRole("button", { name: "Création..." })).toBeDisabled();
+    expect(await screen.findByRole("button", { name: "Création…" })).toBeDisabled();
 
     resolveAction(undefined);
     await vi.waitFor(() =>

@@ -6,10 +6,12 @@ export const PassionForDesign: GlobalConfig = {
   access: { read: () => true },
   fields: [
     {
-      name: "image",
-      type: "relationship",
-      relationTo: "media",
+      name: "imageUrl",
+      type: "text",
       required: true,
+      admin: {
+        description: "URL Cloudinary de l'image.",
+      },
     },
     {
       name: "eyebrow",

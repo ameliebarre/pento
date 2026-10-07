@@ -5,8 +5,8 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { resetPasswordAction } from "@/actions/auth";
+import { AuthCard } from "@/components/auth-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -18,7 +18,7 @@ function ResetPasswordForm() {
   if (state?.success) {
     return (
       <>
-        <p className="text-muted-foreground text-center text-sm">
+        <p role="status" className="text-muted-foreground text-center text-sm">
           Votre mot de passe a bien été mis à jour.
         </p>
         <Link href="/login" className="text-center text-sm underline">
@@ -54,7 +54,7 @@ function ResetPasswordForm() {
         </p>
       )}
       <Button type="submit" disabled={pending || !token} className="h-10 rounded-[6px]">
-        {pending ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+        {pending ? "Mise à jour…" : "Mettre à jour le mot de passe"}
       </Button>
       <p className="text-center text-sm">
         <Link href="/login" className="underline">
@@ -67,19 +67,10 @@ function ResetPasswordForm() {
 
 export function ResetPasswordPageContent() {
   return (
-    <div className="flex min-h-full items-center justify-center">
-      <Card className="w-full max-w-sm ring-0">
-        <CardHeader>
-          <CardTitle as="h1" className="pb-4 text-center text-4xl">
-            Nouveau mot de passe
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Suspense fallback={null}>
-            <ResetPasswordForm />
-          </Suspense>
-        </CardContent>
-      </Card>
-    </div>
+    <AuthCard title="Nouveau mot de passe" compact>
+      <Suspense fallback={null}>
+        <ResetPasswordForm />
+      </Suspense>
+    </AuthCard>
   );
 }

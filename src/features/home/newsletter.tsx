@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
@@ -33,7 +34,7 @@ export function Newsletter() {
         />
         <div className="absolute inset-0 bg-black/55" />
 
-        <div className="relative mx-auto flex max-w-xl flex-col items-center gap-6 px-6 text-center">
+        <ScrollReveal className="relative mx-auto flex max-w-xl flex-col items-center gap-6 px-6 text-center">
           <div className="flex flex-col gap-3">
             <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
               Join the maison
@@ -65,7 +66,8 @@ export function Newsletter() {
                 type="email"
                 required
                 autoComplete="email"
-                placeholder="Your email address"
+                spellCheck={false}
+                placeholder="you@example.com…"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="h-12 flex-1 border-white/40 bg-white/10 px-4 text-white placeholder:text-white/60 focus-visible:border-white/60 focus-visible:ring-white/50"
@@ -85,7 +87,7 @@ export function Newsletter() {
           )}
 
           <p className="text-xs text-white/50">No spam, only design. Unsubscribe anytime.</p>
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   );

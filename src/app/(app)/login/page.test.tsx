@@ -25,7 +25,7 @@ describe("LoginPage", () => {
 
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Mot de passe")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Sign in" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Se connecter" })).toBeInTheDocument();
   });
 
   it("submits the entered credentials to loginAction", async () => {
@@ -35,7 +35,7 @@ describe("LoginPage", () => {
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Mot de passe"), "password123");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "Se connecter" }));
 
     await waitFor(() => expect(mockedLoginAction).toHaveBeenCalled());
     const formData = mockedLoginAction.mock.calls[0][1];
@@ -50,7 +50,7 @@ describe("LoginPage", () => {
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Mot de passe"), "wrongpassword");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "Se connecter" }));
 
     expect(await screen.findByText("Email ou mot de passe incorrect.")).toBeInTheDocument();
   });
@@ -68,13 +68,13 @@ describe("LoginPage", () => {
 
     await user.type(screen.getByLabelText("Email"), "user@example.com");
     await user.type(screen.getByLabelText("Mot de passe"), "password123");
-    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    await user.click(screen.getByRole("button", { name: "Se connecter" }));
 
-    expect(await screen.findByRole("button", { name: "Signing in..." })).toBeDisabled();
+    expect(await screen.findByRole("button", { name: "Connexion…" })).toBeDisabled();
 
     resolveAction(undefined);
     await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Sign in" })).not.toBeDisabled(),
+      expect(screen.getByRole("button", { name: "Se connecter" })).not.toBeDisabled(),
     );
   });
 
