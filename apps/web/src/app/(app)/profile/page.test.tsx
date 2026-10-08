@@ -11,8 +11,12 @@ vi.mock("@/auth", () => ({
   auth: { api: { revokeOtherSessions: vi.fn(), signOut: vi.fn() } },
 }));
 
-vi.mock("@/lib/medusa-admin", () => ({
-  medusaAdminFetch: vi.fn().mockResolvedValue({ orders: [] }),
+vi.mock("@/lib/medusa-customer-auth", () => ({
+  getMedusaCustomerToken: vi.fn().mockResolvedValue("customer-token"),
+}));
+
+vi.mock("@/lib/medusa", () => ({
+  medusa: { client: { fetch: vi.fn().mockResolvedValue({ orders: [] }) } },
 }));
 
 vi.mock("next/headers", () => ({
@@ -32,12 +36,12 @@ import { getSession } from "@/lib/get-session";
 import ProfilePage from "@/app/(app)/profile/page";
 import { QueryProvider } from "@/components/query-provider";
 import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
-import { medusaAdminFetch } from "@/lib/medusa-admin";
+import { medusa } from "@/lib/medusa";
 
 const mockedGetSession = vi.mocked(getSession);
 
 function setupOrders(orders: unknown[]) {
-  vi.mocked(medusaAdminFetch).mockResolvedValue({ orders });
+  vi.mocked(medusa.client.fetch).mockResolvedValue({ orders });
 }
 
 function search(params: Record<string, string> = {}) {
@@ -152,37 +156,5 @@ describe("ProfilePage", () => {
       "href",
       "/checkout/confirmation/order_1",
     );
-  });
-
-  it("only shows orders matching the account's email exactly", async () => {
-    mockedGetSession.mockResolvedValueOnce({
-      user: { firstName: "Amelie", lastName: "Barre", email: "test@example.com" },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
-    setupOrders([
-      {
-        id: "order_mine",
-        display_id: 1,
-        email: "test@example.com",
-        created_at: "2026-01-15T00:00:00.000Z",
-        currency_code: "eur",
-        total: 1455,
-        status: "pending",
-      },
-      {
-        id: "order_someone_elses",
-        display_id: 2,
-        email: "longtest@example.com",
-        created_at: "2026-01-16T00:00:00.000Z",
-        currency_code: "eur",
-        total: 2000,
-        status: "pending",
-      },
-    ]);
-
-    await renderProfilePage(search());
-
-    expect(screen.getByText("Commande n°1")).toBeInTheDocument();
-    expect(screen.queryByText("Commande n°2")).not.toBeInTheDocument();
   });
 });

@@ -25,7 +25,16 @@ vi.mock("@/lib/medusa", () => ({
   medusa: { client: { fetch: vi.fn() } },
 }));
 
+vi.mock("@/lib/get-session", () => ({
+  getSession: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("@/lib/medusa-customer-auth", () => ({
+  getMedusaCustomerToken: vi.fn().mockResolvedValue("customer-token"),
+}));
+
 import { placeOrderAction } from "@/actions/checkout";
+import { getSession } from "@/lib/get-session";
 import { medusa } from "@/lib/medusa";
 
 const CART_ID = "cart_1";
@@ -52,6 +61,7 @@ function buildFormData(overrides: Record<string, string> = {}) {
 function setupMedusa(completeResult: { type: "order"; order: { id: string } } | { type: "cart"; error: { message: string } }) {
   vi.mocked(medusa.client.fetch).mockImplementation(async (path: unknown) => {
     const p = String(path);
+    if (p === `/store/carts/${CART_ID}/customer`) return { cart: { id: CART_ID } };
     if (p === `/store/carts/${CART_ID}`) return { cart: { id: CART_ID } };
     if (p === `/store/carts/${CART_ID}/shipping-methods`) return { cart: { id: CART_ID } };
     if (p === "/store/payment-collections") return { payment_collection: { id: "pay_col_1" } };
@@ -68,6 +78,7 @@ beforeEach(() => {
   cookieStore.set("medusa_cart_id", CART_ID);
   mockRedirect.mockClear();
   vi.mocked(medusa.client.fetch).mockReset();
+  vi.mocked(getSession).mockReset().mockResolvedValue(null);
 });
 
 describe("placeOrderAction", () => {
@@ -110,5 +121,20 @@ describe("placeOrderAction", () => {
 
     expect(result.error).toBe("Le paiement a échoué.");
     expect(cookieStore.has("medusa_cart_id")).toBe(true);
+  });
+
+  it("links the cart to the Medusa customer when the user is signed in", async () => {
+    setupMedusa({ type: "order", order: { id: "order_1" } });
+    vi.mocked(getSession).mockResolvedValue({
+      user: { id: "user_1", email: "test@example.com", firstName: "Jean", lastName: "Dupont" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+
+    await expect(placeOrderAction({ error: null }, buildFormData())).rejects.toThrow();
+
+    expect(medusa.client.fetch).toHaveBeenCalledWith(`/store/carts/${CART_ID}/customer`, {
+      method: "POST",
+      headers: { Authorization: "Bearer customer-token" },
+    });
   });
 });

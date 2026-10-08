@@ -29,8 +29,8 @@ export default async function ProfilePage({
   }
 
   const { revoked } = await searchParams;
-  const { firstName, lastName, email } = session.user;
-  const orders = await getMyOrders(email);
+  const { id, firstName, lastName, email } = session.user;
+  const orders = await getMyOrders({ id, email, firstName, lastName });
 
   return (
     <>

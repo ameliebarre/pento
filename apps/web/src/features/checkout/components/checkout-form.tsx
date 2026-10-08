@@ -16,8 +16,7 @@ type CheckoutFormProps = {
   shippingOptions: MedusaShippingOption[];
   countries: MedusaRegionCountry[];
   // When set, the order is placed under this account's email rather than a
-  // freely-typed one — /profile matches orders to accounts by exact email,
-  // so letting it drift would hide the order from "Mes commandes".
+  // freely-typed one, matching the Medusa customer the cart gets linked to.
   accountEmail: string | null;
 };
 

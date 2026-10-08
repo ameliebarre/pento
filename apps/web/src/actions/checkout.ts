@@ -3,7 +3,9 @@
 import { redirect } from "next/navigation";
 
 import { clearCartId, getCartId } from "@/actions/cart";
+import { getSession } from "@/lib/get-session";
 import { medusa } from "@/lib/medusa";
+import { getMedusaCustomerToken } from "@/lib/medusa-customer-auth";
 
 export type CheckoutState = { error: string | null };
 
@@ -39,6 +41,16 @@ export async function placeOrderAction(
   let orderId: string;
 
   try {
+    const session = await getSession();
+
+    if (session?.user) {
+      const token = await getMedusaCustomerToken(session.user);
+      await medusa.client.fetch(`/store/carts/${cartId}/customer`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    }
+
     await medusa.client.fetch(`/store/carts/${cartId}`, {
       method: "POST",
       body: { email, shipping_address: address, billing_address: address },
