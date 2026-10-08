@@ -6,3 +6,7 @@ node_modules
 
 # misc
 .DS_Store
+
+# claude code local state
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
