@@ -2,12 +2,14 @@ import Link from "next/link";
 import { ImageOff } from "lucide-react";
 
 import { ProductImage } from "@/components/product-image";
+import { AddToCartButton } from "@/features/products/components/add-to-cart-button";
 import { formatPrice } from "@/lib/utils";
 import type { MedusaProduct } from "@/features/products/medusa-types";
 import { getProductPrice } from "@/features/products/utils/get-product-price";
 
 export function ProductCard({ product }: { product: MedusaProduct }) {
   const image = product.images[0];
+  const variantId = product.variants[0]?.id;
   const designerNames = product.designers
     .map((designer) => `${designer.first_name} ${designer.last_name}`)
     .join(", ");
@@ -29,10 +31,12 @@ export function ProductCard({ product }: { product: MedusaProduct }) {
             <span className="sr-only">Aucune image disponible pour {product.title}</span>
           </div>
         )}
-        {/* "Add to cart" is omitted here on purpose: the cart still runs on the
-            Prisma Product table (FK on CartItem.productId), which doesn't have
-            rows for Medusa-sourced products. It comes back once the cart is
-            migrated to Medusa. */}
+        {variantId && (
+          <AddToCartButton
+            variantId={variantId}
+            className="absolute right-4 bottom-4 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+          />
+        )}
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">

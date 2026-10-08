@@ -4,7 +4,19 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { ProductCard } from "@/features/products/components/product-card";
+import { QueryProvider } from "@/components/query-provider";
+import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
 import type { MedusaProduct } from "@/features/products/medusa-types";
+
+function renderProductCard(product: MedusaProduct) {
+  return render(
+    <QueryProvider>
+      <CartDrawerProvider>
+        <ProductCard product={product} />
+      </CartDrawerProvider>
+    </QueryProvider>,
+  );
+}
 
 function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
   return {
@@ -27,7 +39,7 @@ function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
 
 describe("ProductCard", () => {
   it("renders the product name, formatted price and image", () => {
-    render(<ProductCard product={buildProduct()} />);
+    renderProductCard(buildProduct());
 
     expect(screen.getByText("Barcelona Chair")).toBeInTheDocument();
     expect(screen.getByText(/1.445,00.€/)).toBeInTheDocument();
@@ -35,20 +47,20 @@ describe("ProductCard", () => {
   });
 
   it("links to the product detail page", () => {
-    render(<ProductCard product={buildProduct()} />);
+    renderProductCard(buildProduct());
 
     expect(screen.getByRole("link")).toHaveAttribute("href", "/product/barcelona-chair");
   });
 
   it("shows a fallback when the product has no image", () => {
-    render(<ProductCard product={buildProduct({ images: [] })} />);
+    renderProductCard(buildProduct({ images: [] }));
 
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getByText("Aucune image disponible pour Barcelona Chair")).toBeInTheDocument();
   });
 
   it("does not show a designer line when the product has no designer", () => {
-    render(<ProductCard product={buildProduct()} />);
+    renderProductCard(buildProduct());
 
     expect(
       screen.queryByText(/./, { selector: ".text-muted-foreground.text-xs" }),
@@ -62,7 +74,7 @@ describe("ProductCard", () => {
       ],
     });
 
-    render(<ProductCard product={product} />);
+    renderProductCard(product);
 
     expect(screen.getByText("Ludwig Mies van der Rohe")).toBeInTheDocument();
   });
@@ -75,7 +87,7 @@ describe("ProductCard", () => {
       ],
     });
 
-    render(<ProductCard product={product} />);
+    renderProductCard(product);
 
     expect(screen.getByText("Achille Castiglioni, Pier Giacomo Castiglioni")).toBeInTheDocument();
   });
