@@ -18,6 +18,14 @@ export async function getCartId(): Promise<string | null> {
   return cookieStore.get(CART_ID_COOKIE)?.value ?? null;
 }
 
+// Called once an order is placed — the cart is completed server-side and
+// can't be added to again, so the cookie must be dropped to start a fresh
+// one on the next add-to-cart.
+export async function clearCartId(): Promise<void> {
+  const cookieStore = await cookies();
+  cookieStore.delete(CART_ID_COOKIE);
+}
+
 async function getEurRegionId(): Promise<string> {
   const { regions } = await medusa.client.fetch<{ regions: MedusaRegion[] }>("/store/regions");
   const region = regions.find((r) => r.currency_code === "eur") ?? regions[0];
