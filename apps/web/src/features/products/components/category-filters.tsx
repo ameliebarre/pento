@@ -2,10 +2,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { buildClearFilterHref, buildToggleFilterHref } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Category } from "@prisma/client";
+import type { MedusaCategory } from "@/features/products/medusa-types";
 
 type CategoryFiltersProps = {
-  categories: Pick<Category, "id" | "slug" | "name">[];
+  categories: Pick<MedusaCategory, "id" | "handle" | "name">[];
   filters: ProductFilters;
 };
 
@@ -27,11 +27,11 @@ export function CategoryFilters({ categories, filters }: CategoryFiltersProps) {
       )}
       <div className="grid grid-cols-2 gap-2">
         {categories.map((category) => {
-          const isSelected = filters.categories.includes(category.slug);
+          const isSelected = filters.categories.includes(category.handle);
           return (
             <a
               key={category.id}
-              href={buildToggleFilterHref(filters, "categories", category.slug)}
+              href={buildToggleFilterHref(filters, "categories", category.handle)}
               role="button"
               aria-pressed={isSelected}
               className={cn(

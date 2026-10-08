@@ -11,12 +11,12 @@ import {
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Designer } from "@prisma/client";
+import type { MedusaDesigner } from "@/features/products/medusa-types";
 
 const VISIBLE_COUNT = 6;
 
 type DesignerFiltersProps = {
-  designers: Pick<Designer, "id" | "slug" | "firstName" | "lastName">[];
+  designers: Pick<MedusaDesigner, "id" | "slug" | "first_name" | "last_name">[];
   filters: ProductFilters;
 };
 
@@ -41,7 +41,7 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
     if (!query) return designers;
 
     return designers.filter((designer) =>
-      `${designer.firstName} ${designer.lastName}`.toLowerCase().includes(query),
+      `${designer.first_name} ${designer.last_name}`.toLowerCase().includes(query),
     );
   }, [designers, search]);
 
@@ -93,7 +93,7 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
                   }
                 />
                 <Label htmlFor={inputId} className="text-sm font-normal">
-                  {designer.firstName} {designer.lastName}
+                  {designer.first_name} {designer.last_name}
                 </Label>
               </li>
             );

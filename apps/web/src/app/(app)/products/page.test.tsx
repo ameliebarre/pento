@@ -13,10 +13,85 @@ vi.mock("next/headers", () => ({
   cookies: vi.fn().mockResolvedValue({ get: () => undefined }),
 }));
 
+vi.mock("@/lib/medusa", () => ({
+  medusa: { client: { fetch: vi.fn() } },
+}));
+
 import ShopAllPage from "@/app/(app)/products/page";
-import { prisma } from "@/lib/prisma";
+import { medusa } from "@/lib/medusa";
 import { QueryProvider } from "@/components/query-provider";
 import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
+import type {
+  MedusaCategory,
+  MedusaDesigner,
+  MedusaMaterial,
+  MedusaMovement,
+  MedusaProduct,
+} from "@/features/products/medusa-types";
+
+function buildCategory(id: string, handle: string, name: string): MedusaCategory {
+  return { id, handle, name };
+}
+
+function buildDesigner(id: string, slug: string, firstName: string, lastName: string): MedusaDesigner {
+  return { id, slug, first_name: firstName, last_name: lastName };
+}
+
+function buildMaterial(id: string, slug: string, name: string): MedusaMaterial {
+  return { id, slug, name };
+}
+
+function buildMovement(id: string, slug: string, name: string): MedusaMovement {
+  return { id, slug, name };
+}
+
+function buildProduct(
+  id: string,
+  title: string,
+  options: {
+    category?: MedusaCategory;
+    designer?: MedusaDesigner;
+    material?: MedusaMaterial;
+    movement?: MedusaMovement;
+    price?: number;
+    createdAt?: string;
+  } = {},
+): MedusaProduct {
+  return {
+    id,
+    title,
+    handle: id,
+    description: "desc",
+    created_at: options.createdAt ?? "2026-01-01T00:00:00.000Z",
+    images: [],
+    categories: options.category ? [options.category] : [],
+    tags: [],
+    variants: [
+      { id: `${id}-variant`, sku: null, prices: [{ currency_code: "eur", amount: options.price ?? 100 }] },
+    ],
+    designers: options.designer ? [options.designer] : [],
+    movement: options.movement ?? null,
+    materials: options.material ? [options.material] : [],
+    manufacturer: null,
+  };
+}
+
+function setupMedusa(
+  data: {
+    products?: MedusaProduct[];
+    designers?: MedusaDesigner[];
+    materials?: MedusaMaterial[];
+    movements?: MedusaMovement[];
+  } = {},
+) {
+  vi.mocked(medusa.client.fetch).mockImplementation(async (path: unknown) => {
+    if (path === "/store/products/full") return { products: data.products ?? [] };
+    if (path === "/store/designers") return { designers: data.designers ?? [] };
+    if (path === "/store/materials") return { materials: data.materials ?? [] };
+    if (path === "/store/movements") return { movements: data.movements ?? [] };
+    throw new Error(`Unexpected path: ${String(path)}`);
+  });
+}
 
 async function renderPage(
   category?: string | string[],
@@ -45,55 +120,18 @@ async function expandSection(name: string) {
   await user.click(screen.getByRole("button", { name }));
 }
 
-async function createProduct(
-  slug: string,
-  name: string,
-  categoryId?: string,
-  designerId?: string,
-  price = 100,
-  materialId?: string,
-  movementId?: string,
-) {
-  const product = await prisma.product.create({
-    data: { name, slug, description: "desc", price, categoryId, movementId },
-  });
-  if (designerId) {
-    await prisma.productDesigner.create({ data: { productId: product.id, designerId } });
-  }
-  if (materialId) {
-    await prisma.productMaterial.create({ data: { productId: product.id, materialId } });
-  }
-  return product;
-}
-
-async function createCategory(slug: string, name: string) {
-  return prisma.category.create({ data: { name, slug } });
-}
-
-async function createDesigner(slug: string, firstName: string, lastName: string) {
-  return prisma.designer.create({
-    data: { slug, firstName, lastName, biography: "" },
-  });
-}
-
-async function createMaterial(slug: string, name: string) {
-  return prisma.material.create({ data: { name, slug } });
-}
-
-async function createMovement(slug: string, name: string) {
-  return prisma.movement.create({ data: { name, slug, description: "" } });
-}
-
 describe("ShopAllPage", () => {
   it("shows an empty state when there are no products", async () => {
+    setupMedusa();
     render(await renderPage());
 
     expect(screen.getByText("Aucun produit disponible pour le moment.")).toBeInTheDocument();
   });
 
   it("lists every product with a link to its detail page", async () => {
-    await createProduct("shop-all-1", "Chaise Test");
-    await createProduct("shop-all-2", "Table Test");
+    setupMedusa({
+      products: [buildProduct("shop-all-1", "Chaise Test"), buildProduct("shop-all-2", "Table Test")],
+    });
 
     render(await renderPage());
 
@@ -106,9 +144,12 @@ describe("ShopAllPage", () => {
   });
 
   it("orders products most-recently-created first", async () => {
-    await createProduct("shop-all-older", "Ancien produit");
-    await new Promise((resolve) => setTimeout(resolve, 10));
-    await createProduct("shop-all-newer", "Nouveau produit");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-older", "Ancien produit", { createdAt: "2026-01-01T00:00:00.000Z" }),
+        buildProduct("shop-all-newer", "Nouveau produit", { createdAt: "2026-01-02T00:00:00.000Z" }),
+      ],
+    });
 
     render(await renderPage());
 
@@ -123,8 +164,14 @@ describe("ShopAllPage", () => {
   });
 
   it("lists every category as a filter button", async () => {
-    await createCategory("chairs", "Chairs");
-    await createCategory("tables", "Tables");
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    setupMedusa({
+      products: [
+        buildProduct("p1", "Chaise", { category: chairs }),
+        buildProduct("p2", "Table", { category: tables }),
+      ],
+    });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
     await expandSection("Catégories");
@@ -134,10 +181,14 @@ describe("ShopAllPage", () => {
   });
 
   it("only shows products from the selected category", async () => {
-    const chairs = await createCategory("chairs", "Chairs");
-    const tables = await createCategory("tables", "Tables");
-    await createProduct("shop-all-chair", "Chaise Test", chairs.id);
-    await createProduct("shop-all-table", "Table Test", tables.id);
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-chair", "Chaise Test", { category: chairs }),
+        buildProduct("shop-all-table", "Table Test", { category: tables }),
+      ],
+    });
 
     render(await renderPage("chairs", undefined, undefined, undefined, { showFilters: "1" }));
 
@@ -147,12 +198,16 @@ describe("ShopAllPage", () => {
   });
 
   it("shows products from any of the selected categories", async () => {
-    const chairs = await createCategory("chairs", "Chairs");
-    const tables = await createCategory("tables", "Tables");
-    const sofas = await createCategory("sofas", "Sofas");
-    await createProduct("shop-all-chair", "Chaise Test", chairs.id);
-    await createProduct("shop-all-table", "Table Test", tables.id);
-    await createProduct("shop-all-sofa", "Canapé Test", sofas.id);
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    const sofas = buildCategory("cat_sofas", "sofas", "Sofas");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-chair", "Chaise Test", { category: chairs }),
+        buildProduct("shop-all-table", "Table Test", { category: tables }),
+        buildProduct("shop-all-sofa", "Canapé Test", { category: sofas }),
+      ],
+    });
 
     render(await renderPage(["chairs", "tables"]));
 
@@ -162,7 +217,8 @@ describe("ShopAllPage", () => {
   });
 
   it("lists every designer as a filter checkbox", async () => {
-    await createDesigner("hans-j-wegner", "Hans J.", "Wegner");
+    const wegner = buildDesigner("des_wegner", "hans-j-wegner", "Hans J.", "Wegner");
+    setupMedusa({ designers: [wegner] });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
     await expandSection("Designers");
@@ -171,10 +227,15 @@ describe("ShopAllPage", () => {
   });
 
   it("only shows products from the selected designer", async () => {
-    const wegner = await createDesigner("hans-j-wegner", "Hans J.", "Wegner");
-    const jacobsen = await createDesigner("arne-jacobsen", "Arne", "Jacobsen");
-    await createProduct("shop-all-wegner", "Wishbone Chair", undefined, wegner.id);
-    await createProduct("shop-all-jacobsen", "Egg Chair", undefined, jacobsen.id);
+    const wegner = buildDesigner("des_wegner", "hans-j-wegner", "Hans J.", "Wegner");
+    const jacobsen = buildDesigner("des_jacobsen", "arne-jacobsen", "Arne", "Jacobsen");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-wegner", "Wishbone Chair", { designer: wegner }),
+        buildProduct("shop-all-jacobsen", "Egg Chair", { designer: jacobsen }),
+      ],
+      designers: [wegner, jacobsen],
+    });
 
     render(
       await renderPage(undefined, "hans-j-wegner", undefined, undefined, { showFilters: "1" }),
@@ -186,11 +247,15 @@ describe("ShopAllPage", () => {
   });
 
   it("combines a category filter and a designer filter", async () => {
-    const chairs = await createCategory("chairs", "Chairs");
-    const tables = await createCategory("tables", "Tables");
-    const wegner = await createDesigner("hans-j-wegner", "Hans J.", "Wegner");
-    await createProduct("shop-all-matching", "Wishbone Chair", chairs.id, wegner.id);
-    await createProduct("shop-all-wrong-category", "CH327 Table", tables.id, wegner.id);
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    const wegner = buildDesigner("des_wegner", "hans-j-wegner", "Hans J.", "Wegner");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-matching", "Wishbone Chair", { category: chairs, designer: wegner }),
+        buildProduct("shop-all-wrong-category", "CH327 Table", { category: tables, designer: wegner }),
+      ],
+    });
 
     render(await renderPage("chairs", "hans-j-wegner"));
 
@@ -199,8 +264,12 @@ describe("ShopAllPage", () => {
   });
 
   it("keeps the designer filter when resetting the category filter", async () => {
-    await createCategory("chairs", "Chairs");
-    await createDesigner("hans-j-wegner", "Hans J.", "Wegner");
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const wegner = buildDesigner("des_wegner", "hans-j-wegner", "Hans J.", "Wegner");
+    setupMedusa({
+      products: [buildProduct("p1", "Wishbone Chair", { category: chairs, designer: wegner })],
+      designers: [wegner],
+    });
 
     render(
       await renderPage("chairs", "hans-j-wegner", undefined, undefined, { showFilters: "1" }),
@@ -217,8 +286,12 @@ describe("ShopAllPage", () => {
   });
 
   it("shows the price slider bounded by the catalog's actual min and max price", async () => {
-    await createProduct("shop-all-cheap", "Petite lampe", undefined, undefined, 100);
-    await createProduct("shop-all-expensive", "Grand canapé", undefined, undefined, 3000);
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-cheap", "Petite lampe", { price: 100 }),
+        buildProduct("shop-all-expensive", "Grand canapé", { price: 3000 }),
+      ],
+    });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
     await expandSection("Prix");
@@ -234,9 +307,13 @@ describe("ShopAllPage", () => {
   });
 
   it("only shows products within the selected price range", async () => {
-    await createProduct("shop-all-cheap", "Petite lampe", undefined, undefined, 100);
-    await createProduct("shop-all-mid", "Chaise Test", undefined, undefined, 1000);
-    await createProduct("shop-all-expensive", "Grand canapé", undefined, undefined, 3000);
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-cheap", "Petite lampe", { price: 100 }),
+        buildProduct("shop-all-mid", "Chaise Test", { price: 1000 }),
+        buildProduct("shop-all-expensive", "Grand canapé", { price: 3000 }),
+      ],
+    });
 
     render(await renderPage(undefined, undefined, { min: 500, max: 1500 }));
 
@@ -246,11 +323,15 @@ describe("ShopAllPage", () => {
   });
 
   it("combines a price filter with a category filter", async () => {
-    const chairs = await createCategory("chairs", "Chairs");
-    const tables = await createCategory("tables", "Tables");
-    await createProduct("shop-all-matching", "Chaise Test", chairs.id, undefined, 1000);
-    await createProduct("shop-all-wrong-category", "Table Test", tables.id, undefined, 1000);
-    await createProduct("shop-all-wrong-price", "Chaise Chère", chairs.id, undefined, 3000);
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-matching", "Chaise Test", { category: chairs, price: 1000 }),
+        buildProduct("shop-all-wrong-category", "Table Test", { category: tables, price: 1000 }),
+        buildProduct("shop-all-wrong-price", "Chaise Chère", { category: chairs, price: 3000 }),
+      ],
+    });
 
     render(await renderPage("chairs", undefined, { min: 500, max: 1500 }));
 
@@ -260,8 +341,9 @@ describe("ShopAllPage", () => {
   });
 
   it("lists every material as a filter checkbox", async () => {
-    await createMaterial("cuir", "Cuir");
-    await createMaterial("chene-massif", "Chêne massif");
+    const leather = buildMaterial("mat_cuir", "cuir", "Cuir");
+    const oak = buildMaterial("mat_chene", "chene-massif", "Chêne massif");
+    setupMedusa({ materials: [leather, oak] });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
     await expandSection("Matériaux");
@@ -271,10 +353,15 @@ describe("ShopAllPage", () => {
   });
 
   it("only shows products with the selected material", async () => {
-    const leather = await createMaterial("cuir", "Cuir");
-    const oak = await createMaterial("chene-massif", "Chêne massif");
-    await createProduct("shop-all-leather", "Fauteuil Cuir", undefined, undefined, 100, leather.id);
-    await createProduct("shop-all-oak", "Table Chêne", undefined, undefined, 100, oak.id);
+    const leather = buildMaterial("mat_cuir", "cuir", "Cuir");
+    const oak = buildMaterial("mat_chene", "chene-massif", "Chêne massif");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-leather", "Fauteuil Cuir", { material: leather }),
+        buildProduct("shop-all-oak", "Table Chêne", { material: oak }),
+      ],
+      materials: [leather, oak],
+    });
 
     render(await renderPage(undefined, undefined, undefined, "cuir", { showFilters: "1" }));
 
@@ -284,11 +371,15 @@ describe("ShopAllPage", () => {
   });
 
   it("combines a material filter with a category filter", async () => {
-    const chairs = await createCategory("chairs", "Chairs");
-    const tables = await createCategory("tables", "Tables");
-    const leather = await createMaterial("cuir", "Cuir");
-    await createProduct("shop-all-matching", "Fauteuil Cuir", chairs.id, undefined, 100, leather.id);
-    await createProduct("shop-all-wrong-category", "Table Cuir", tables.id, undefined, 100, leather.id);
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    const leather = buildMaterial("mat_cuir", "cuir", "Cuir");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-matching", "Fauteuil Cuir", { category: chairs, material: leather }),
+        buildProduct("shop-all-wrong-category", "Table Cuir", { category: tables, material: leather }),
+      ],
+    });
 
     render(await renderPage("chairs", undefined, undefined, "cuir"));
 
@@ -297,8 +388,9 @@ describe("ShopAllPage", () => {
   });
 
   it("lists every movement as a filter checkbox", async () => {
-    await createMovement("bauhaus", "Bauhaus");
-    await createMovement("mid-century", "Mid-Century");
+    const bauhaus = buildMovement("mov_bauhaus", "bauhaus", "Bauhaus");
+    const midCentury = buildMovement("mov_mid", "mid-century", "Mid-Century");
+    setupMedusa({ movements: [bauhaus, midCentury] });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
     await expandSection("Mouvements");
@@ -308,26 +400,15 @@ describe("ShopAllPage", () => {
   });
 
   it("only shows products with the selected movement", async () => {
-    const bauhaus = await createMovement("bauhaus", "Bauhaus");
-    const midCentury = await createMovement("mid-century", "Mid-Century");
-    await createProduct(
-      "shop-all-bauhaus",
-      "Chaise Bauhaus",
-      undefined,
-      undefined,
-      100,
-      undefined,
-      bauhaus.id,
-    );
-    await createProduct(
-      "shop-all-mid-century",
-      "Chaise Mid-Century",
-      undefined,
-      undefined,
-      100,
-      undefined,
-      midCentury.id,
-    );
+    const bauhaus = buildMovement("mov_bauhaus", "bauhaus", "Bauhaus");
+    const midCentury = buildMovement("mov_mid", "mid-century", "Mid-Century");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-bauhaus", "Chaise Bauhaus", { movement: bauhaus }),
+        buildProduct("shop-all-mid-century", "Chaise Mid-Century", { movement: midCentury }),
+      ],
+      movements: [bauhaus, midCentury],
+    });
 
     render(
       await renderPage(undefined, undefined, undefined, undefined, {
@@ -342,27 +423,15 @@ describe("ShopAllPage", () => {
   });
 
   it("combines a movement filter with a category filter", async () => {
-    const chairs = await createCategory("chairs", "Chairs");
-    const tables = await createCategory("tables", "Tables");
-    const bauhaus = await createMovement("bauhaus", "Bauhaus");
-    await createProduct(
-      "shop-all-matching",
-      "Chaise Bauhaus",
-      chairs.id,
-      undefined,
-      100,
-      undefined,
-      bauhaus.id,
-    );
-    await createProduct(
-      "shop-all-wrong-category",
-      "Table Bauhaus",
-      tables.id,
-      undefined,
-      100,
-      undefined,
-      bauhaus.id,
-    );
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    const tables = buildCategory("cat_tables", "tables", "Tables");
+    const bauhaus = buildMovement("mov_bauhaus", "bauhaus", "Bauhaus");
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-matching", "Chaise Bauhaus", { category: chairs, movement: bauhaus }),
+        buildProduct("shop-all-wrong-category", "Table Bauhaus", { category: tables, movement: bauhaus }),
+      ],
+    });
 
     render(await renderPage("chairs", undefined, undefined, undefined, { movement: "bauhaus" }));
 
@@ -371,9 +440,13 @@ describe("ShopAllPage", () => {
   });
 
   it("sorts products by price ascending", async () => {
-    await createProduct("shop-all-mid", "Milieu", undefined, undefined, 1000);
-    await createProduct("shop-all-cheap", "Pas cher", undefined, undefined, 100);
-    await createProduct("shop-all-expensive", "Cher", undefined, undefined, 3000);
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-mid", "Milieu", { price: 1000 }),
+        buildProduct("shop-all-cheap", "Pas cher", { price: 100 }),
+        buildProduct("shop-all-expensive", "Cher", { price: 3000 }),
+      ],
+    });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { sort: "price-asc" }));
 
@@ -385,9 +458,13 @@ describe("ShopAllPage", () => {
   });
 
   it("sorts products by price descending", async () => {
-    await createProduct("shop-all-mid", "Milieu", undefined, undefined, 1000);
-    await createProduct("shop-all-cheap", "Pas cher", undefined, undefined, 100);
-    await createProduct("shop-all-expensive", "Cher", undefined, undefined, 3000);
+    setupMedusa({
+      products: [
+        buildProduct("shop-all-mid", "Milieu", { price: 1000 }),
+        buildProduct("shop-all-cheap", "Pas cher", { price: 100 }),
+        buildProduct("shop-all-expensive", "Cher", { price: 3000 }),
+      ],
+    });
 
     render(await renderPage(undefined, undefined, undefined, undefined, { sort: "price-desc" }));
 
@@ -399,6 +476,7 @@ describe("ShopAllPage", () => {
   });
 
   it("hides the filters column and shows an 'Afficher les filtres' link by default", async () => {
+    setupMedusa();
     render(await renderPage());
 
     expect(screen.queryByLabelText("Filtres")).not.toBeInTheDocument();
@@ -409,6 +487,7 @@ describe("ShopAllPage", () => {
   });
 
   it("shows the filters column and a 'Masquer les filtres' link when showFilters=1", async () => {
+    setupMedusa();
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
 
     expect(screen.getByLabelText("Filtres")).toBeInTheDocument();
@@ -419,7 +498,8 @@ describe("ShopAllPage", () => {
   });
 
   it("keeps other filters when toggling the filters column visibility", async () => {
-    await createCategory("chairs", "Chairs");
+    const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
+    setupMedusa({ products: [buildProduct("p1", "Chaise", { category: chairs })] });
 
     render(await renderPage("chairs"));
 

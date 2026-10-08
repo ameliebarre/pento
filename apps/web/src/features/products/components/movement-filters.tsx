@@ -9,12 +9,12 @@ import {
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Movement } from "@prisma/client";
+import type { MedusaMovement } from "@/features/products/medusa-types";
 
 const VISIBLE_COUNT = 12;
 
 type MovementFiltersProps = {
-  movements: Pick<Movement, "id" | "slug" | "name">[];
+  movements: Pick<MedusaMovement, "id" | "slug" | "name">[];
   filters: ProductFilters;
 };
 

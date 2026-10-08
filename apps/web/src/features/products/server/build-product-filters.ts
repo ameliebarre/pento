@@ -1,55 +1,56 @@
-import { Prisma } from "@prisma/client";
-import { ProductFilters } from "../types";
+import type { MedusaProduct } from "../medusa-types";
+import type { ProductFilters } from "../types";
+import { getProductPrice } from "../utils/get-product-price";
 
-export function buildProductWhere(filters: ProductFilters): Prisma.ProductWhereInput {
-  const where: Prisma.ProductWhereInput = {};
-
-  if (filters.categories.length > 0) {
-    where.category = {
-      slug: {
-        in: filters.categories,
-      },
-    };
+function matchesFilters(product: MedusaProduct, filters: ProductFilters): boolean {
+  if (
+    filters.categories.length > 0 &&
+    !product.categories.some((category) => filters.categories.includes(category.handle))
+  ) {
+    return false;
   }
 
-  if (filters.designers.length > 0) {
-    where.designers = {
-      some: {
-        designer: {
-          slug: {
-            in: filters.designers,
-          },
-        },
-      },
-    };
+  if (
+    filters.designers.length > 0 &&
+    !product.designers.some((designer) => filters.designers.includes(designer.slug))
+  ) {
+    return false;
   }
 
-  if (filters.materials.length > 0) {
-    where.materials = {
-      some: {
-        material: {
-          slug: {
-            in: filters.materials,
-          },
-        },
-      },
-    };
+  if (
+    filters.materials.length > 0 &&
+    !product.materials.some((material) => filters.materials.includes(material.slug))
+  ) {
+    return false;
   }
 
-  if (filters.movements.length > 0) {
-    where.movement = {
-      slug: {
-        in: filters.movements,
-      },
-    };
+  if (
+    filters.movements.length > 0 &&
+    !(product.movement && filters.movements.includes(product.movement.slug))
+  ) {
+    return false;
   }
 
   if (filters.minPrice !== null || filters.maxPrice !== null) {
-    where.price = {
-      ...(filters.minPrice !== null ? { gte: filters.minPrice } : {}),
-      ...(filters.maxPrice !== null ? { lte: filters.maxPrice } : {}),
-    };
+    const price = getProductPrice(product);
+    if (filters.minPrice !== null && price < filters.minPrice) return false;
+    if (filters.maxPrice !== null && price > filters.maxPrice) return false;
   }
 
-  return where;
+  return true;
+}
+
+function compareProducts(a: MedusaProduct, b: MedusaProduct, filters: ProductFilters): number {
+  if (filters.sort === "price-asc") return getProductPrice(a) - getProductPrice(b);
+  if (filters.sort === "price-desc") return getProductPrice(b) - getProductPrice(a);
+  return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+}
+
+export function filterAndSortProducts(
+  products: MedusaProduct[],
+  filters: ProductFilters,
+): MedusaProduct[] {
+  return products
+    .filter((product) => matchesFilters(product, filters))
+    .sort((a, b) => compareProducts(a, b, filters));
 }
