@@ -1,0 +1,18 @@
+export const PRODUCT_FULL_FIELDS = [
+  "id",
+  "title",
+  "handle",
+  "description",
+  "status",
+  "thumbnail",
+  "created_at",
+  "images.*",
+  "categories.*",
+  "tags.*",
+  "variants.*",
+  "variants.prices.*",
+  "designers.*",
+  "movement.*",
+  "materials.*",
+  "manufacturer.*",
+]
