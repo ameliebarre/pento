@@ -8,7 +8,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const { data: products } = await query.graph({
     entity: "product",
     fields: PRODUCT_FULL_FIELDS,
-    filters: { id: req.params.id },
+    filters: { handle: req.params.handle, status: "published" },
   })
 
   const product = products[0]
