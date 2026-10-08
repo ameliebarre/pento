@@ -15,9 +15,13 @@ type CheckoutFormProps = {
   cart: MedusaCheckoutCart;
   shippingOptions: MedusaShippingOption[];
   countries: MedusaRegionCountry[];
+  // When set, the order is placed under this account's email rather than a
+  // freely-typed one — /profile matches orders to accounts by exact email,
+  // so letting it drift would hide the order from "Mes commandes".
+  accountEmail: string | null;
 };
 
-export function CheckoutForm({ cart, shippingOptions, countries }: CheckoutFormProps) {
+export function CheckoutForm({ cart, shippingOptions, countries, accountEmail }: CheckoutFormProps) {
   const [state, formAction, pending] = useActionState(placeOrderAction, { error: null });
   const currency = cart.currency_code.toUpperCase();
   const address = cart.shipping_address;
@@ -35,9 +39,15 @@ export function CheckoutForm({ cart, shippingOptions, countries }: CheckoutFormP
             type="email"
             required
             autoComplete="email"
-            defaultValue={cart.email ?? ""}
-            className="h-10 rounded-[6px]"
+            readOnly={accountEmail !== null}
+            defaultValue={accountEmail ?? cart.email ?? ""}
+            className={accountEmail !== null ? "bg-muted h-10 rounded-[6px]" : "h-10 rounded-[6px]"}
           />
+          {accountEmail !== null && (
+            <p className="text-muted-foreground text-xs">
+              Commande associée à votre compte, pour la retrouver dans votre historique.
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-4 sm:flex-row">
           <div className="flex flex-1 flex-col gap-2">

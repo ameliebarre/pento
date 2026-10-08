@@ -4,10 +4,15 @@ import { SiteHeader } from "@/components/site-header";
 import { ProductImage } from "@/components/product-image";
 import { CheckoutForm } from "@/features/checkout/components/checkout-form";
 import { getCheckoutData } from "@/features/checkout/server/get-checkout-data";
+import { getSession } from "@/lib/get-session";
 import { formatPrice } from "@/lib/utils";
 
 export default async function CheckoutPage() {
-  const { cart, shippingOptions, countries } = await getCheckoutData();
+  const [{ cart, shippingOptions, countries }, session] = await Promise.all([
+    getCheckoutData(),
+    getSession(),
+  ]);
+  const accountEmail = session?.user?.email ?? null;
 
   if (!cart || cart.items.length === 0) {
     return (
@@ -32,7 +37,12 @@ export default async function CheckoutPage() {
       <h1 className="font-heading text-2xl uppercase">Finaliser la commande</h1>
       <div className="flex flex-col gap-10 lg:flex-row lg:items-start">
         <div className="flex-1">
-          <CheckoutForm cart={cart} shippingOptions={shippingOptions} countries={countries} />
+          <CheckoutForm
+            cart={cart}
+            shippingOptions={shippingOptions}
+            countries={countries}
+            accountEmail={accountEmail}
+          />
         </div>
 
         <div className="flex w-full flex-col gap-4 lg:w-96 lg:shrink-0">

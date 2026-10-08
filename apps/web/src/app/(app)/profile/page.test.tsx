@@ -11,6 +11,10 @@ vi.mock("@/auth", () => ({
   auth: { api: { revokeOtherSessions: vi.fn(), signOut: vi.fn() } },
 }));
 
+vi.mock("@/lib/medusa-admin", () => ({
+  medusaAdminFetch: vi.fn().mockResolvedValue({ orders: [] }),
+}));
+
 vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue(new Headers()),
 }));
@@ -28,8 +32,13 @@ import { getSession } from "@/lib/get-session";
 import ProfilePage from "@/app/(app)/profile/page";
 import { QueryProvider } from "@/components/query-provider";
 import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
+import { medusaAdminFetch } from "@/lib/medusa-admin";
 
 const mockedGetSession = vi.mocked(getSession);
+
+function setupOrders(orders: unknown[]) {
+  vi.mocked(medusaAdminFetch).mockResolvedValue({ orders });
+}
 
 function search(params: Record<string, string> = {}) {
   return Promise.resolve(params);
@@ -103,5 +112,77 @@ describe("ProfilePage", () => {
     await renderProfilePage(search());
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("shows an empty-state message when the account has no orders", async () => {
+    mockedGetSession.mockResolvedValueOnce({
+      user: { firstName: "Amelie", lastName: "Barre", email: "amelie@example.com" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+    setupOrders([]);
+
+    await renderProfilePage(search());
+
+    expect(screen.getByText("Vous n'avez pas encore de commande.")).toBeInTheDocument();
+  });
+
+  it("lists the account's orders with their total and status", async () => {
+    mockedGetSession.mockResolvedValueOnce({
+      user: { firstName: "Amelie", lastName: "Barre", email: "amelie@example.com" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+    setupOrders([
+      {
+        id: "order_1",
+        display_id: 7,
+        email: "amelie@example.com",
+        created_at: "2026-01-15T00:00:00.000Z",
+        currency_code: "eur",
+        total: 1455,
+        status: "pending",
+      },
+    ]);
+
+    await renderProfilePage(search());
+
+    expect(screen.getByText("Commande n°7")).toBeInTheDocument();
+    expect(screen.getByText(/1.455,00.€/)).toBeInTheDocument();
+    expect(screen.getByText("En attente")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Commande n°7/ })).toHaveAttribute(
+      "href",
+      "/checkout/confirmation/order_1",
+    );
+  });
+
+  it("only shows orders matching the account's email exactly", async () => {
+    mockedGetSession.mockResolvedValueOnce({
+      user: { firstName: "Amelie", lastName: "Barre", email: "test@example.com" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+    setupOrders([
+      {
+        id: "order_mine",
+        display_id: 1,
+        email: "test@example.com",
+        created_at: "2026-01-15T00:00:00.000Z",
+        currency_code: "eur",
+        total: 1455,
+        status: "pending",
+      },
+      {
+        id: "order_someone_elses",
+        display_id: 2,
+        email: "longtest@example.com",
+        created_at: "2026-01-16T00:00:00.000Z",
+        currency_code: "eur",
+        total: 2000,
+        status: "pending",
+      },
+    ]);
+
+    await renderProfilePage(search());
+
+    expect(screen.getByText("Commande n°1")).toBeInTheDocument();
+    expect(screen.queryByText("Commande n°2")).not.toBeInTheDocument();
   });
 });

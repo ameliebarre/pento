@@ -22,6 +22,7 @@ vi.mock("@/lib/medusa", () => ({
 import CheckoutPage from "@/app/(app)/checkout/page";
 import { QueryProvider } from "@/components/query-provider";
 import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
+import { getSession } from "@/lib/get-session";
 import { medusa } from "@/lib/medusa";
 
 const CART_ID = "cart_1";
@@ -125,5 +126,20 @@ describe("CheckoutPage", () => {
     await renderPage();
 
     expect(screen.getByText("Votre panier est vide.")).toBeInTheDocument();
+  });
+
+  it("locks the email field to the signed-in account's email", async () => {
+    cookieStore.set("medusa_cart_id", CART_ID);
+    setupMedusa();
+    vi.mocked(getSession).mockResolvedValueOnce({
+      user: { email: "amelie@example.com" },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
+
+    await renderPage();
+
+    const emailInput = screen.getByLabelText("Email");
+    expect(emailInput).toHaveValue("amelie@example.com");
+    expect(emailInput).toHaveAttribute("readonly");
   });
 });
