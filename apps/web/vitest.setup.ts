@@ -32,36 +32,10 @@ beforeEach(async () => {
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
 
-  // Carts are guest-token based (no user relation), so they aren't cascaded
-  // by the user deletion above — clear them explicitly, before the product
-  // catalog, since CartItem.productId is a non-cascading relation.
-  await prisma.cartItem.deleteMany();
-  await prisma.cart.deleteMany();
-
-  // Product catalog.
-  await prisma.product.deleteMany();
-  await prisma.designer.deleteMany();
-  await prisma.manufacturer.deleteMany();
-  await prisma.movement.deleteMany();
-  await prisma.material.deleteMany();
-  await prisma.image.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.country.deleteMany();
-  await prisma.tag.deleteMany();
-
-  // Payload-managed catalog (dedicated "payload" Postgres schema) — no Local
+  // Payload-managed content (dedicated "payload" Postgres schema) — no Local
   // API bulk-delete, so truncate directly via the same Postgres connection.
   await prisma.$executeRawUnsafe(`
     TRUNCATE TABLE
-      payload.products_rels,
-      payload.products,
-      payload.categories,
-      payload.designers,
-      payload.manufacturers,
-      payload.materials,
-      payload.movements,
-      payload.tags,
-      payload.countries,
       payload.media,
       payload.hero_banner,
       payload.users_sessions,

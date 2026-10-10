@@ -3,12 +3,12 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import { ProductCard, type ProductWithImage } from "@/features/products/components/product-card";
+import { ProductCard } from "@/features/products/components/product-card";
 import { QueryProvider } from "@/components/query-provider";
 import { CartDrawerProvider } from "@/features/cart/components/cart-drawer-provider";
-import { Prisma } from "@prisma/client";
+import type { MedusaProduct } from "@/features/products/medusa-types";
 
-function renderProductCard(product: ProductWithImage) {
+function renderProductCard(product: MedusaProduct) {
   return render(
     <QueryProvider>
       <CartDrawerProvider>
@@ -18,37 +18,21 @@ function renderProductCard(product: ProductWithImage) {
   );
 }
 
-function buildProduct(overrides: Partial<ProductWithImage> = {}): ProductWithImage {
+function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
   return {
-    id: "product_1",
-    sku: null,
-    name: "Barcelona Chair",
-    slug: "barcelona-chair",
+    id: "prod_1",
+    title: "Barcelona Chair",
+    handle: "barcelona-chair",
     description: "A very nice chair.",
-    price: new Prisma.Decimal(1445),
-    currency: "EUR",
-    stock: 4,
-    salesCount: 0,
-    featured: false,
-    width: null,
-    height: null,
-    depth: null,
-    weight: null,
-    categoryId: null,
-    manufacturerId: null,
-    movementId: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    images: [
-      {
-        id: "img_1",
-        url: "/images/armchairs.png",
-        alt: "Barcelona Chair",
-        productId: "product_1",
-        createdAt: new Date(),
-      },
-    ],
+    created_at: "2026-01-01T00:00:00.000Z",
+    images: [{ id: "img_1", url: "/images/armchairs.png" }],
+    categories: [],
+    tags: [],
+    variants: [{ id: "variant_1", sku: null, prices: [{ currency_code: "eur", amount: 1445 }] }],
     designers: [],
+    movement: null,
+    materials: [],
+    manufacturer: null,
     ...overrides,
   };
 }
@@ -86,24 +70,7 @@ describe("ProductCard", () => {
   it("shows a single designer's full name", () => {
     const product = buildProduct({
       designers: [
-        {
-          productId: "product_1",
-          designerId: "designer_1",
-          designer: {
-            id: "designer_1",
-            slug: "ludwig-mies-van-der-rohe",
-            firstName: "Ludwig",
-            lastName: "Mies van der Rohe",
-            birthDate: null,
-            deathDate: null,
-            nationality: null,
-            biography: "",
-            quote: null,
-            imageId: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        },
+        { id: "designer_1", slug: "ludwig-mies-van-der-rohe", first_name: "Ludwig", last_name: "Mies van der Rohe" },
       ],
     });
 
@@ -113,29 +80,10 @@ describe("ProductCard", () => {
   });
 
   it("joins multiple designers with a comma", () => {
-    const designer = (id: string, firstName: string, lastName: string) => ({
-      productId: "product_1",
-      designerId: id,
-      designer: {
-        id,
-        slug: id,
-        firstName,
-        lastName,
-        birthDate: null,
-        deathDate: null,
-        nationality: null,
-        biography: "",
-        quote: null,
-        imageId: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-
     const product = buildProduct({
       designers: [
-        designer("d1", "Achille", "Castiglioni"),
-        designer("d2", "Pier Giacomo", "Castiglioni"),
+        { id: "d1", slug: "achille-castiglioni", first_name: "Achille", last_name: "Castiglioni" },
+        { id: "d2", slug: "pier-giacomo-castiglioni", first_name: "Pier Giacomo", last_name: "Castiglioni" },
       ],
     });
 

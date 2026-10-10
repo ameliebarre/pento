@@ -7,8 +7,8 @@ import { CategoryFilters } from "@/features/products/components/category-filters
 import type { ProductFilters } from "@/features/products/types";
 
 const CATEGORIES = [
-  { id: "cat_chairs", slug: "chairs", name: "Chairs" },
-  { id: "cat_tables", slug: "tables", name: "Tables" },
+  { id: "cat_chairs", handle: "chairs", name: "Chairs" },
+  { id: "cat_tables", handle: "tables", name: "Tables" },
 ];
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {

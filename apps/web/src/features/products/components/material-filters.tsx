@@ -9,12 +9,12 @@ import {
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Material } from "@prisma/client";
+import type { MedusaMaterial } from "@/features/products/medusa-types";
 
 const VISIBLE_COUNT = 12;
 
 type MaterialFiltersProps = {
-  materials: Pick<Material, "id" | "slug" | "name">[];
+  materials: Pick<MedusaMaterial, "id" | "slug" | "name">[];
   filters: ProductFilters;
 };
 

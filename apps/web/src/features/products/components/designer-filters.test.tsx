@@ -8,15 +8,15 @@ import { DesignerFilters } from "@/features/products/components/designer-filters
 import type { ProductFilters } from "@/features/products/types";
 
 const DESIGNERS = [
-  { id: "des_1", slug: "hans-j-wegner", firstName: "Hans J.", lastName: "Wegner" },
-  { id: "des_2", slug: "arne-jacobsen", firstName: "Arne", lastName: "Jacobsen" },
+  { id: "des_1", slug: "hans-j-wegner", first_name: "Hans J.", last_name: "Wegner" },
+  { id: "des_2", slug: "arne-jacobsen", first_name: "Arne", last_name: "Jacobsen" },
 ];
 
 const MANY_DESIGNERS = Array.from({ length: 8 }, (_, index) => ({
   id: `des_${index}`,
   slug: `designer-${index}`,
-  firstName: "Designer",
-  lastName: String(index),
+  first_name: "Designer",
+  last_name: String(index),
 }));
 
 function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
