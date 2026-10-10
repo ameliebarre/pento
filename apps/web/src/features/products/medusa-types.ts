@@ -3,6 +3,9 @@ export type MedusaDesigner = {
   slug: string;
   first_name: string;
   last_name: string;
+  nationality?: string | null;
+  image_url?: string | null;
+  featured?: boolean;
 };
 
 export type MedusaMaterial = {
@@ -30,6 +33,14 @@ export type MedusaCategory = {
   name: string;
 };
 
+export type MedusaProductCategory = {
+  id: string;
+  handle: string;
+  name: string;
+  rank: number;
+  metadata: Record<string, unknown> | null;
+};
+
 export type MedusaProductImage = {
   id: string;
   url: string;
@@ -52,6 +63,7 @@ export type MedusaProduct = {
   handle: string;
   description: string | null;
   created_at: string;
+  metadata?: Record<string, unknown> | null;
   images: MedusaProductImage[];
   categories: MedusaCategory[];
   tags: { id: string; value: string }[];

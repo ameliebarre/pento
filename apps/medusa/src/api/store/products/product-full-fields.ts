@@ -6,6 +6,7 @@ export const PRODUCT_FULL_FIELDS = [
   "status",
   "thumbnail",
   "created_at",
+  "metadata",
   "images.*",
   "categories.*",
   "tags.*",

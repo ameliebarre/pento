@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Button, Container, Drawer, Heading, Input, Label, Table, Textarea, toast, usePrompt } from "@medusajs/ui"
+import { Button, Checkbox, Container, Drawer, Heading, Input, Label, Table, Textarea, toast, usePrompt } from "@medusajs/ui"
 import { sdk } from "../lib/sdk"
 
 type FieldDef = {
   name: string
   label: string
-  type?: "text" | "textarea" | "date"
+  type?: "text" | "textarea" | "date" | "checkbox"
   required?: boolean
 }
 
@@ -23,7 +23,7 @@ type CatalogCrudPageProps = {
   fields: FieldDef[]
 }
 
-type DrawerState = { mode: "create" | "edit"; id?: string; form: Record<string, string> }
+type DrawerState = { mode: "create" | "edit"; id?: string; form: Record<string, string | boolean> }
 
 export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields }: CatalogCrudPageProps) {
   const queryClient = useQueryClient()
@@ -40,7 +40,7 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: [resourcePath] })
 
   const createMutation = useMutation({
-    mutationFn: (body: Record<string, string>) =>
+    mutationFn: (body: Record<string, string | boolean>) =>
       sdk.client.fetch<Record<string, unknown>>(resourcePath, { method: "POST", body }),
     onSuccess: () => {
       invalidate()
@@ -51,7 +51,7 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...body }: Record<string, string> & { id: string }) =>
+    mutationFn: ({ id, ...body }: Record<string, string | boolean> & { id: string }) =>
       sdk.client.fetch<Record<string, unknown>>(`${resourcePath}/${id}`, { method: "POST", body }),
     onSuccess: () => {
       invalidate()
@@ -73,9 +73,9 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
   const openCreate = () => setDrawer({ mode: "create", form: {} })
 
   const openEdit = (item: Record<string, unknown>) => {
-    const form: Record<string, string> = {}
+    const form: Record<string, string | boolean> = {}
     for (const field of fields) {
-      form[field.name] = (item[field.name] as string) ?? ""
+      form[field.name] = field.type === "checkbox" ? Boolean(item[field.name]) : ((item[field.name] as string) ?? "")
     }
     setDrawer({ mode: "edit", id: item.id as string, form })
   }
@@ -130,7 +130,9 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
           {items.map((item) => (
             <Table.Row key={item.id as string} className="cursor-pointer" onClick={() => openEdit(item)}>
               {columns.map((column) => (
-                <Table.Cell key={column.key}>{(item[column.key] as string) ?? "—"}</Table.Cell>
+                <Table.Cell key={column.key}>
+                  {typeof item[column.key] === "boolean" ? (item[column.key] ? "Yes" : "No") : (item[column.key] as string) ?? "—"}
+                </Table.Cell>
               ))}
               <Table.Cell>
                 <Button
@@ -161,10 +163,18 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
                   {field.label}
                   {field.required ? " *" : ""}
                 </Label>
-                {field.type === "textarea" ? (
+                {field.type === "checkbox" ? (
+                  <Checkbox
+                    id={field.name}
+                    checked={Boolean(drawer?.form[field.name])}
+                    onCheckedChange={(checked) =>
+                      setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: checked === true } } : prev))
+                    }
+                  />
+                ) : field.type === "textarea" ? (
                   <Textarea
                     id={field.name}
-                    value={drawer?.form[field.name] ?? ""}
+                    value={(drawer?.form[field.name] as string) ?? ""}
                     onChange={(e) =>
                       setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: e.target.value } } : prev))
                     }
@@ -173,7 +183,7 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
                   <Input
                     id={field.name}
                     type={field.type === "date" ? "date" : "text"}
-                    value={drawer?.form[field.name] ?? ""}
+                    value={(drawer?.form[field.name] as string) ?? ""}
                     onChange={(e) =>
                       setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: e.target.value } } : prev))
                     }

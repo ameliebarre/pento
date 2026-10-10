@@ -11,6 +11,7 @@ const DesignersPage = () => (
       { key: "last_name", label: "Last name" },
       { key: "nationality", label: "Nationality" },
       { key: "slug", label: "Slug" },
+      { key: "featured", label: "Featured" },
     ]}
     fields={[
       { name: "slug", label: "Slug", required: true },
@@ -22,6 +23,7 @@ const DesignersPage = () => (
       { name: "biography", label: "Biography", type: "textarea", required: true },
       { name: "quote", label: "Quote", type: "textarea" },
       { name: "image_url", label: "Image URL" },
+      { name: "featured", label: "Featured", type: "checkbox" },
     ]}
   />
 )
