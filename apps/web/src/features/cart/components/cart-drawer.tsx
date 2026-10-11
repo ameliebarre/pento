@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { X as XIcon } from "lucide-react";
 
 import { removeFromCartAction } from "@/actions/cart";
 import { ProductImage } from "@/components/product-image";
+import { buttonVariants } from "@/components/ui/button";
 import { useCartDrawer } from "@/features/cart/components/cart-drawer-provider";
 import { CART_QUERY_KEY } from "@/features/cart/constants";
 import { getCart } from "@/features/cart/server/get-cart";
@@ -143,11 +145,18 @@ export function CartDrawer() {
             </div>
 
             {items.length > 0 && (
-              <div className="border-t px-6 py-5">
+              <div className="flex flex-col gap-4 border-t px-6 py-5">
                 <div className="flex items-center justify-between text-sm font-medium">
                   <span>Sous-total</span>
                   <span>{formatPrice(subtotal, currency)}</span>
                 </div>
+                <Link
+                  href="/checkout"
+                  onClick={close}
+                  className={buttonVariants({ className: "h-10 w-full rounded-[6px]" })}
+                >
+                  Commander
+                </Link>
               </div>
             )}
 

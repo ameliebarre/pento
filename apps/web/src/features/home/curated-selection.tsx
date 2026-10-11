@@ -1,19 +1,21 @@
-import Image from "next/image";
 import { ImageOff } from "lucide-react";
 
-import { getPayloadClient } from "@/lib/payload";
+import { medusa } from "@/lib/medusa";
 import { formatPrice } from "@/lib/utils";
+import { ProductImage } from "@/components/product-image";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
+import type { MedusaProduct } from "@/features/products/medusa-types";
+import { getProductPrice } from "@/features/products/utils/get-product-price";
 
 export async function CuratedSelection() {
-  const payload = await getPayloadClient();
-  const { docs: products } = await payload.find({
-    collection: "products",
-    where: { featured: { equals: true } },
-    depth: 2,
-    limit: 6,
-    sort: "id",
-  });
+  const { products: allProducts } = await medusa.client.fetch<{ products: MedusaProduct[] }>(
+    "/store/products/full",
+  );
+
+  const products = allProducts
+    .filter((product) => product.metadata?.featured === "true")
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 6);
 
   if (products.length === 0) return null;
 
@@ -42,23 +44,18 @@ export async function CuratedSelection() {
         className="mx-auto mt-10 grid max-w-7xl grid-cols-1 gap-x-4 gap-y-8 sm:mt-12 sm:grid-cols-2 sm:gap-x-3 lg:grid-cols-3"
       >
         {products.map((product) => {
-          const image = product.images?.[0] ?? null;
-          const designers = Array.isArray(product.designers)
-            ? product.designers.filter((designer) => typeof designer === "object")
-            : [];
-          const designerNames = designers
-            .map((designer) => `${designer.firstName} ${designer.lastName}`)
+          const image = product.images[0] ?? null;
+          const designerNames = product.designers
+            .map((designer) => `${designer.first_name} ${designer.last_name}`)
             .join(" & ");
-          const year = product.creationDate ? new Date(product.creationDate).getFullYear() : null;
-          const caption = [designerNames, year].filter(Boolean).join(" – ");
 
           return (
             <ScrollRevealItem key={product.id} as="li" className="flex flex-col">
               <div className="bg-card relative aspect-5/6 w-full overflow-hidden">
-                {image?.url ? (
-                  <Image
+                {image ? (
+                  <ProductImage
                     src={image.url}
-                    alt={image.alt}
+                    alt={product.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className="object-contain p-10 transition-transform duration-500 hover:scale-105 sm:p-12"
@@ -66,19 +63,19 @@ export async function CuratedSelection() {
                 ) : (
                   <div className="text-muted-foreground flex h-full w-full items-center justify-center">
                     <ImageOff aria-hidden="true" className="size-8" />
-                    <span className="sr-only">Aucune image disponible pour {product.name}</span>
+                    <span className="sr-only">Aucune image disponible pour {product.title}</span>
                   </div>
                 )}
               </div>
               <div className="flex items-start justify-between gap-4 pt-4">
                 <div className="flex min-w-0 flex-col gap-0.5">
-                  <p className="font-heading truncate text-lg">{product.name}</p>
-                  {caption ? (
-                    <p className="text-muted-foreground truncate text-xs">{caption}</p>
+                  <p className="font-heading truncate text-lg">{product.title}</p>
+                  {designerNames ? (
+                    <p className="text-muted-foreground truncate text-xs">{designerNames}</p>
                   ) : null}
                 </div>
                 <p className="shrink-0 text-sm font-medium whitespace-nowrap">
-                  {formatPrice(product.price, product.currency ?? "EUR")}
+                  {formatPrice(getProductPrice(product), "EUR")}
                 </p>
               </div>
             </ScrollRevealItem>

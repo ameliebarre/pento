@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { getCartToken } from "@/actions/cart";
+import { medusa } from "@/lib/medusa";
+import { getCartId } from "@/actions/cart";
 
 export type CartData = {
   items: {
@@ -18,41 +18,48 @@ export type CartData = {
   }[];
 };
 
-export async function getCart(): Promise<CartData> {
-  const token = await getCartToken();
+type MedusaCartLineItem = {
+  id: string;
+  quantity: number;
+  unit_price: number;
+  product_id: string;
+  product_handle: string;
+  product_title: string;
+  thumbnail: string | null;
+};
 
-  if (!token) {
+type MedusaCart = {
+  currency_code: string;
+  items: MedusaCartLineItem[];
+};
+
+export async function getCart(): Promise<CartData> {
+  const cartId = await getCartId();
+
+  if (!cartId) {
     return { items: [] };
   }
 
-  const cart = await prisma.cart.findUnique({
-    where: { token },
-    include: {
-      items: {
-        include: {
-          product: {
-            include: {
-              images: { take: 1, orderBy: { createdAt: "asc" } },
-            },
-          },
-        },
-      },
-    },
-  });
+  let cart: MedusaCart;
+  try {
+    ({ cart } = await medusa.client.fetch<{ cart: MedusaCart }>(`/store/carts/${cartId}`));
+  } catch {
+    // Stale/invalid cart id (e.g. cart deleted server-side) — treat as empty
+    // rather than surfacing an error for something the shopper can't fix.
+    return { items: [] };
+  }
 
   return {
-    items: (cart?.items ?? []).map((item) => ({
+    items: cart.items.map((item) => ({
       id: item.id,
       quantity: item.quantity,
       product: {
-        id: item.product.id,
-        slug: item.product.slug,
-        name: item.product.name,
-        price: item.product.price.toNumber(),
-        currency: item.product.currency,
-        image: item.product.images[0]
-          ? { url: item.product.images[0].url, alt: item.product.images[0].alt }
-          : null,
+        id: item.product_id,
+        slug: item.product_handle,
+        name: item.product_title,
+        price: item.unit_price,
+        currency: cart.currency_code,
+        image: item.thumbnail ? { url: item.thumbnail, alt: item.product_title } : null,
       },
     })),
   };

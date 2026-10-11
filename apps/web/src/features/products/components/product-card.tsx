@@ -4,19 +4,14 @@ import { ImageOff } from "lucide-react";
 import { ProductImage } from "@/components/product-image";
 import { AddToCartButton } from "@/features/products/components/add-to-cart-button";
 import { formatPrice } from "@/lib/utils";
-import type { Prisma } from "@prisma/client";
+import type { MedusaProduct } from "@/features/products/medusa-types";
+import { getProductPrice } from "@/features/products/utils/get-product-price";
 
-export type ProductWithImage = Prisma.ProductGetPayload<{
-  include: {
-    images: { take: 1 };
-    designers: { include: { designer: true } };
-  };
-}>;
-
-export function ProductCard({ product }: { product: ProductWithImage }) {
+export function ProductCard({ product }: { product: MedusaProduct }) {
   const image = product.images[0];
+  const variantId = product.variants[0]?.id;
   const designerNames = product.designers
-    .map(({ designer }) => `${designer.firstName} ${designer.lastName}`)
+    .map((designer) => `${designer.first_name} ${designer.last_name}`)
     .join(", ");
 
   return (
@@ -25,7 +20,7 @@ export function ProductCard({ product }: { product: ProductWithImage }) {
         {image ? (
           <ProductImage
             src={image.url}
-            alt={image.alt}
+            alt={product.title}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
             className="object-cover"
@@ -33,19 +28,21 @@ export function ProductCard({ product }: { product: ProductWithImage }) {
         ) : (
           <div className="text-muted-foreground flex h-full w-full items-center justify-center">
             <ImageOff aria-hidden="true" className="size-8" />
-            <span className="sr-only">Aucune image disponible pour {product.name}</span>
+            <span className="sr-only">Aucune image disponible pour {product.title}</span>
           </div>
         )}
-        <AddToCartButton
-          productId={product.id}
-          className="absolute right-4 bottom-4 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
-        />
+        {variantId && (
+          <AddToCartButton
+            variantId={variantId}
+            className="absolute right-4 bottom-4 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+          />
+        )}
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="min-w-0 truncate text-sm font-medium uppercase">{product.name}</span>
+          <span className="min-w-0 truncate text-sm font-medium uppercase">{product.title}</span>
           <span className="shrink-0 text-xs font-medium">
-            {formatPrice(product.price.toString(), product.currency)}
+            {formatPrice(getProductPrice(product), "EUR")}
           </span>
         </div>
         {designerNames && (
@@ -53,8 +50,8 @@ export function ProductCard({ product }: { product: ProductWithImage }) {
         )}
       </div>
       <Link
-        href={`/product/${product.slug}`}
-        aria-label={product.name}
+        href={`/product/${product.handle}`}
+        aria-label={product.title}
         className="absolute inset-0 z-0"
       />
     </div>

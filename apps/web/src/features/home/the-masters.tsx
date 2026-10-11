@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ArrowUpRight, ImageOff } from "lucide-react";
 
-import { getPayloadClient } from "@/lib/payload";
+import { medusa } from "@/lib/medusa";
 import { ProductImage } from "@/components/product-image";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
+import type { MedusaDesigner } from "@/features/products/medusa-types";
 
 // Charles and Ray Eames are stored as two distinct Designer records (each
 // individually attributed on products), but they share a single portrait
@@ -13,14 +14,14 @@ const DESIGNER_NAME_OVERRIDES: Record<string, string> = {
 };
 
 export async function TheMasters() {
-  const payload = await getPayloadClient();
-  const { docs: designers } = await payload.find({
-    collection: "designers",
-    where: { featured: { equals: true } },
-    depth: 1,
-    limit: 6,
-    sort: "lastName",
-  });
+  const { designers: allDesigners } = await medusa.client.fetch<{ designers: MedusaDesigner[] }>(
+    "/store/designers",
+  );
+
+  const designers = allDesigners
+    .filter((designer) => designer.featured)
+    .sort((a, b) => a.last_name.localeCompare(b.last_name))
+    .slice(0, 6);
 
   if (designers.length === 0) return null;
 
@@ -56,14 +57,14 @@ export async function TheMasters() {
       <ScrollRevealGroup as="ul" className="grid grid-cols-2 gap-6 sm:grid-cols-3">
         {designers.map((designer) => {
           const name =
-            DESIGNER_NAME_OVERRIDES[designer.slug] ?? `${designer.firstName} ${designer.lastName}`;
+            DESIGNER_NAME_OVERRIDES[designer.slug] ?? `${designer.first_name} ${designer.last_name}`;
 
           return (
             <ScrollRevealItem key={designer.id} as="li">
               <div className="bg-muted relative aspect-3/4 w-full overflow-hidden">
-                {designer.image ? (
+                {designer.image_url ? (
                   <ProductImage
-                    src={designer.image}
+                    src={designer.image_url}
                     alt={`Portrait de ${name}`}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 33vw, 50vw"

@@ -1,64 +1,79 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { cookies } from "next/headers";
 
-import { prisma } from "@/lib/prisma";
+import { medusa } from "@/lib/medusa";
 
-const CART_TOKEN_COOKIE = "cart_token";
-const CART_TOKEN_MAX_AGE = 60 * 60 * 24 * 365;
+const CART_ID_COOKIE = "medusa_cart_id";
+const CART_ID_MAX_AGE = 60 * 60 * 24 * 365;
+
+type MedusaCart = { id: string };
+type MedusaRegion = { id: string; currency_code: string };
 
 // Carts aren't tied to a user account — a guest can add to cart without
-// signing in. Identity is a random token stored in a long-lived cookie.
-export async function getCartToken(): Promise<string | null> {
+// signing in. Identity is the Medusa cart id itself, stored in a long-lived
+// cookie (Medusa cart ids are unguessable ULIDs, safe to use directly).
+export async function getCartId(): Promise<string | null> {
   const cookieStore = await cookies();
-  return cookieStore.get(CART_TOKEN_COOKIE)?.value ?? null;
+  return cookieStore.get(CART_ID_COOKIE)?.value ?? null;
 }
 
-async function getOrCreateCartToken(): Promise<string> {
+// Called once an order is placed — the cart is completed server-side and
+// can't be added to again, so the cookie must be dropped to start a fresh
+// one on the next add-to-cart.
+export async function clearCartId(): Promise<void> {
   const cookieStore = await cookies();
-  const existing = cookieStore.get(CART_TOKEN_COOKIE)?.value;
+  cookieStore.delete(CART_ID_COOKIE);
+}
+
+async function getEurRegionId(): Promise<string> {
+  const { regions } = await medusa.client.fetch<{ regions: MedusaRegion[] }>("/store/regions");
+  const region = regions.find((r) => r.currency_code === "eur") ?? regions[0];
+
+  if (!region) {
+    throw new Error("No region configured in Medusa.");
+  }
+
+  return region.id;
+}
+
+async function getOrCreateCartId(): Promise<string> {
+  const cookieStore = await cookies();
+  const existing = cookieStore.get(CART_ID_COOKIE)?.value;
 
   if (existing) return existing;
 
-  const token = randomUUID();
+  const regionId = await getEurRegionId();
+  const { cart } = await medusa.client.fetch<{ cart: MedusaCart }>("/store/carts", {
+    method: "POST",
+    body: { region_id: regionId },
+  });
 
-  cookieStore.set(CART_TOKEN_COOKIE, token, {
+  cookieStore.set(CART_ID_COOKIE, cart.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: CART_TOKEN_MAX_AGE,
+    maxAge: CART_ID_MAX_AGE,
   });
-  return token;
+
+  return cart.id;
 }
 
-async function getOrCreateCart(token: string) {
-  return prisma.cart.upsert({
-    where: { token },
-    update: {},
-    create: { token },
-  });
-}
+export async function addToCartAction(variantId: string) {
+  const cartId = await getOrCreateCartId();
 
-export async function addToCartAction(productId: string) {
-  const token = await getOrCreateCartToken();
-  const cart = await getOrCreateCart(token);
-
-  await prisma.cartItem.upsert({
-    where: { cartId_productId: { cartId: cart.id, productId } },
-    update: { quantity: { increment: 1 } },
-    create: { cartId: cart.id, productId, quantity: 1 },
+  await medusa.client.fetch(`/store/carts/${cartId}/line-items`, {
+    method: "POST",
+    body: { variant_id: variantId, quantity: 1 },
   });
 }
 
-export async function removeFromCartAction(cartItemId: string) {
-  const token = await getCartToken();
-  if (!token) return;
+export async function removeFromCartAction(lineItemId: string) {
+  const cartId = await getCartId();
+  if (!cartId) return;
 
-  // Scope the delete to the current cart so one shopper can't remove
-  // another shopper's cart item by guessing an id.
-  await prisma.cartItem.deleteMany({
-    where: { id: cartItemId, cart: { token } },
+  await medusa.client.fetch(`/store/carts/${cartId}/line-items/${lineItemId}`, {
+    method: "DELETE",
   });
 }

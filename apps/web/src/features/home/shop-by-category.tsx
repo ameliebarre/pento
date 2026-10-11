@@ -2,9 +2,10 @@ import Link from "next/link";
 import { ArrowUpRight, ImageOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { getPayloadClient } from "@/lib/payload";
+import { medusa } from "@/lib/medusa";
 import { ProductImage } from "@/components/product-image";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
+import type { MedusaProductCategory } from "@/features/products/medusa-types";
 
 // Curated 3x3 mosaic: each column is 3 grid rows tall. "large" tiles span
 // 2 rows (a 1x2 cell, ~3:4 once cropped) and sit above a "small" 1-row tile
@@ -20,12 +21,12 @@ const CATEGORY_LAYOUT: Record<string, { colStart: string; rowStart: string; rowS
 };
 
 export async function ShopByCategory() {
-  const payload = await getPayloadClient();
-  const { docs: categories } = await payload.find({
-    collection: "categories",
-    sort: "position",
-    depth: 1,
+  const { product_categories: categories } = await medusa.client.fetch<{
+    product_categories: MedusaProductCategory[];
+  }>("/store/product-categories", {
+    query: { fields: "id,name,handle,rank,metadata", limit: 100 },
   });
+  categories.sort((a, b) => a.rank - b.rank);
 
   return (
     <section aria-labelledby="shop-by-category-heading" className="flex flex-col gap-8 py-16">
@@ -60,30 +61,28 @@ export async function ShopByCategory() {
         as="ul"
       >
         {categories
-          .filter(
-            (category): category is typeof category & { slug: string } =>
-              !!category.slug && category.slug in CATEGORY_LAYOUT,
-          )
+          .filter((category) => category.handle in CATEGORY_LAYOUT)
           .map((category) => {
-            const layout = CATEGORY_LAYOUT[category.slug];
+            const layout = CATEGORY_LAYOUT[category.handle];
+            const imageUrl = category.metadata?.image_url;
 
             return (
               <ScrollRevealItem
-                key={category.slug}
+                key={category.handle}
                 as="li"
                 className={cn(layout.colStart, layout.rowStart, layout.rowSpan)}
               >
-                <Link href={`/products/${category.slug}`} className="group block h-full">
+                <Link href={`/products/${category.handle}`} className="group block h-full">
                   <div
                     className={cn(
                       "bg-muted relative w-full overflow-hidden",
                       "aspect-4/3 lg:aspect-auto lg:h-full",
                     )}
                   >
-                    {category.image ? (
+                    {typeof imageUrl === "string" && imageUrl ? (
                       <ProductImage
-                        src={category.image}
-                        alt={category.title ?? ""}
+                        src={imageUrl}
+                        alt={category.name}
                         fill
                         sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -92,13 +91,13 @@ export async function ShopByCategory() {
                       <div className="text-muted-foreground flex h-full w-full items-center justify-center">
                         <ImageOff aria-hidden="true" className="size-8" />
                         <span className="sr-only">
-                          Aucune image disponible pour {category.title}
+                          Aucune image disponible pour {category.name}
                         </span>
                       </div>
                     )}
                     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/5 to-transparent" />
                     <span className="font-heading absolute inset-x-4 bottom-4 text-xl text-white sm:text-2xl">
-                      {category.title}
+                      {category.name}
                     </span>
                     <span
                       aria-hidden="true"

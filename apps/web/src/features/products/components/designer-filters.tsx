@@ -6,25 +6,23 @@ import { Search } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
 } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
-import type { Designer } from "@prisma/client";
+import type { MedusaDesigner } from "@/features/products/medusa-types";
 
 const VISIBLE_COUNT = 6;
 
 type DesignerFiltersProps = {
-  designers: Pick<Designer, "id" | "slug" | "firstName" | "lastName">[];
+  designers: Pick<MedusaDesigner, "id" | "slug" | "first_name" | "last_name">[];
   filters: ProductFilters;
 };
 
-function navigateTo(href: string) {
-  window.location.href = href;
-}
-
 export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
+  const { navigate, isPending } = useFiltersNavigation();
   const [search, setSearch] = useState("");
   // Selecting a designer navigates (full page reload), which remounts this
   // component and would otherwise always collapse back to the first
@@ -41,7 +39,7 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
     if (!query) return designers;
 
     return designers.filter((designer) =>
-      `${designer.firstName} ${designer.lastName}`.toLowerCase().includes(query),
+      `${designer.first_name} ${designer.last_name}`.toLowerCase().includes(query),
     );
   }, [designers, search]);
 
@@ -53,12 +51,12 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
   return (
     <div role="group" aria-label="Designers" className="flex flex-col gap-3">
       {filters.designers.length > 0 && (
-        <a
+        <FiltersNavigationLink
           href={buildClearFilterHref(filters, "designers")}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           Réinitialiser
-        </a>
+        </FiltersNavigationLink>
       )}
 
       <div className="relative">
@@ -88,12 +86,13 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
                 <Checkbox
                   id={inputId}
                   checked={isSelected}
+                  disabled={isPending}
                   onCheckedChange={() =>
-                    navigateTo(buildToggleFilterHref(filters, "designers", designer.slug))
+                    navigate(buildToggleFilterHref(filters, "designers", designer.slug))
                   }
                 />
                 <Label htmlFor={inputId} className="text-sm font-normal">
-                  {designer.firstName} {designer.lastName}
+                  {designer.first_name} {designer.last_name}
                 </Label>
               </li>
             );

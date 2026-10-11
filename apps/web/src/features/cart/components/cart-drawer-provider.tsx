@@ -10,8 +10,8 @@ type CartDrawerContextValue = {
   isOpen: boolean;
   open: () => void;
   close: () => void;
-  addToCart: (productId: string) => void;
-  pendingProductId: string | null;
+  addToCart: (variantId: string) => void;
+  pendingVariantId: string | null;
   addError: string | null;
 };
 
@@ -39,11 +39,11 @@ export function CartDrawerProvider({ children }: { children: React.ReactNode }) 
       isOpen,
       open: () => setIsOpen(true),
       close: () => setIsOpen(false),
-      addToCart: (productId: string) => {
+      addToCart: (variantId: string) => {
         setIsOpen(true);
-        mutation.mutate(productId);
+        mutation.mutate(variantId);
       },
-      pendingProductId: mutation.isPending ? mutation.variables : null,
+      pendingVariantId: mutation.isPending ? mutation.variables : null,
       addError: mutation.isError ? mutation.error.message : null,
     }),
     [isOpen, mutation],

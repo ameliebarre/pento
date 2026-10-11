@@ -1,10 +1,16 @@
 // @vitest-environment jsdom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+const pushMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: pushMock }),
+}));
+
 import { MaterialFilters } from "@/features/products/components/material-filters";
+import { FiltersNavigationProvider } from "@/features/products/components/filters-navigation";
 import type { ProductFilters } from "@/features/products/types";
 
 const MATERIALS = [
@@ -22,35 +28,29 @@ function filters(overrides: Partial<ProductFilters> = {}): ProductFilters {
   return { categories: [], designers: [], materials: [], movements: [], minPrice: null, maxPrice: null, sort: null, ...overrides };
 }
 
-let location: { href: string };
-
-beforeEach(() => {
-  // Checkbox selection navigates via `location.href =`, not next/link,
-  // so it needs a writable stub here instead of a real (jsdom-unsupported) navigation.
-  location = { href: "" };
-  vi.stubGlobal("location", location);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
+function renderWithProvider(ui: React.ReactElement) {
+  pushMock.mockClear();
+  return render(<FiltersNavigationProvider>{ui}</FiltersNavigationProvider>);
+}
 
 describe("MaterialFilters", () => {
   it("renders nothing when there are no materials", () => {
-    const { container } = render(<MaterialFilters materials={[]} filters={filters()} />);
+    const { container } = renderWithProvider(<MaterialFilters materials={[]} filters={filters()} />);
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it("shows each material's name as a checkbox", () => {
-    render(<MaterialFilters materials={MATERIALS} filters={filters()} />);
+    renderWithProvider(<MaterialFilters materials={MATERIALS} filters={filters()} />);
 
     expect(screen.getByRole("checkbox", { name: "Cuir" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Chêne massif" })).toBeInTheDocument();
   });
 
   it("checks the box for an already-selected material", () => {
-    render(<MaterialFilters materials={MATERIALS} filters={filters({ materials: ["cuir"] })} />);
+    renderWithProvider(
+      <MaterialFilters materials={MATERIALS} filters={filters({ materials: ["cuir"] })} />,
+    );
 
     expect(screen.getByRole("checkbox", { name: "Cuir" })).toBeChecked();
     expect(screen.getByRole("checkbox", { name: "Chêne massif" })).not.toBeChecked();
@@ -58,24 +58,30 @@ describe("MaterialFilters", () => {
 
   it("navigates to add a material, keeping an already-selected category", async () => {
     const user = userEvent.setup();
-    render(<MaterialFilters materials={MATERIALS} filters={filters({ categories: ["chairs"] })} />);
+    renderWithProvider(
+      <MaterialFilters materials={MATERIALS} filters={filters({ categories: ["chairs"] })} />,
+    );
 
     await user.click(screen.getByRole("checkbox", { name: "Cuir" }));
 
-    expect(location.href).toBe("/products?category=chairs&material=cuir&showFilters=1");
+    expect(pushMock).toHaveBeenCalledWith("/products?category=chairs&material=cuir&showFilters=1", {
+      scroll: false,
+    });
   });
 
   it("navigates to remove an already-selected material", async () => {
     const user = userEvent.setup();
-    render(<MaterialFilters materials={MATERIALS} filters={filters({ materials: ["cuir"] })} />);
+    renderWithProvider(
+      <MaterialFilters materials={MATERIALS} filters={filters({ materials: ["cuir"] })} />,
+    );
 
     await user.click(screen.getByRole("checkbox", { name: "Cuir" }));
 
-    expect(location.href).toBe("/products?showFilters=1");
+    expect(pushMock).toHaveBeenCalledWith("/products?showFilters=1", { scroll: false });
   });
 
   it("only shows the first 12 materials with a 'Voir plus' button beyond that", () => {
-    render(<MaterialFilters materials={MANY_MATERIALS} filters={filters()} />);
+    renderWithProvider(<MaterialFilters materials={MANY_MATERIALS} filters={filters()} />);
 
     expect(screen.getAllByRole("checkbox")).toHaveLength(12);
     expect(screen.getByRole("button", { name: "Voir plus" })).toBeInTheDocument();
@@ -83,7 +89,7 @@ describe("MaterialFilters", () => {
 
   it("reveals the rest of the list when clicking 'Voir plus'", async () => {
     const user = userEvent.setup();
-    render(<MaterialFilters materials={MANY_MATERIALS} filters={filters()} />);
+    renderWithProvider(<MaterialFilters materials={MANY_MATERIALS} filters={filters()} />);
 
     await user.click(screen.getByRole("button", { name: "Voir plus" }));
 
@@ -94,7 +100,7 @@ describe("MaterialFilters", () => {
   it("starts expanded when a selected material is past the visible count", () => {
     const selectedSlug = MANY_MATERIALS[13].slug;
 
-    render(
+    renderWithProvider(
       <MaterialFilters materials={MANY_MATERIALS} filters={filters({ materials: [selectedSlug] })} />,
     );
 
@@ -103,23 +109,23 @@ describe("MaterialFilters", () => {
     expect(screen.getByRole("button", { name: "Voir moins" })).toBeInTheDocument();
   });
 
-  it("does not show a reset link when no material is selected", () => {
-    render(<MaterialFilters materials={MATERIALS} filters={filters()} />);
+  it("does not show a reset button when no material is selected", () => {
+    renderWithProvider(<MaterialFilters materials={MATERIALS} filters={filters()} />);
 
-    expect(screen.queryByRole("link", { name: "Réinitialiser" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Réinitialiser" })).not.toBeInTheDocument();
   });
 
-  it("resets only the material filter, keeping the category filter untouched", () => {
-    render(
+  it("resets only the material filter, keeping the category filter untouched", async () => {
+    renderWithProvider(
       <MaterialFilters
         materials={MATERIALS}
         filters={filters({ categories: ["chairs"], materials: ["cuir"] })}
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Réinitialiser" })).toHaveAttribute(
-      "href",
-      "/products?category=chairs&showFilters=1",
-    );
+    await userEvent.click(screen.getByRole("button", { name: "Réinitialiser" }));
+    expect(pushMock).toHaveBeenCalledWith("/products?category=chairs&showFilters=1", {
+      scroll: false,
+    });
   });
 });

@@ -6,20 +6,20 @@ import { useCartDrawer } from "@/features/cart/components/cart-drawer-provider";
 import { cn } from "@/lib/utils";
 
 type AddToCartButtonProps = {
-  productId: string;
+  variantId: string;
   className?: string;
 };
 
-export function AddToCartButton({ productId, className }: AddToCartButtonProps) {
-  const { addToCart, pendingProductId } = useCartDrawer();
-  const isAdding = pendingProductId === productId;
+export function AddToCartButton({ variantId, className }: AddToCartButtonProps) {
+  const { addToCart, pendingVariantId } = useCartDrawer();
+  const isAdding = pendingVariantId === variantId;
 
   return (
     <button
       type="button"
       aria-label="Ajouter au panier"
       disabled={isAdding}
-      onClick={() => addToCart(productId)}
+      onClick={() => addToCart(variantId)}
       className={cn(
         "cursor-pointer rounded-[8px] bg-white p-2 text-black transition-[opacity,background-color] duration-300 hover:bg-neutral-200 disabled:pointer-events-none",
         className,

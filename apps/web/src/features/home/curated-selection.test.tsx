@@ -1,79 +1,75 @@
 // @vitest-environment jsdom
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+vi.mock("@/lib/medusa", () => ({
+  medusa: { client: { fetch: vi.fn() } },
+}));
+
 import { CuratedSelection } from "@/features/home/curated-selection";
-import { getPayloadClient } from "@/lib/payload";
-import type { Product } from "../../../payload-types";
+import { medusa } from "@/lib/medusa";
+import type { MedusaProduct } from "@/features/products/medusa-types";
 
-function richText(text: string): Product["description"] {
-  return {
-    root: {
-      type: "root" as const,
-      children: [
-        {
-          type: "paragraph" as const,
-          children: [{ type: "text" as const, text, version: 1 }],
-          direction: "ltr" as const,
-          format: "" as const,
-          indent: 0,
-          version: 1,
-        },
-      ],
-      direction: "ltr" as const,
-      format: "" as const,
-      indent: 0,
-      version: 1,
-    },
-  };
-}
-
-async function createDesigner(slug: string, firstName: string, lastName: string) {
-  const payload = await getPayloadClient();
-  return payload.create({
-    collection: "designers",
-    data: { slug, firstName, lastName, biography: "Biographie." },
-  });
-}
-
-async function createProduct(data: {
-  name: string;
-  slug: string;
+function buildProduct(data: {
+  title: string;
+  handle: string;
   price: number;
   featured: boolean;
   image?: { url: string; alt: string };
-  designers?: number[];
-  creationDate?: string;
-}) {
-  const payload = await getPayloadClient();
-  return payload.create({
-    collection: "products",
-    data: {
-      name: data.name,
-      slug: data.slug,
-      description: richText("Une pièce de collection."),
-      price: data.price,
-      stock: 1,
-      salesCount: 0,
-      featured: data.featured,
-      images: data.image ? [data.image] : undefined,
-      designers: data.designers,
-      creationDate: data.creationDate,
-    },
+  designers?: { first_name: string; last_name: string }[];
+  createdAt?: string;
+}): MedusaProduct {
+  return {
+    id: data.handle,
+    title: data.title,
+    handle: data.handle,
+    description: "Une pièce de collection.",
+    created_at: data.createdAt ?? "2026-01-01T00:00:00.000Z",
+    metadata: { featured: data.featured ? "true" : "false" },
+    images: data.image ? [{ id: `${data.handle}-image`, url: data.image.url }] : [],
+    categories: [],
+    tags: [],
+    variants: [
+      {
+        id: `${data.handle}-variant`,
+        sku: null,
+        prices: [{ currency_code: "eur", amount: data.price }],
+      },
+    ],
+    designers: (data.designers ?? []).map((designer, index) => ({
+      id: `${data.handle}-designer-${index}`,
+      slug: `${data.handle}-designer-${index}`,
+      first_name: designer.first_name,
+      last_name: designer.last_name,
+    })),
+    movement: null,
+    materials: [],
+    manufacturer: null,
+  };
+}
+
+function setupMedusa(products: MedusaProduct[]) {
+  vi.mocked(medusa.client.fetch).mockImplementation(async (path: unknown) => {
+    if (path === "/store/products/full") return { products };
+    throw new Error(`Unexpected path: ${String(path)}`);
   });
 }
 
 describe("CuratedSelection", () => {
   it("renders nothing when there are no featured products", async () => {
+    setupMedusa([]);
+
     const result = await CuratedSelection();
 
     expect(result).toBeNull();
   });
 
   it("only renders featured products", async () => {
-    await createProduct({ name: "Womb Chair", slug: "womb-chair", price: 4435, featured: true });
-    await createProduct({ name: "Chaise SERIE 7", slug: "serie-7", price: 558, featured: false });
+    setupMedusa([
+      buildProduct({ title: "Womb Chair", handle: "womb-chair", price: 4435, featured: true }),
+      buildProduct({ title: "Chaise SERIE 7", handle: "serie-7", price: 558, featured: false }),
+    ]);
 
     render(await CuratedSelection());
 
@@ -81,42 +77,46 @@ describe("CuratedSelection", () => {
     expect(screen.queryByText("Chaise SERIE 7")).not.toBeInTheDocument();
   });
 
-  it("shows the price, designer(s) and year", async () => {
-    const designer = await createDesigner("eero-saarinen", "Eero", "Saarinen");
-    await createProduct({
-      name: "Womb Chair",
-      slug: "womb-chair",
-      price: 4435,
-      featured: true,
-      designers: [designer.id],
-      creationDate: new Date(1946, 0, 1).toISOString(),
-    });
+  it("shows the price and designer(s)", async () => {
+    setupMedusa([
+      buildProduct({
+        title: "Womb Chair",
+        handle: "womb-chair",
+        price: 4435,
+        featured: true,
+        designers: [{ first_name: "Eero", last_name: "Saarinen" }],
+      }),
+    ]);
 
     render(await CuratedSelection());
 
     expect(screen.getByText("4 435,00 €")).toBeInTheDocument();
-    expect(screen.getByText("Eero Saarinen – 1946")).toBeInTheDocument();
+    expect(screen.getByText("Eero Saarinen")).toBeInTheDocument();
   });
 
   it("shows the cover image when one is set", async () => {
-    await createProduct({
-      name: "Womb Chair",
-      slug: "womb-chair",
-      price: 4435,
-      featured: true,
-      image: {
-        url: "https://res.cloudinary.com/demo/image/upload/womb-chair.jpg",
-        alt: "Le fauteuil Womb Chair",
-      },
-    });
+    setupMedusa([
+      buildProduct({
+        title: "Womb Chair",
+        handle: "womb-chair",
+        price: 4435,
+        featured: true,
+        image: {
+          url: "https://res.cloudinary.com/demo/image/upload/womb-chair.jpg",
+          alt: "Le fauteuil Womb Chair",
+        },
+      }),
+    ]);
 
     render(await CuratedSelection());
 
-    expect(screen.getByRole("img", { name: "Le fauteuil Womb Chair" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Womb Chair" })).toBeInTheDocument();
   });
 
   it("shows a fallback when a featured product has no cover image", async () => {
-    await createProduct({ name: "Womb Chair", slug: "womb-chair", price: 4435, featured: true });
+    setupMedusa([
+      buildProduct({ title: "Womb Chair", handle: "womb-chair", price: 4435, featured: true }),
+    ]);
 
     render(await CuratedSelection());
 
