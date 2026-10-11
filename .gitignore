@@ -10,3 +10,5 @@ node_modules
 # claude code local state
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+.vercel
+.env*
