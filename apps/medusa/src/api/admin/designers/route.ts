@@ -10,6 +10,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 }
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const { result: designer } = await createDesignerWorkflow(req.scope).run({ input: req.body })
+  const { result: designer } = await createDesignerWorkflow(req.scope).run({
+    input: req.body as Record<string, unknown>,
+  })
   res.status(201).json({ designer })
 }

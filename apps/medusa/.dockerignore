@@ -1,0 +1,10 @@
+node_modules
+.medusa
+.turbo
+.env
+.env.*
+!.env.template
+.git
+.DS_Store
+coverage
+*.log

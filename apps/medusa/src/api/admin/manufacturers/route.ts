@@ -10,6 +10,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 }
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const { result: manufacturer } = await createManufacturerWorkflow(req.scope).run({ input: req.body })
+  const { result: manufacturer } = await createManufacturerWorkflow(req.scope).run({
+    input: req.body as Record<string, unknown>,
+  })
   res.status(201).json({ manufacturer })
 }

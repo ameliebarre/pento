@@ -10,6 +10,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
 }
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const { result: material } = await createMaterialWorkflow(req.scope).run({ input: req.body })
+  const { result: material } = await createMaterialWorkflow(req.scope).run({
+    input: req.body as Record<string, unknown>,
+  })
   res.status(201).json({ material })
 }
