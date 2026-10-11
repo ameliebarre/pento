@@ -1,5 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { FiltersNavigationLink } from "@/features/products/components/filters-navigation";
 import { buildClearFilterHref, buildToggleFilterHref } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
 import type { MedusaCategory } from "@/features/products/medusa-types";
@@ -18,21 +19,20 @@ export function CategoryFilters({ categories, filters }: CategoryFiltersProps) {
   return (
     <div role="group" aria-label="Catégories" className="flex flex-col gap-3">
       {resetHref && (
-        <a
+        <FiltersNavigationLink
           href={resetHref}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           Réinitialiser
-        </a>
+        </FiltersNavigationLink>
       )}
       <div className="grid grid-cols-2 gap-2">
         {categories.map((category) => {
           const isSelected = filters.categories.includes(category.handle);
           return (
-            <a
+            <FiltersNavigationLink
               key={category.id}
               href={buildToggleFilterHref(filters, "categories", category.handle)}
-              role="button"
               aria-pressed={isSelected}
               className={cn(
                 buttonVariants({ variant: isSelected ? "default" : "outline", size: "sm" }),
@@ -40,7 +40,7 @@ export function CategoryFilters({ categories, filters }: CategoryFiltersProps) {
               )}
             >
               {category.name}
-            </a>
+            </FiltersNavigationLink>
           );
         })}
       </div>

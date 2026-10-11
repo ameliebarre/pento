@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { Slider } from "@/components/ui/slider";
+import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildPriceFilterHref,
@@ -18,19 +19,12 @@ type PriceFiltersProps = {
   filters: ProductFilters;
 };
 
-function navigateTo(href: string) {
-  // Real navigation on purpose, not next/link or router.push: with several
-  // filters toggling the same repeated search params, Next's client-side
-  // router can get stuck showing stale content after a soft navigation (see
-  // category-filters for the full writeup) — a full navigation sidesteps it.
-  window.location.href = href;
-}
-
 function getAriaLabel(index: number) {
   return index === 0 ? "Prix minimum" : "Prix maximum";
 }
 
 export function PriceFilters({ bounds, filters }: PriceFiltersProps) {
+  const { navigate, isPending } = useFiltersNavigation();
   const [range, setRange] = useState<readonly [number, number]>([
     filters.minPrice ?? bounds.min,
     filters.maxPrice ?? bounds.max,
@@ -43,12 +37,12 @@ export function PriceFilters({ bounds, filters }: PriceFiltersProps) {
   return (
     <div role="group" aria-label="Prix" className="flex flex-col gap-3">
       {isActive && (
-        <a
+        <FiltersNavigationLink
           href={buildClearFilterHref(filters, "price")}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           Réinitialiser
-        </a>
+        </FiltersNavigationLink>
       )}
 
       <div className="flex items-center justify-between text-sm font-medium">
@@ -61,12 +55,13 @@ export function PriceFilters({ bounds, filters }: PriceFiltersProps) {
         max={bounds.max}
         step={STEP}
         value={range}
+        disabled={isPending}
         format={{ style: "currency", currency: "EUR" }}
         getAriaLabel={getAriaLabel}
         onValueChange={(value) => setRange(value as [number, number])}
         onValueCommitted={(value) => {
           const [min, max] = value as [number, number];
-          navigateTo(buildPriceFilterHref(filters, min, max));
+          navigate(buildPriceFilterHref(filters, min, max));
         }}
         className="mt-1"
       />

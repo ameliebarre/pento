@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
@@ -20,11 +21,8 @@ type DesignerFiltersProps = {
   filters: ProductFilters;
 };
 
-function navigateTo(href: string) {
-  window.location.href = href;
-}
-
 export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
+  const { navigate, isPending } = useFiltersNavigation();
   const [search, setSearch] = useState("");
   // Selecting a designer navigates (full page reload), which remounts this
   // component and would otherwise always collapse back to the first
@@ -53,12 +51,12 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
   return (
     <div role="group" aria-label="Designers" className="flex flex-col gap-3">
       {filters.designers.length > 0 && (
-        <a
+        <FiltersNavigationLink
           href={buildClearFilterHref(filters, "designers")}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           Réinitialiser
-        </a>
+        </FiltersNavigationLink>
       )}
 
       <div className="relative">
@@ -88,8 +86,9 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
                 <Checkbox
                   id={inputId}
                   checked={isSelected}
+                  disabled={isPending}
                   onCheckedChange={() =>
-                    navigateTo(buildToggleFilterHref(filters, "designers", designer.slug))
+                    navigate(buildToggleFilterHref(filters, "designers", designer.slug))
                   }
                 />
                 <Label htmlFor={inputId} className="text-sm font-normal">

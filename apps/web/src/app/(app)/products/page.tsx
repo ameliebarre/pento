@@ -6,6 +6,11 @@ import { ProductCard } from "@/features/products/components/product-card";
 import { CategoryFilters } from "@/features/products/components/category-filters";
 import { DesignerFilters } from "@/features/products/components/designer-filters";
 import { FilterAccordionSection } from "@/features/products/components/filter-accordion-section";
+import {
+  FiltersNavigationLink,
+  FiltersNavigationProvider,
+  FiltersPendingGroup,
+} from "@/features/products/components/filters-navigation";
 import { FiltersPanel } from "@/features/products/components/filters-panel";
 import { MaterialFilters } from "@/features/products/components/material-filters";
 import { MovementFilters } from "@/features/products/components/movement-filters";
@@ -67,57 +72,59 @@ export default async function ShopAllPage({ searchParams }: ShopAllPageProps) {
   const shouldAnimateFiltersPanel = filtersVisible && !refererShowedFilters;
 
   return (
-    <div className="flex flex-col gap-6 pt-32 pb-16">
-      {await SiteHeader()}
-      <a
-        href={buildFiltersVisibilityHref(rawParams, !filtersVisible)}
-        className="flex items-center gap-1 self-start text-sm font-medium underline-offset-2 hover:underline"
-      >
-        {filtersVisible ? "Masquer les filtres" : "Afficher les filtres"}
-        <SlidersHorizontal aria-hidden="true" className="size-4" />
-      </a>
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
-        {filtersVisible && (
-          <FiltersPanel shouldAnimate={shouldAnimateFiltersPanel}>
-            <h2 className="font-heading mb-4 text-xl uppercase">Filtres</h2>
-            <PersistentFilterAccordion defaultValue={openSections}>
-              <FilterAccordionSection value="sort" title="Trier par prix">
-                <PriceSortFilter filters={filters} />
-              </FilterAccordionSection>
-              <FilterAccordionSection value="categories" title="Catégories">
-                <CategoryFilters categories={categories} filters={filters} />
-              </FilterAccordionSection>
-              <FilterAccordionSection value="designers" title="Designers">
-                <DesignerFilters designers={designers} filters={filters} />
-              </FilterAccordionSection>
-              <FilterAccordionSection value="materials" title="Matériaux">
-                <MaterialFilters materials={materials} filters={filters} />
-              </FilterAccordionSection>
-              <FilterAccordionSection value="movements" title="Mouvements">
-                <MovementFilters movements={movements} filters={filters} />
-              </FilterAccordionSection>
-              <FilterAccordionSection value="price" title="Prix">
-                <PriceFilters bounds={priceBounds} filters={filters} />
-              </FilterAccordionSection>
-            </PersistentFilterAccordion>
-          </FiltersPanel>
-        )}
-        <div className="flex flex-1 flex-col gap-6">
-          {products.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              Aucun produit disponible pour le moment.
-            </p>
-          ) : (
-            <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {products.map((product) => (
-                <li key={product.id}>
-                  <ProductCard product={product} />
-                </li>
-              ))}
-            </ul>
+    <FiltersNavigationProvider>
+      <div className="flex flex-col gap-6 pt-32 pb-16">
+        {await SiteHeader()}
+        <FiltersNavigationLink
+          href={buildFiltersVisibilityHref(rawParams, !filtersVisible)}
+          className="flex items-center gap-1 self-start text-sm font-medium underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {filtersVisible ? "Masquer les filtres" : "Afficher les filtres"}
+          <SlidersHorizontal aria-hidden="true" className="size-4" />
+        </FiltersNavigationLink>
+        <FiltersPendingGroup>
+          {filtersVisible && (
+            <FiltersPanel shouldAnimate={shouldAnimateFiltersPanel}>
+              <h2 className="font-heading mb-4 text-xl uppercase">Filtres</h2>
+              <PersistentFilterAccordion defaultValue={openSections}>
+                <FilterAccordionSection value="sort" title="Trier par prix">
+                  <PriceSortFilter filters={filters} />
+                </FilterAccordionSection>
+                <FilterAccordionSection value="categories" title="Catégories">
+                  <CategoryFilters categories={categories} filters={filters} />
+                </FilterAccordionSection>
+                <FilterAccordionSection value="designers" title="Designers">
+                  <DesignerFilters designers={designers} filters={filters} />
+                </FilterAccordionSection>
+                <FilterAccordionSection value="materials" title="Matériaux">
+                  <MaterialFilters materials={materials} filters={filters} />
+                </FilterAccordionSection>
+                <FilterAccordionSection value="movements" title="Mouvements">
+                  <MovementFilters movements={movements} filters={filters} />
+                </FilterAccordionSection>
+                <FilterAccordionSection value="price" title="Prix">
+                  <PriceFilters bounds={priceBounds} filters={filters} />
+                </FilterAccordionSection>
+              </PersistentFilterAccordion>
+            </FiltersPanel>
           )}
-        </div>
+          <div className="flex flex-1 flex-col gap-6">
+            {products.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                Aucun produit disponible pour le moment.
+              </p>
+            ) : (
+              <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {products.map((product) => (
+                  <li key={product.id}>
+                    <ProductCard product={product} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </FiltersPendingGroup>
       </div>
-    </div>
+    </FiltersNavigationProvider>
   );
 }

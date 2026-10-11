@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 vi.mock("@/lib/get-session", () => ({
@@ -11,6 +11,11 @@ vi.mock("@/lib/get-session", () => ({
 vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue(new Headers()),
   cookies: vi.fn().mockResolvedValue({ get: () => undefined }),
+}));
+
+const pushMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: pushMock }),
 }));
 
 vi.mock("@/lib/medusa", () => ({
@@ -264,6 +269,7 @@ describe("ShopAllPage", () => {
   });
 
   it("keeps the designer filter when resetting the category filter", async () => {
+    pushMock.mockClear();
     const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
     const wegner = buildDesigner("des_wegner", "hans-j-wegner", "Hans J.", "Wegner");
     setupMedusa({
@@ -275,14 +281,11 @@ describe("ShopAllPage", () => {
       await renderPage("chairs", "hans-j-wegner", undefined, undefined, { showFilters: "1" }),
     );
 
-    const resetLinks = screen.getAllByRole("link", { name: "Réinitialiser" });
-    const categoryReset = resetLinks.find((link) =>
-      link.getAttribute("href")?.startsWith("/products?designer"),
-    );
-    expect(categoryReset).toHaveAttribute(
-      "href",
-      "/products?designer=hans-j-wegner&showFilters=1",
-    );
+    const categoryGroup = screen.getByRole("group", { name: "Catégories" });
+    await userEvent.click(within(categoryGroup).getByRole("button", { name: "Réinitialiser" }));
+    expect(pushMock).toHaveBeenCalledWith("/products?designer=hans-j-wegner&showFilters=1", {
+      scroll: false,
+    });
   });
 
   it("shows the price slider bounded by the catalog's actual min and max price", async () => {
@@ -476,36 +479,33 @@ describe("ShopAllPage", () => {
   });
 
   it("hides the filters column and shows an 'Afficher les filtres' link by default", async () => {
+    pushMock.mockClear();
     setupMedusa();
     render(await renderPage());
 
     expect(screen.queryByLabelText("Filtres")).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Afficher les filtres" })).toHaveAttribute(
-      "href",
-      "/products?showFilters=1",
-    );
+    await userEvent.click(screen.getByRole("button", { name: "Afficher les filtres" }));
+    expect(pushMock).toHaveBeenCalledWith("/products?showFilters=1", { scroll: false });
   });
 
   it("shows the filters column and a 'Masquer les filtres' link when showFilters=1", async () => {
+    pushMock.mockClear();
     setupMedusa();
     render(await renderPage(undefined, undefined, undefined, undefined, { showFilters: "1" }));
 
     expect(screen.getByLabelText("Filtres")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Masquer les filtres" })).toHaveAttribute(
-      "href",
-      "/products",
-    );
+    await userEvent.click(screen.getByRole("button", { name: "Masquer les filtres" }));
+    expect(pushMock).toHaveBeenCalledWith("/products", { scroll: false });
   });
 
   it("keeps other filters when toggling the filters column visibility", async () => {
+    pushMock.mockClear();
     const chairs = buildCategory("cat_chairs", "chairs", "Chairs");
     setupMedusa({ products: [buildProduct("p1", "Chaise", { category: chairs })] });
 
     render(await renderPage("chairs"));
 
-    expect(screen.getByRole("link", { name: "Afficher les filtres" })).toHaveAttribute(
-      "href",
-      "/products?category=chairs&showFilters=1",
-    );
+    await userEvent.click(screen.getByRole("button", { name: "Afficher les filtres" }));
+    expect(pushMock).toHaveBeenCalledWith("/products?category=chairs&showFilters=1", { scroll: false });
   });
 });

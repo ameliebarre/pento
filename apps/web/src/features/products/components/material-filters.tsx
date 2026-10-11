@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
@@ -18,14 +19,9 @@ type MaterialFiltersProps = {
   filters: ProductFilters;
 };
 
-function navigateTo(href: string) {
-  // Real navigation on purpose, not next/link or router.push — see
-  // designer-filters.tsx for the full writeup on why.
-  window.location.href = href;
-}
-
 export function MaterialFilters({ materials, filters }: MaterialFiltersProps) {
-  // Selecting a material navigates (full page reload), which remounts this
+  const { navigate, isPending } = useFiltersNavigation();
+  // Selecting a material navigates, which remounts this
   // component and would otherwise always collapse back to the first
   // VISIBLE_COUNT — hiding a just-selected material past that cutoff. Default
   // to expanded whenever the current selection has one of those.
@@ -43,12 +39,12 @@ export function MaterialFilters({ materials, filters }: MaterialFiltersProps) {
   return (
     <div role="group" aria-label="Matériaux" className="flex flex-col gap-3">
       {filters.materials.length > 0 && (
-        <a
+        <FiltersNavigationLink
           href={buildClearFilterHref(filters, "materials")}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           Réinitialiser
-        </a>
+        </FiltersNavigationLink>
       )}
 
       <ul className="flex flex-col gap-2.5">
@@ -60,8 +56,9 @@ export function MaterialFilters({ materials, filters }: MaterialFiltersProps) {
               <Checkbox
                 id={inputId}
                 checked={isSelected}
+                disabled={isPending}
                 onCheckedChange={() =>
-                  navigateTo(buildToggleFilterHref(filters, "materials", material.slug))
+                  navigate(buildToggleFilterHref(filters, "materials", material.slug))
                 }
               />
               <Label htmlFor={inputId} className="text-sm font-normal">

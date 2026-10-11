@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
@@ -18,14 +19,9 @@ type MovementFiltersProps = {
   filters: ProductFilters;
 };
 
-function navigateTo(href: string) {
-  // Real navigation on purpose, not next/link or router.push — see
-  // designer-filters.tsx for the full writeup on why.
-  window.location.href = href;
-}
-
 export function MovementFilters({ movements, filters }: MovementFiltersProps) {
-  // Selecting a movement navigates (full page reload), which remounts this
+  const { navigate, isPending } = useFiltersNavigation();
+  // Selecting a movement navigates, which remounts this
   // component and would otherwise always collapse back to the first
   // VISIBLE_COUNT — hiding a just-selected movement past that cutoff. Default
   // to expanded whenever the current selection has one of those.
@@ -43,12 +39,12 @@ export function MovementFilters({ movements, filters }: MovementFiltersProps) {
   return (
     <div role="group" aria-label="Mouvements" className="flex flex-col gap-3">
       {filters.movements.length > 0 && (
-        <a
+        <FiltersNavigationLink
           href={buildClearFilterHref(filters, "movements")}
-          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground self-start text-xs underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           Réinitialiser
-        </a>
+        </FiltersNavigationLink>
       )}
 
       <ul className="flex flex-col gap-2.5">
@@ -60,8 +56,9 @@ export function MovementFilters({ movements, filters }: MovementFiltersProps) {
               <Checkbox
                 id={inputId}
                 checked={isSelected}
+                disabled={isPending}
                 onCheckedChange={() =>
-                  navigateTo(buildToggleFilterHref(filters, "movements", movement.slug))
+                  navigate(buildToggleFilterHref(filters, "movements", movement.slug))
                 }
               />
               <Label htmlFor={inputId} className="text-sm font-normal">
