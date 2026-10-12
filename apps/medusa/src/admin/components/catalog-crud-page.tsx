@@ -156,7 +156,7 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
           <Drawer.Header>
             <Drawer.Title>{drawer?.mode === "edit" ? `Edit ${title}` : `New ${title}`}</Drawer.Title>
           </Drawer.Header>
-          <Drawer.Body className="flex flex-col gap-y-4">
+          <Drawer.Body className="flex flex-col gap-y-4 overflow-y-auto">
             {fields.map((field) => (
               <div key={field.name} className="flex flex-col gap-y-1">
                 <Label htmlFor={field.name}>

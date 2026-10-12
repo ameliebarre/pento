@@ -61,14 +61,17 @@ export async function TheMasters() {
 
           return (
             <ScrollRevealItem key={designer.id} as="li">
-              <div className="bg-muted relative aspect-3/4 w-full overflow-hidden">
+              <Link
+                href={`/designer/${designer.slug}`}
+                className="group block bg-muted relative aspect-3/4 w-full overflow-hidden"
+              >
                 {designer.image_url ? (
                   <ProductImage
                     src={designer.image_url}
                     alt={`Portrait de ${name}`}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 33vw, 50vw"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="text-muted-foreground flex h-full w-full items-center justify-center">
@@ -83,7 +86,7 @@ export async function TheMasters() {
                     <p className="text-sm text-white/70">{designer.nationality}</p>
                   ) : null}
                 </div>
-              </div>
+              </Link>
             </ScrollRevealItem>
           );
         })}

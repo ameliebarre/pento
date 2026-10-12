@@ -105,6 +105,19 @@ describe("TheMasters", () => {
     expect(screen.queryByText("Achille Castiglioni")).not.toBeInTheDocument();
   });
 
+  it("links each designer's portrait to their profile page", async () => {
+    setupMedusa([
+      buildDesigner({ slug: "gio-ponti", firstName: "Gio", lastName: "Ponti" }),
+    ]);
+
+    render(await TheMasters());
+
+    expect(screen.getByRole("link", { name: /gio ponti/i })).toHaveAttribute(
+      "href",
+      "/designer/gio-ponti",
+    );
+  });
+
   it("renders nothing when there are no featured designers", async () => {
     setupMedusa([
       buildDesigner({

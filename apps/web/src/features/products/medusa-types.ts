@@ -6,6 +6,10 @@ export type MedusaDesigner = {
   nationality?: string | null;
   image_url?: string | null;
   featured?: boolean;
+  birth_date?: string | null;
+  death_date?: string | null;
+  biography?: string | null;
+  quote?: string | null;
 };
 
 export type MedusaMaterial = {
