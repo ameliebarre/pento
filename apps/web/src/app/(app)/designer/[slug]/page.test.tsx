@@ -58,7 +58,7 @@ describe("DesignerPage", () => {
     expect(screen.getByRole("heading", { name: "Gio Ponti" })).toBeInTheDocument();
   });
 
-  it("shows the portrait, nationality, and lifespan when set", async () => {
+  it("shows the portrait and lifespan when set", async () => {
     setupMedusa([
       buildDesigner({
         nationality: "Italienne",
@@ -70,8 +70,8 @@ describe("DesignerPage", () => {
 
     render(await renderPage("gio-ponti"));
 
-    expect(screen.getByRole("img", { name: "Portrait de Gio Ponti" })).toBeInTheDocument();
-    expect(screen.getByText("Italienne — 1891–1979")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Portrait of Gio Ponti" })).toBeInTheDocument();
+    expect(screen.getByText("1891–1979")).toBeInTheDocument();
   });
 
   it("shows a fallback when the designer has no portrait", async () => {
@@ -80,21 +80,95 @@ describe("DesignerPage", () => {
     render(await renderPage("gio-ponti"));
 
     expect(screen.queryByRole("img", { name: /portrait/i })).not.toBeInTheDocument();
-    expect(screen.getByText("Aucun portrait disponible pour Gio Ponti")).toBeInTheDocument();
+    expect(screen.getByText("No portrait available for Gio Ponti")).toBeInTheDocument();
   });
 
-  it("shows the quote and biography when set", async () => {
+  it("shows the biography when set", async () => {
     setupMedusa([
       buildDesigner({
-        quote: "Le design est une synthèse.",
         biography: "Une biographie détaillée.",
       }),
     ]);
 
     render(await renderPage("gio-ponti"));
 
-    expect(screen.getByText("“Le design est une synthèse.”")).toBeInTheDocument();
     expect(screen.getByText("Une biographie détaillée.")).toBeInTheDocument();
+  });
+
+  it("puts the last name on its own line in the heading", async () => {
+    setupMedusa([buildDesigner()]);
+
+    render(await renderPage("gio-ponti"));
+
+    const heading = screen.getByRole("heading", { name: "Gio Ponti" });
+    expect(heading.querySelector("br")).toBeInTheDocument();
+  });
+
+  it("shows profession and design movement as tags", async () => {
+    setupMedusa([
+      buildDesigner({
+        profession: "Architect & Designer",
+        design_movement: "Danish Modern",
+      }),
+    ]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.getByText("Architect & Designer")).toBeInTheDocument();
+    expect(screen.getAllByText("Danish Modern").length).toBeGreaterThan(0);
+  });
+
+  it("shows a banner with nationality, birth details, death details, and the design movement", async () => {
+    setupMedusa([
+      buildDesigner({
+        nationality: "Danish",
+        birth_date: "1902-02-11T00:00:00.000Z",
+        birth_place: "Copenhagen",
+        death_date: "1971-03-24T00:00:00.000Z",
+        death_place: "Copenhagen",
+        design_movement: "Danish Modern",
+      }),
+    ]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.getByText("Nationality")).toBeInTheDocument();
+    expect(screen.getByText("Danish")).toBeInTheDocument();
+    expect(screen.getByText("Born")).toBeInTheDocument();
+    expect(screen.getByText("1902 - Copenhagen")).toBeInTheDocument();
+    expect(screen.getByText("Dead")).toBeInTheDocument();
+    expect(screen.getByText("1971 - Copenhagen")).toBeInTheDocument();
+    expect(screen.getByText("Design language")).toBeInTheDocument();
+    expect(screen.getAllByText("Danish Modern").length).toBeGreaterThan(0);
+  });
+
+  it("omits the Nationality banner item when the designer has no nationality", async () => {
+    setupMedusa([buildDesigner()]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.queryByText("Nationality")).not.toBeInTheDocument();
+  });
+
+  it("omits the Dead banner item when the designer has no death date", async () => {
+    setupMedusa([
+      buildDesigner({
+        birth_date: "1902-02-11T00:00:00.000Z",
+      }),
+    ]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.queryByText("Dead")).not.toBeInTheDocument();
+  });
+
+  it("omits the Born banner item when the designer has no birth date", async () => {
+    setupMedusa([buildDesigner()]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.queryByText("Born")).not.toBeInTheDocument();
+    expect(screen.queryByText("Dead")).not.toBeInTheDocument();
   });
 
   it("calls notFound() when the designer slug does not exist", async () => {

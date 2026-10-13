@@ -4,10 +4,14 @@ export type MedusaDesigner = {
   first_name: string;
   last_name: string;
   nationality?: string | null;
+  profession?: string | null;
+  design_movement?: string | null;
   image_url?: string | null;
   featured?: boolean;
   birth_date?: string | null;
+  birth_place?: string | null;
   death_date?: string | null;
+  death_place?: string | null;
   biography?: string | null;
   quote?: string | null;
 };

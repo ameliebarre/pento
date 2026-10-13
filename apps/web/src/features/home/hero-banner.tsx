@@ -11,7 +11,7 @@ export async function HeroBanner() {
   return (
     <section className="relative right-1/2 left-1/2 mx-[-50vw] h-screen w-screen">
       <Image
-        src={banner.backgroundImageUrl || "/images/banner-image.png"}
+        src={banner.backgroundImageUrl || "/images/hero-banner.jpg"}
         alt="Intérieur design mettant en scène du mobilier haut de gamme"
         fill
         priority
@@ -22,7 +22,7 @@ export async function HeroBanner() {
         <h1 className="font-heading max-w-xl text-4xl md:text-[70px]">
           {banner.heading} <span className="text-[#E4CDA0] italic">{banner.headingAccent}</span>
         </h1>
-        <p className="max-w-155 text-[#E1DED6] text-[18px]">{banner.description}</p>
+        <p className="max-w-155 text-[18px] text-[#E1DED6]">{banner.description}</p>
         <Link
           href={banner.ctaHref}
           className="group inline-flex w-fit items-center gap-2 bg-[#c5964b] px-6 py-3 text-sm font-normal text-black uppercase"
