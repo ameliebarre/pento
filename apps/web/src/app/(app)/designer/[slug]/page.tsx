@@ -4,6 +4,7 @@ import { ImageOff } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { ProductImage } from "@/components/product-image";
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
+import { TimelineReveal } from "@/features/designers/components/timeline-reveal";
 
 type DesignerPageProps = {
   params: Promise<{ slug: string }>;
@@ -50,6 +51,9 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
     designer.design_movement && { label: "Design language", value: designer.design_movement },
     designer.nationality && { label: "Nationality", value: designer.nationality },
   ].filter((item): item is { label: string; value: string } => Boolean(item));
+
+  const timeline = designer.timeline;
+  const timelineEntries = timeline?.entries ?? [];
 
   return (
     <div className="flex flex-col gap-16 pt-32 pb-16">
@@ -113,6 +117,19 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {timeline && timelineEntries.length > 0 && (
+        <div className="flex flex-col gap-10">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+              {timeline.eyebrow}
+            </p>
+            <h2 className="font-heading text-3xl sm:text-4xl">{timeline.heading}</h2>
+          </div>
+
+          <TimelineReveal entries={timelineEntries} name={`${firstName} ${lastName}`} />
         </div>
       )}
     </div>

@@ -1,3 +1,17 @@
+export type DesignerTimelineEntry = {
+  year: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  image_url?: string | null;
+};
+
+export type DesignerTimeline = {
+  eyebrow: string;
+  heading: string;
+  entries: DesignerTimelineEntry[];
+};
+
 export type MedusaDesigner = {
   id: string;
   slug: string;
@@ -14,6 +28,7 @@ export type MedusaDesigner = {
   death_place?: string | null;
   biography?: string | null;
   quote?: string | null;
+  timeline?: DesignerTimeline | null;
 };
 
 export type MedusaMaterial = {

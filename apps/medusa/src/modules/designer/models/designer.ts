@@ -16,6 +16,7 @@ const Designer = model.define("designer", {
   quote: model.text().nullable(),
   image_url: model.text().nullable(),
   featured: model.boolean().default(false),
+  timeline: model.json().nullable(),
 })
 
 export default Designer

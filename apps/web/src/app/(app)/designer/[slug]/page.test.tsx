@@ -95,6 +95,47 @@ describe("DesignerPage", () => {
     expect(screen.getByText("Une biographie détaillée.")).toBeInTheDocument();
   });
 
+  it("renders the timeline section inline below the banner when the designer has one", async () => {
+    setupMedusa([
+      buildDesigner({
+        timeline: {
+          eyebrow: "A life in design",
+          heading: "Key moments",
+          entries: [
+            {
+              year: "1902",
+              eyebrow: "Copenhagen, Denmark",
+              title: "A Danish Beginning",
+              description: "Arne Emil Jacobsen is born in Copenhagen.",
+            },
+            {
+              year: "1924–1927",
+              eyebrow: "From painting to architecture",
+              title: "Education & Influence",
+              description: "Jacobsen studies architecture at the Royal Danish Academy of Fine Arts.",
+              image_url: "https://example.com/education.jpg",
+            },
+          ],
+        },
+      }),
+    ]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.getByRole("heading", { name: "Key moments" })).toBeInTheDocument();
+    expect(screen.getByText("A Danish Beginning")).toBeInTheDocument();
+    expect(screen.getByText("Education & Influence")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /Education & Influence/i })).toBeInTheDocument();
+  });
+
+  it("omits the timeline section when the designer has no timeline", async () => {
+    setupMedusa([buildDesigner()]);
+
+    render(await renderPage("gio-ponti"));
+
+    expect(screen.queryByRole("heading", { name: "Key moments" })).not.toBeInTheDocument();
+  });
+
   it("puts the last name on its own line in the heading", async () => {
     setupMedusa([buildDesigner()]);
 
