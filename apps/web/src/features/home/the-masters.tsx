@@ -6,13 +6,6 @@ import { ProductImage } from "@/components/product-image";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
 import type { MedusaDesigner } from "@/features/products/medusa-types";
 
-// Charles and Ray Eames are stored as two distinct Designer records (each
-// individually attributed on products), but they share a single portrait
-// and are presented here as one card under their joint name.
-const DESIGNER_NAME_OVERRIDES: Record<string, string> = {
-  "charles-eames": "Charles & Ray Eames",
-};
-
 export async function TheMasters() {
   const { designers: allDesigners } = await medusa.client.fetch<{ designers: MedusaDesigner[] }>(
     "/store/designers",
@@ -56,19 +49,21 @@ export async function TheMasters() {
 
       <ScrollRevealGroup as="ul" className="grid grid-cols-2 gap-6 sm:grid-cols-3">
         {designers.map((designer) => {
-          const name =
-            DESIGNER_NAME_OVERRIDES[designer.slug] ?? `${designer.first_name} ${designer.last_name}`;
+          const name = `${designer.first_name} ${designer.last_name}`;
 
           return (
             <ScrollRevealItem key={designer.id} as="li">
-              <div className="bg-muted relative aspect-3/4 w-full overflow-hidden">
+              <Link
+                href={`/designer/${designer.slug}`}
+                className="group bg-muted relative block aspect-3/4 w-full overflow-hidden"
+              >
                 {designer.image_url ? (
                   <ProductImage
                     src={designer.image_url}
                     alt={`Portrait de ${name}`}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 33vw, 50vw"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
                   <div className="text-muted-foreground flex h-full w-full items-center justify-center">
@@ -83,7 +78,7 @@ export async function TheMasters() {
                     <p className="text-sm text-white/70">{designer.nationality}</p>
                   ) : null}
                 </div>
-              </div>
+              </Link>
             </ScrollRevealItem>
           );
         })}

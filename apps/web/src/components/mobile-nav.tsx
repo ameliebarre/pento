@@ -96,7 +96,7 @@ export function MobileNav() {
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="bg-background fixed inset-y-0 left-0 z-50 flex w-md flex-col gap-1 overflow-y-auto p-6 shadow-xl [overscroll-behavior:contain] md:hidden"
+              className="bg-background fixed inset-y-0 left-0 z-50 flex w-md flex-col gap-1 overflow-y-auto overscroll-contain p-6 shadow-xl md:hidden"
             >
               <button
                 ref={closeButtonRef}
