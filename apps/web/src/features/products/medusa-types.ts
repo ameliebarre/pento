@@ -1,20 +1,25 @@
+export type MedusaMovement = {
+  id: string;
+  slug: string;
+  name: string;
+};
+
 export type MedusaDesigner = {
   id: string;
   slug: string;
   first_name: string;
   last_name: string;
   nationality?: string | null;
+  movements?: MedusaMovement[];
+  birth_date?: string | null;
+  death_date?: string | null;
+  biography?: string | null;
+  quote?: string | null;
   image_url?: string | null;
   featured?: boolean;
 };
 
 export type MedusaMaterial = {
-  id: string;
-  slug: string;
-  name: string;
-};
-
-export type MedusaMovement = {
   id: string;
   slug: string;
   name: string;
