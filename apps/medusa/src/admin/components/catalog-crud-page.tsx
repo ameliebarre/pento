@@ -6,7 +6,7 @@ import { sdk } from "../lib/sdk"
 type FieldDef = {
   name: string
   label: string
-  type?: "text" | "textarea" | "date" | "checkbox" | "json"
+  type?: "text" | "textarea" | "date" | "checkbox"
   required?: boolean
 }
 
@@ -75,13 +75,7 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
   const openEdit = (item: Record<string, unknown>) => {
     const form: Record<string, string | boolean> = {}
     for (const field of fields) {
-      if (field.type === "checkbox") {
-        form[field.name] = Boolean(item[field.name])
-      } else if (field.type === "json") {
-        form[field.name] = item[field.name] ? JSON.stringify(item[field.name], null, 2) : ""
-      } else {
-        form[field.name] = (item[field.name] as string) ?? ""
-      }
+      form[field.name] = field.type === "checkbox" ? Boolean(item[field.name]) : ((item[field.name] as string) ?? "")
     }
     setDrawer({ mode: "edit", id: item.id as string, form })
   }
@@ -99,33 +93,12 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
     }
   }
 
-  const buildPayload = (): Record<string, string | boolean> | null => {
-    if (!drawer) return null
-    const payload: Record<string, unknown> = { ...drawer.form }
-    for (const field of fields) {
-      if (field.type !== "json") continue
-      const raw = (drawer.form[field.name] as string) ?? ""
-      if (!raw.trim()) {
-        payload[field.name] = null
-        continue
-      }
-      try {
-        payload[field.name] = JSON.parse(raw)
-      } catch {
-        toast.error(`${field.label} is not valid JSON`)
-        return null
-      }
-    }
-    return payload as Record<string, string | boolean>
-  }
-
   const handleSave = () => {
-    const payload = buildPayload()
-    if (!payload) return
-    if (drawer?.mode === "create") {
-      createMutation.mutate(payload)
-    } else if (drawer?.mode === "edit" && drawer.id) {
-      updateMutation.mutate({ id: drawer.id, ...payload })
+    if (!drawer) return
+    if (drawer.mode === "create") {
+      createMutation.mutate(drawer.form)
+    } else if (drawer.id) {
+      updateMutation.mutate({ id: drawer.id, ...drawer.form })
     }
   }
 
@@ -183,7 +156,7 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
           <Drawer.Header>
             <Drawer.Title>{drawer?.mode === "edit" ? `Edit ${title}` : `New ${title}`}</Drawer.Title>
           </Drawer.Header>
-          <Drawer.Body className="flex flex-col gap-y-4 overflow-y-auto">
+          <Drawer.Body className="flex flex-col gap-y-4">
             {fields.map((field) => (
               <div key={field.name} className="flex flex-col gap-y-1">
                 <Label htmlFor={field.name}>
@@ -201,16 +174,6 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
                 ) : field.type === "textarea" ? (
                   <Textarea
                     id={field.name}
-                    value={(drawer?.form[field.name] as string) ?? ""}
-                    onChange={(e) =>
-                      setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: e.target.value } } : prev))
-                    }
-                  />
-                ) : field.type === "json" ? (
-                  <Textarea
-                    id={field.name}
-                    rows={16}
-                    className="font-mono text-xs"
                     value={(drawer?.form[field.name] as string) ?? ""}
                     onChange={(e) =>
                       setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: e.target.value } } : prev))

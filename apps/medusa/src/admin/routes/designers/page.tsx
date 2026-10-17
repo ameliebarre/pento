@@ -18,17 +18,12 @@ const DesignersPage = () => (
       { name: "first_name", label: "First name", required: true },
       { name: "last_name", label: "Last name", required: true },
       { name: "nationality", label: "Nationality" },
-      { name: "profession", label: "Profession" },
-      { name: "design_movement", label: "Design movement" },
       { name: "birth_date", label: "Birth date", type: "date" },
-      { name: "birth_place", label: "Birth place" },
       { name: "death_date", label: "Death date", type: "date" },
-      { name: "death_place", label: "Death place" },
       { name: "biography", label: "Biography", type: "textarea", required: true },
       { name: "quote", label: "Quote", type: "textarea" },
       { name: "image_url", label: "Image URL" },
       { name: "featured", label: "Featured", type: "checkbox" },
-      { name: "timeline", label: "Timeline (JSON)", type: "json" },
     ]}
   />
 )
