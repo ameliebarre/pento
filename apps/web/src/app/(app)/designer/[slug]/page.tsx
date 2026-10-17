@@ -8,6 +8,14 @@ type DesignerPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+const SECTION_LINKS = [
+  { href: "#life-career", label: "Life & Career" },
+  { href: "#quote", label: "Quote" },
+  { href: "#collection", label: "The Collection" },
+  { href: "#in-focus", label: "In Focus" },
+  { href: "#similar-designers", label: "Similar Designers" },
+];
+
 function formatLifespan(
   birthDate: string | null | undefined,
   deathDate: string | null | undefined,
@@ -85,6 +93,21 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
           </div>
         )}
       </div>
+
+      <nav
+        aria-label="Sections de la page designer"
+        className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#EFE9DF] py-8"
+      >
+        <ul className="flex flex-wrap items-center justify-center gap-18.75">
+          {SECTION_LINKS.map((link) => (
+            <li key={link.href}>
+              <a href={link.href} className="text-sm text-[#26221B] uppercase">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }
