@@ -24,6 +24,7 @@ const DesignersPage = () => (
       { name: "quote", label: "Quote", type: "textarea" },
       { name: "image_url", label: "Image URL" },
       { name: "featured", label: "Featured", type: "checkbox" },
+      { name: "timeline", label: "Timeline (JSON)", type: "json" },
     ]}
   />
 )

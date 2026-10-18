@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { SiteHeader } from "@/components/site-header";
 import { ProductImage } from "@/components/product-image";
+import { CareerTimeline } from "@/features/designers/components/career-timeline";
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
 
 type DesignerPageProps = {
@@ -73,12 +74,12 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
             </div>
           )}
 
-          <button
-            type="button"
+          <a
+            href="#life-career"
             className="inline-flex w-fit items-center bg-[#282828] px-6 py-3 text-sm text-white uppercase"
           >
             Explore his story
-          </button>
+          </a>
         </div>
 
         {designer.image_url && (
@@ -108,6 +109,21 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
           ))}
         </ul>
       </nav>
+
+      {designer.timeline && designer.timeline.entries.length > 0 && (
+        <div id="life-career" className="flex flex-col gap-10 scroll-mt-32">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+              Life & Career
+            </p>
+            <h2 className="font-heading text-3xl text-[#26221B] sm:text-4xl">
+              The story of <span className="italic">{`${designer.first_name} ${designer.last_name}`}</span>
+            </h2>
+          </div>
+
+          <CareerTimeline entries={designer.timeline.entries} />
+        </div>
+      )}
     </div>
   );
 }

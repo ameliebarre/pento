@@ -4,6 +4,13 @@ export type MedusaMovement = {
   name: string;
 };
 
+export type DesignerTimelineEntry = {
+  date: string;
+  title: string;
+  subtitle: string;
+  description: string;
+};
+
 export type MedusaDesigner = {
   id: string;
   slug: string;
@@ -17,6 +24,7 @@ export type MedusaDesigner = {
   quote?: string | null;
   image_url?: string | null;
   featured?: boolean;
+  timeline?: { entries: DesignerTimelineEntry[] } | null;
 };
 
 export type MedusaMaterial = {
