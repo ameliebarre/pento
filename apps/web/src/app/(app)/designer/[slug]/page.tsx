@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Quote } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { ProductImage } from "@/components/product-image";
@@ -122,6 +123,20 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
           </div>
 
           <CareerTimeline entries={designer.timeline.entries} />
+        </div>
+      )}
+
+      {designer.quote && (
+        <div
+          id="quote"
+          className="relative right-1/2 left-1/2 mx-[-50vw] w-screen scroll-mt-32 bg-[#282828] py-15.5"
+        >
+          <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 text-center">
+            <Quote aria-hidden="true" className="size-10 fill-white text-white" />
+            <p className="font-heading text-[40px] leading-tight text-white italic">
+              {designer.quote}
+            </p>
+          </div>
         </div>
       )}
     </div>

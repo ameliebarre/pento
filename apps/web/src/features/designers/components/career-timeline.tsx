@@ -58,7 +58,7 @@ export function CareerTimeline({ entries }: CareerTimelineProps) {
         onPointerMove={handlePointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        className={`relative right-1/2 left-1/2 mx-[-50vw] w-screen overflow-x-auto overflow-y-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+        className={`relative right-1/2 left-1/2 mx-[-50vw] w-screen scrollbar-none overflow-x-auto overflow-y-hidden [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
           isDragging ? "cursor-grabbing select-none" : "cursor-grab"
         }`}
       >
