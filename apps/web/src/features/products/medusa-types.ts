@@ -32,6 +32,7 @@ export type MedusaDesigner = {
   featured?: boolean;
   timeline?: { entries: DesignerTimelineEntry[] } | null;
   in_focus?: DesignerInFocus | null;
+  similar_designers?: { slugs: string[] } | null;
 };
 
 export type MedusaMaterial = {

@@ -6,8 +6,11 @@ import { ProductImage } from "@/components/product-image";
 import { CareerTimeline } from "@/features/designers/components/career-timeline";
 import { DesignerCollection } from "@/features/designers/components/designer-collection";
 import { DesignerInFocus } from "@/features/designers/components/designer-in-focus";
+import { SimilarDesigners } from "@/features/designers/components/similar-designers";
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
+import { getDesignersBySlugs } from "@/features/designers/server/get-designers-by-slugs";
 import { getProductsByDesigner } from "@/features/designers/server/get-products-by-designer";
+import { formatLifespan } from "@/features/designers/utils/format-lifespan";
 
 type DesignerPageProps = {
   params: Promise<{ slug: string }>;
@@ -21,16 +24,6 @@ const SECTION_LINKS = [
   { href: "#similar-designers", label: "Similar Designers" },
 ];
 
-function formatLifespan(
-  birthDate: string | null | undefined,
-  deathDate: string | null | undefined,
-) {
-  if (!birthDate) return null;
-  const born = new Date(birthDate).getFullYear();
-  const died = deathDate ? new Date(deathDate).getFullYear() : null;
-  return died ? `${born} — ${died}` : `Born ${born}`;
-}
-
 export default async function DesignerPage({ params }: DesignerPageProps) {
   const { slug } = await params;
   const designer = await getDesignerBySlug(slug);
@@ -42,6 +35,7 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
   const lifespan = formatLifespan(designer.birth_date, designer.death_date);
   const biographyParagraphs = (designer.biography ?? "").split("\n\n").filter(Boolean);
   const collectionProducts = await getProductsByDesigner(designer.slug, 4);
+  const similarDesigners = await getDesignersBySlugs(designer.similar_designers?.slugs ?? []);
 
   return (
     <div className="flex flex-col gap-16 pt-32 pb-16">
@@ -151,6 +145,8 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
       />
 
       {designer.in_focus && <DesignerInFocus inFocus={designer.in_focus} />}
+
+      <SimilarDesigners designers={similarDesigners} />
     </div>
   );
 }

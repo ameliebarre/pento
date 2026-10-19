@@ -26,6 +26,7 @@ const DesignersPage = () => (
       { name: "featured", label: "Featured", type: "checkbox" },
       { name: "timeline", label: "Timeline (JSON)", type: "json" },
       { name: "in_focus", label: "In Focus (JSON)", type: "json" },
+      { name: "similar_designers", label: "Similar Designers (JSON)", type: "json" },
     ]}
   />
 )

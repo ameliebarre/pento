@@ -14,6 +14,7 @@ const Designer = model.define("designer", {
   featured: model.boolean().default(false),
   timeline: model.json().nullable(),
   in_focus: model.json().nullable(),
+  similar_designers: model.json().nullable(),
 })
 
 export default Designer
