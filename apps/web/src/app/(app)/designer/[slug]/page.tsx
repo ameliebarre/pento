@@ -10,6 +10,8 @@ import { SimilarDesigners } from "@/features/designers/components/similar-design
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
 import { getDesignersBySlugs } from "@/features/designers/server/get-designers-by-slugs";
 import { getProductsByDesigner } from "@/features/designers/server/get-products-by-designer";
+import { getProductsByMovements } from "@/features/designers/server/get-products-by-movements";
+import { SimilarProducts } from "@/features/designers/components/similar-products";
 import { formatLifespan } from "@/features/designers/utils/format-lifespan";
 
 type DesignerPageProps = {
@@ -22,6 +24,7 @@ const SECTION_LINKS = [
   { href: "#collection", label: "The Collection" },
   { href: "#in-focus", label: "In Focus" },
   { href: "#similar-designers", label: "Similar Designers" },
+  { href: "#similar-products", label: "Similar Products" },
 ];
 
 export default async function DesignerPage({ params }: DesignerPageProps) {
@@ -36,6 +39,8 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
   const biographyParagraphs = (designer.biography ?? "").split("\n\n").filter(Boolean);
   const collectionProducts = await getProductsByDesigner(designer.slug, 4);
   const similarDesigners = await getDesignersBySlugs(designer.similar_designers?.slugs ?? []);
+  const movementSlugs = (designer.movements ?? []).map((movement) => movement.slug);
+  const similarProducts = await getProductsByMovements(movementSlugs, designer.slug, 4);
 
   return (
     <div className="flex flex-col gap-16 pt-32 pb-16">
@@ -147,6 +152,8 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
       {designer.in_focus && <DesignerInFocus inFocus={designer.in_focus} />}
 
       <SimilarDesigners designers={similarDesigners} />
+
+      <SimilarProducts products={similarProducts} />
     </div>
   );
 }
