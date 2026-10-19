@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ProductImage } from "@/components/product-image";
 import { CareerTimeline } from "@/features/designers/components/career-timeline";
 import { DesignerCollection } from "@/features/designers/components/designer-collection";
+import { DesignerInFocus } from "@/features/designers/components/designer-in-focus";
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
 import { getProductsByDesigner } from "@/features/designers/server/get-products-by-designer";
 
@@ -148,6 +149,8 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
         designerName={`${designer.first_name} ${designer.last_name}`}
         products={collectionProducts}
       />
+
+      {designer.in_focus && <DesignerInFocus inFocus={designer.in_focus} />}
     </div>
   );
 }

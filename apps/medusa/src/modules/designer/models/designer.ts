@@ -13,6 +13,7 @@ const Designer = model.define("designer", {
   image_url: model.text().nullable(),
   featured: model.boolean().default(false),
   timeline: model.json().nullable(),
+  in_focus: model.json().nullable(),
 })
 
 export default Designer

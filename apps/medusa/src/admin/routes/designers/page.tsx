@@ -25,6 +25,7 @@ const DesignersPage = () => (
       { name: "image_url", label: "Image URL" },
       { name: "featured", label: "Featured", type: "checkbox" },
       { name: "timeline", label: "Timeline (JSON)", type: "json" },
+      { name: "in_focus", label: "In Focus (JSON)", type: "json" },
     ]}
   />
 )

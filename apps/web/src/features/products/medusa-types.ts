@@ -11,6 +11,12 @@ export type DesignerTimelineEntry = {
   description: string;
 };
 
+export type DesignerInFocus = {
+  title: string;
+  image_url: string | null;
+  paragraphs: string[];
+};
+
 export type MedusaDesigner = {
   id: string;
   slug: string;
@@ -25,6 +31,7 @@ export type MedusaDesigner = {
   image_url?: string | null;
   featured?: boolean;
   timeline?: { entries: DesignerTimelineEntry[] } | null;
+  in_focus?: DesignerInFocus | null;
 };
 
 export type MedusaMaterial = {
