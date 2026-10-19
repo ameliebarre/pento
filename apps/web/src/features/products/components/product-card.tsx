@@ -8,7 +8,14 @@ import type { MedusaProduct } from "@/features/products/medusa-types";
 import { getProductPrice } from "@/features/products/utils/get-product-price";
 
 export function ProductCard({ product }: { product: MedusaProduct }) {
-  const image = product.images[0];
+  const lifestyleImageUrl =
+    typeof product.metadata?.lifestyle_image_url === "string"
+      ? product.metadata.lifestyle_image_url
+      : null;
+  const defaultImageUrl = lifestyleImageUrl ?? product.images[0]?.url ?? null;
+  const hoverImageUrl =
+    product.thumbnail && product.thumbnail !== defaultImageUrl ? product.thumbnail : null;
+
   const variantId = product.variants[0]?.id;
   const designerNames = product.designers
     .map((designer) => `${designer.first_name} ${designer.last_name}`)
@@ -16,15 +23,30 @@ export function ProductCard({ product }: { product: MedusaProduct }) {
 
   return (
     <div className="group relative flex flex-col gap-3">
-      <div className="bg-muted relative aspect-4/5 w-full overflow-hidden">
-        {image ? (
-          <ProductImage
-            src={image.url}
-            alt={product.title}
-            fill
-            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-            className="object-cover"
-          />
+      <div className="bg-muted relative aspect-square w-full overflow-hidden">
+        {defaultImageUrl ? (
+          <>
+            <ProductImage
+              src={defaultImageUrl}
+              alt={product.title}
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+              className={
+                hoverImageUrl
+                  ? "object-cover transition-opacity duration-300 group-hover:opacity-0"
+                  : "object-cover"
+              }
+            />
+            {hoverImageUrl && (
+              <ProductImage
+                src={hoverImageUrl}
+                alt={product.title}
+                fill
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
+            )}
+          </>
         ) : (
           <div className="text-muted-foreground flex h-full w-full items-center justify-center">
             <ImageOff aria-hidden="true" className="size-8" />

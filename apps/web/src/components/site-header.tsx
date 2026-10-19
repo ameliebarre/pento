@@ -22,7 +22,7 @@ export async function SiteHeader() {
       >
         Aller au contenu principal
       </a>
-      <div className="mx-auto flex items-center justify-between px-4 py-4 sm:px-8 md:px-6">
+      <div className="mx-auto flex items-center justify-between bg-white px-4 py-4 sm:px-8 md:px-6">
         <div className="flex items-center gap-4">
           <MobileNav />
           <div className="flex items-center gap-8">

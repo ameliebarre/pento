@@ -4,7 +4,9 @@ import { Quote } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { ProductImage } from "@/components/product-image";
 import { CareerTimeline } from "@/features/designers/components/career-timeline";
+import { DesignerCollection } from "@/features/designers/components/designer-collection";
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
+import { getProductsByDesigner } from "@/features/designers/server/get-products-by-designer";
 
 type DesignerPageProps = {
   params: Promise<{ slug: string }>;
@@ -38,6 +40,7 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
 
   const lifespan = formatLifespan(designer.birth_date, designer.death_date);
   const biographyParagraphs = (designer.biography ?? "").split("\n\n").filter(Boolean);
+  const collectionProducts = await getProductsByDesigner(designer.slug, 4);
 
   return (
     <div className="flex flex-col gap-16 pt-32 pb-16">
@@ -139,6 +142,12 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
           </div>
         </div>
       )}
+
+      <DesignerCollection
+        designerSlug={designer.slug}
+        designerName={`${designer.first_name} ${designer.last_name}`}
+        products={collectionProducts}
+      />
     </div>
   );
 }

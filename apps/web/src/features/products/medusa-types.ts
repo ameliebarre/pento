@@ -76,6 +76,7 @@ export type MedusaProduct = {
   handle: string;
   description: string | null;
   created_at: string;
+  thumbnail?: string | null;
   metadata?: Record<string, unknown> | null;
   images: MedusaProductImage[];
   categories: MedusaCategory[];
