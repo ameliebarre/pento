@@ -7,6 +7,7 @@ import { CareerTimeline } from "@/features/designers/components/career-timeline"
 import { DesignerCollection } from "@/features/designers/components/designer-collection";
 import { DesignerInFocus } from "@/features/designers/components/designer-in-focus";
 import { SimilarDesigners } from "@/features/designers/components/similar-designers";
+import { SmoothScrollAnchors } from "@/features/designers/components/smooth-scroll-anchors";
 import { getDesignerBySlug } from "@/features/designers/server/get-designer-by-slug";
 import { getDesignersBySlugs } from "@/features/designers/server/get-designers-by-slugs";
 import { getProductsByDesigner } from "@/features/designers/server/get-products-by-designer";
@@ -44,6 +45,7 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
 
   return (
     <div className="flex flex-col gap-16 pt-32 pb-16">
+      <SmoothScrollAnchors />
       {await SiteHeader()}
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16">
         <div className="flex w-full flex-col gap-6 lg:w-1/2">
