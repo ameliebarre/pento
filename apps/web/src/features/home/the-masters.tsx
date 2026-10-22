@@ -14,7 +14,7 @@ export async function TheMasters() {
   const designers = allDesigners
     .filter((designer) => designer.featured)
     .sort((a, b) => a.last_name.localeCompare(b.last_name))
-    .slice(0, 6);
+    .slice(0, 8);
 
   if (designers.length === 0) return null;
 
@@ -47,7 +47,7 @@ export async function TheMasters() {
         </div>
       </ScrollReveal>
 
-      <ScrollRevealGroup as="ul" className="grid grid-cols-2 gap-6 sm:grid-cols-3">
+      <ScrollRevealGroup as="ul" className="grid grid-cols-2 gap-6 sm:grid-cols-4">
         {designers.map((designer) => {
           const name = `${designer.first_name} ${designer.last_name}`;
 
