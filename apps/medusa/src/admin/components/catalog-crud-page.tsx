@@ -79,6 +79,9 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
         form[field.name] = Boolean(item[field.name])
       } else if (field.type === "json") {
         form[field.name] = item[field.name] ? JSON.stringify(item[field.name], null, 2) : ""
+      } else if (field.type === "date") {
+        const value = item[field.name] as string | null
+        form[field.name] = value ? value.slice(0, 10) : ""
       } else {
         form[field.name] = (item[field.name] as string) ?? ""
       }
@@ -103,6 +106,13 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
     if (!drawer) return null
     const payload: Record<string, unknown> = { ...drawer.form }
     for (const field of fields) {
+      if (field.type === "date") {
+        // An emptied date field submits "" — Medusa's update DTO expects a
+        // real Date or null, and crashes parsing an empty string.
+        const raw = (drawer.form[field.name] as string) ?? ""
+        payload[field.name] = raw.trim() ? raw : null
+        continue
+      }
       if (field.type !== "json") continue
       const raw = (drawer.form[field.name] as string) ?? ""
       if (!raw.trim()) {
