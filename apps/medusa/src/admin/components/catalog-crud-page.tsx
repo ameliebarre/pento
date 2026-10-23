@@ -1,7 +1,9 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Button, Checkbox, Container, Drawer, Heading, Input, Label, Table, Textarea, toast, usePrompt } from "@medusajs/ui"
+import { Button, Checkbox, Container, Drawer, Heading, Input, Label, Table, Text, Textarea, toast, usePrompt } from "@medusajs/ui"
 import { sdk } from "../lib/sdk"
+
+const PAGE_SIZE = 20
 
 type FieldDef = {
   name: string
@@ -24,18 +26,38 @@ type CatalogCrudPageProps = {
 }
 
 type DrawerState = { mode: "create" | "edit"; id?: string; form: Record<string, string | boolean> }
+type ListResponse = Record<string, Record<string, unknown>[] | number> & { count?: number }
 
 export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields }: CatalogCrudPageProps) {
   const queryClient = useQueryClient()
   const prompt = usePrompt()
   const [drawer, setDrawer] = useState<DrawerState | null>(null)
+  const [searchInput, setSearchInput] = useState("")
+  const [search, setSearch] = useState("")
+  const [offset, setOffset] = useState(0)
+
+  // Debounce the search input before it triggers a request, and reset back
+  // to the first page whenever the effective search term changes.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearch(searchInput)
+      setOffset(0)
+    }, 300)
+    return () => clearTimeout(timeout)
+  }, [searchInput])
 
   const { data, isLoading } = useQuery({
-    queryKey: [resourcePath],
-    queryFn: () => sdk.client.fetch<Record<string, Record<string, unknown>[]>>(resourcePath),
+    queryKey: [resourcePath, search, offset],
+    queryFn: () =>
+      sdk.client.fetch<ListResponse>(resourcePath, {
+        query: { q: search || undefined, limit: PAGE_SIZE, offset },
+      }),
   })
 
-  const items = data?.[listKey] ?? []
+  const items = (data?.[listKey] as Record<string, unknown>[] | undefined) ?? []
+  const count = typeof data?.count === "number" ? data.count : items.length
+  const pageStart = count === 0 ? 0 : offset + 1
+  const pageEnd = Math.min(offset + PAGE_SIZE, count)
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: [resourcePath] })
 
@@ -149,6 +171,14 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
           Create
         </Button>
       </div>
+      <div className="px-6 py-4">
+        <Input
+          type="search"
+          placeholder={`Search ${title.toLowerCase()}...`}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
+      </div>
       <Table>
         <Table.Header>
           <Table.Row>
@@ -187,6 +217,30 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
           ))}
         </Table.Body>
       </Table>
+
+      <div className="flex items-center justify-between px-6 py-4">
+        <Text size="small" className="text-ui-fg-subtle">
+          {count === 0 ? `No ${title.toLowerCase()}` : `${pageStart}–${pageEnd} of ${count}`}
+        </Text>
+        <div className="flex items-center gap-x-2">
+          <Button
+            size="small"
+            variant="secondary"
+            disabled={offset === 0}
+            onClick={() => setOffset((prev) => Math.max(0, prev - PAGE_SIZE))}
+          >
+            Previous
+          </Button>
+          <Button
+            size="small"
+            variant="secondary"
+            disabled={offset + PAGE_SIZE >= count}
+            onClick={() => setOffset((prev) => prev + PAGE_SIZE)}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
 
       <Drawer open={drawer !== null} onOpenChange={(isOpen) => !isOpen && setDrawer(null)}>
         <Drawer.Content>
