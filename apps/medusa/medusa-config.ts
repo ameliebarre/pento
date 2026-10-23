@@ -42,6 +42,32 @@ const redisModules = process.env.REDIS_URL
     ]
   : []
 
+// Falls back to Medusa's built-in local file provider (disk storage under
+// /static — fine for local dev, but not for production) when Cloudinary
+// credentials aren't set, so a fresh checkout without secrets still boots.
+const fileModules =
+  process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET
+    ? [
+        {
+          resolve: "@medusajs/medusa/file",
+          options: {
+            providers: [
+              {
+                resolve: "./src/modules/cloudinary-file",
+                id: "cloudinary",
+                options: {
+                  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+                  api_key: process.env.CLOUDINARY_API_KEY,
+                  api_secret: process.env.CLOUDINARY_API_SECRET,
+                  folder: process.env.CLOUDINARY_UPLOAD_FOLDER || "pento/uploads",
+                },
+              },
+            ],
+          },
+        },
+      ]
+    : []
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -68,5 +94,6 @@ module.exports = defineConfig({
       resolve: "./src/modules/manufacturer",
     },
     ...redisModules,
+    ...fileModules,
   ],
 })

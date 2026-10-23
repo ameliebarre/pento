@@ -1,20 +1,41 @@
+export type MedusaMovement = {
+  id: string;
+  slug: string;
+  name: string;
+};
+
+export type DesignerTimelineEntry = {
+  date: string;
+  title: string;
+  subtitle: string;
+  description: string;
+};
+
+export type DesignerInFocus = {
+  title: string;
+  image_url: string | null;
+  paragraphs: string[];
+};
+
 export type MedusaDesigner = {
   id: string;
   slug: string;
   first_name: string;
   last_name: string;
   nationality?: string | null;
+  movements?: MedusaMovement[];
+  birth_date?: string | null;
+  death_date?: string | null;
+  biography?: string | null;
+  quote?: string | null;
   image_url?: string | null;
   featured?: boolean;
+  timeline?: { entries: DesignerTimelineEntry[] } | null;
+  in_focus?: DesignerInFocus | null;
+  similar_designers?: { slugs: string[] } | null;
 };
 
 export type MedusaMaterial = {
-  id: string;
-  slug: string;
-  name: string;
-};
-
-export type MedusaMovement = {
   id: string;
   slug: string;
   name: string;
@@ -63,6 +84,7 @@ export type MedusaProduct = {
   handle: string;
   description: string | null;
   created_at: string;
+  thumbnail?: string | null;
   metadata?: Record<string, unknown> | null;
   images: MedusaProductImage[];
   categories: MedusaCategory[];

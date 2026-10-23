@@ -1,12 +1,14 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { Button, Checkbox, Container, Drawer, Heading, Input, Label, Table, Textarea, toast, usePrompt } from "@medusajs/ui"
+import { Button, Checkbox, Container, Drawer, Heading, Input, Label, Table, Text, Textarea, toast, usePrompt } from "@medusajs/ui"
 import { sdk } from "../lib/sdk"
+
+const PAGE_SIZE = 20
 
 type FieldDef = {
   name: string
   label: string
-  type?: "text" | "textarea" | "date" | "checkbox"
+  type?: "text" | "textarea" | "date" | "checkbox" | "json"
   required?: boolean
 }
 
@@ -24,18 +26,38 @@ type CatalogCrudPageProps = {
 }
 
 type DrawerState = { mode: "create" | "edit"; id?: string; form: Record<string, string | boolean> }
+type ListResponse = Record<string, Record<string, unknown>[] | number> & { count?: number }
 
 export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields }: CatalogCrudPageProps) {
   const queryClient = useQueryClient()
   const prompt = usePrompt()
   const [drawer, setDrawer] = useState<DrawerState | null>(null)
+  const [searchInput, setSearchInput] = useState("")
+  const [search, setSearch] = useState("")
+  const [offset, setOffset] = useState(0)
+
+  // Debounce the search input before it triggers a request, and reset back
+  // to the first page whenever the effective search term changes.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearch(searchInput)
+      setOffset(0)
+    }, 300)
+    return () => clearTimeout(timeout)
+  }, [searchInput])
 
   const { data, isLoading } = useQuery({
-    queryKey: [resourcePath],
-    queryFn: () => sdk.client.fetch<Record<string, Record<string, unknown>[]>>(resourcePath),
+    queryKey: [resourcePath, search, offset],
+    queryFn: () =>
+      sdk.client.fetch<ListResponse>(resourcePath, {
+        query: { q: search || undefined, limit: PAGE_SIZE, offset },
+      }),
   })
 
-  const items = data?.[listKey] ?? []
+  const items = (data?.[listKey] as Record<string, unknown>[] | undefined) ?? []
+  const count = typeof data?.count === "number" ? data.count : items.length
+  const pageStart = count === 0 ? 0 : offset + 1
+  const pageEnd = Math.min(offset + PAGE_SIZE, count)
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: [resourcePath] })
 
@@ -75,7 +97,16 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
   const openEdit = (item: Record<string, unknown>) => {
     const form: Record<string, string | boolean> = {}
     for (const field of fields) {
-      form[field.name] = field.type === "checkbox" ? Boolean(item[field.name]) : ((item[field.name] as string) ?? "")
+      if (field.type === "checkbox") {
+        form[field.name] = Boolean(item[field.name])
+      } else if (field.type === "json") {
+        form[field.name] = item[field.name] ? JSON.stringify(item[field.name], null, 2) : ""
+      } else if (field.type === "date") {
+        const value = item[field.name] as string | null
+        form[field.name] = value ? value.slice(0, 10) : ""
+      } else {
+        form[field.name] = (item[field.name] as string) ?? ""
+      }
     }
     setDrawer({ mode: "edit", id: item.id as string, form })
   }
@@ -93,12 +124,40 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
     }
   }
 
+  const buildPayload = (): Record<string, string | boolean> | null => {
+    if (!drawer) return null
+    const payload: Record<string, unknown> = { ...drawer.form }
+    for (const field of fields) {
+      if (field.type === "date") {
+        // An emptied date field submits "" — Medusa's update DTO expects a
+        // real Date or null, and crashes parsing an empty string.
+        const raw = (drawer.form[field.name] as string) ?? ""
+        payload[field.name] = raw.trim() ? raw : null
+        continue
+      }
+      if (field.type !== "json") continue
+      const raw = (drawer.form[field.name] as string) ?? ""
+      if (!raw.trim()) {
+        payload[field.name] = null
+        continue
+      }
+      try {
+        payload[field.name] = JSON.parse(raw)
+      } catch {
+        toast.error(`${field.label} is not valid JSON`)
+        return null
+      }
+    }
+    return payload as Record<string, string | boolean>
+  }
+
   const handleSave = () => {
-    if (!drawer) return
-    if (drawer.mode === "create") {
-      createMutation.mutate(drawer.form)
-    } else if (drawer.id) {
-      updateMutation.mutate({ id: drawer.id, ...drawer.form })
+    const payload = buildPayload()
+    if (!payload) return
+    if (drawer?.mode === "create") {
+      createMutation.mutate(payload)
+    } else if (drawer?.mode === "edit" && drawer.id) {
+      updateMutation.mutate({ id: drawer.id, ...payload })
     }
   }
 
@@ -111,6 +170,14 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
         <Button size="small" onClick={openCreate}>
           Create
         </Button>
+      </div>
+      <div className="px-6 py-4">
+        <Input
+          type="search"
+          placeholder={`Search ${title.toLowerCase()}...`}
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+        />
       </div>
       <Table>
         <Table.Header>
@@ -151,12 +218,36 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
         </Table.Body>
       </Table>
 
+      <div className="flex items-center justify-between px-6 py-4">
+        <Text size="small" className="text-ui-fg-subtle">
+          {count === 0 ? `No ${title.toLowerCase()}` : `${pageStart}–${pageEnd} of ${count}`}
+        </Text>
+        <div className="flex items-center gap-x-2">
+          <Button
+            size="small"
+            variant="secondary"
+            disabled={offset === 0}
+            onClick={() => setOffset((prev) => Math.max(0, prev - PAGE_SIZE))}
+          >
+            Previous
+          </Button>
+          <Button
+            size="small"
+            variant="secondary"
+            disabled={offset + PAGE_SIZE >= count}
+            onClick={() => setOffset((prev) => prev + PAGE_SIZE)}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+
       <Drawer open={drawer !== null} onOpenChange={(isOpen) => !isOpen && setDrawer(null)}>
         <Drawer.Content>
           <Drawer.Header>
             <Drawer.Title>{drawer?.mode === "edit" ? `Edit ${title}` : `New ${title}`}</Drawer.Title>
           </Drawer.Header>
-          <Drawer.Body className="flex flex-col gap-y-4">
+          <Drawer.Body className="flex min-h-0 flex-1 flex-col gap-y-4 overflow-y-auto">
             {fields.map((field) => (
               <div key={field.name} className="flex flex-col gap-y-1">
                 <Label htmlFor={field.name}>
@@ -174,6 +265,16 @@ export function CatalogCrudPage({ title, resourcePath, listKey, columns, fields 
                 ) : field.type === "textarea" ? (
                   <Textarea
                     id={field.name}
+                    value={(drawer?.form[field.name] as string) ?? ""}
+                    onChange={(e) =>
+                      setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: e.target.value } } : prev))
+                    }
+                  />
+                ) : field.type === "json" ? (
+                  <Textarea
+                    id={field.name}
+                    rows={16}
+                    className="font-mono text-xs"
                     value={(drawer?.form[field.name] as string) ?? ""}
                     onChange={(e) =>
                       setDrawer((prev) => (prev ? { ...prev, form: { ...prev.form, [field.name]: e.target.value } } : prev))

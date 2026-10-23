@@ -15,14 +15,14 @@ export async function SiteHeader() {
     : null;
 
   return (
-    <header className="absolute top-0 right-0 left-0 z-10">
+    <header className="border-border/60 absolute top-0 right-0 left-0 z-10 border-b">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow"
       >
         Aller au contenu principal
       </a>
-      <div className="mx-auto flex items-center justify-between px-4 py-4 sm:px-8 md:px-6">
+      <div className="mx-auto flex items-center justify-between bg-white px-4 py-4 sm:px-8 md:px-6">
         <div className="flex items-center gap-4">
           <MobileNav />
           <div className="flex items-center gap-8">
