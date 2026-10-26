@@ -4,59 +4,22 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { HeroBanner } from "@/features/home/hero-banner";
-import { getPayloadClient } from "@/lib/payload";
-
-async function seedHeroBanner(overrides: {
-  backgroundImageUrl?: string;
-  heading?: string;
-  headingAccent?: string;
-  description?: string;
-  ctaLabel?: string;
-  ctaHref?: string;
-}) {
-  const payload = await getPayloadClient();
-  return payload.updateGlobal({
-    slug: "hero-banner",
-    data: {
-      backgroundImageUrl: "https://res.cloudinary.com/demo/image/upload/hero.jpg",
-      heading: "Timeless design,",
-      headingAccent: "curated with reverence.",
-      description: "From mid-century icons to contemporary masterpieces.",
-      ctaLabel: "Explore the collection",
-      ctaHref: "/products",
-      ...overrides,
-    },
-  });
-}
+import { HERO_DATA } from "@/features/home/hero-data";
 
 describe("HeroBanner", () => {
-  it("renders the heading, tagline and a link to the shop", async () => {
-    await seedHeroBanner({});
+  it("renders the heading and a link to the collection", () => {
+    render(<HeroBanner />);
 
-    render(await HeroBanner());
-
-    expect(
-      screen.getByRole("heading", { name: /timeless design, curated with reverence\./i }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /explore the collection/i })).toHaveAttribute(
+    expect(screen.getByRole("heading", { level: 1, name: HERO_DATA.title })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: new RegExp(HERO_DATA.ctaLabel, "i") })).toHaveAttribute(
       "href",
-      "/products",
+      HERO_DATA.ctaHref,
     );
   });
 
-  it("renders the background image from the Payload global", async () => {
-    await seedHeroBanner({
-      backgroundImageUrl: "https://res.cloudinary.com/demo/image/upload/living-room.jpg",
-    });
+  it("renders the background photo", () => {
+    render(<HeroBanner />);
 
-    render(await HeroBanner());
-
-    const image = screen.getByRole("img", {
-      name: "Intérieur design mettant en scène du mobilier haut de gamme",
-    });
-    expect(image).toHaveAttribute(
-      "src",
-      expect.stringContaining(encodeURIComponent("https://res.cloudinary.com/demo/image/upload/living-room.jpg")),
-    );
+    expect(screen.getByAltText(HERO_DATA.backgroundImageAlt)).toBeInTheDocument();
   });
 });
