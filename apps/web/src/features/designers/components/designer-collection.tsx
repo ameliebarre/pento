@@ -22,7 +22,7 @@ export function DesignerCollection({ designerSlug, designerName, products }: Des
             <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
               The Collection
             </p>
-            <h2 className="font-heading text-3xl text-[#26221B] sm:text-4xl">
+            <h2 className="font-heading text-3xl text-ink sm:text-4xl">
               Design worth living with
             </h2>
           </div>

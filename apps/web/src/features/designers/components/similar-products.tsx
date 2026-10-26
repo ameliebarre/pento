@@ -16,7 +16,7 @@ export function SimilarProducts({ products }: SimilarProductsProps) {
           <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
             Similar Products
           </p>
-          <h2 className="font-heading text-3xl text-[#26221B] sm:text-4xl">
+          <h2 className="font-heading text-3xl text-ink sm:text-4xl">
             You may also like
           </h2>
         </div>

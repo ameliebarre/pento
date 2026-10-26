@@ -52,7 +52,7 @@ export function Testimonials() {
             <p className="font-heading flex-1 text-base italic sm:text-lg">
               &ldquo;{testimonial.quote}&rdquo;
             </p>
-            <div className="border-t border-black/10 pt-4">
+            <div className="border-t border-ink/10 pt-4">
               <p className="text-sm font-semibold">{testimonial.name}</p>
               <p className="text-muted-foreground text-sm">{testimonial.location}</p>
             </div>

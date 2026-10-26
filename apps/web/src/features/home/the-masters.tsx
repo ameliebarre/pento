@@ -71,7 +71,7 @@ export async function TheMasters() {
                     <span className="sr-only">Aucun portrait disponible pour {name}</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/5 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-ink/60 via-ink/5 to-transparent" />
                 <div className="absolute inset-x-4 bottom-4">
                   <p className="font-heading text-xl text-white sm:text-2xl">{name}</p>
                   {designer.nationality ? (

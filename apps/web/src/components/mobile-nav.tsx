@@ -86,7 +86,7 @@ export function MobileNav() {
               transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
               onClick={close}
               aria-hidden="true"
-              className="fixed inset-0 z-40 bg-black/50 md:hidden"
+              className="fixed inset-0 z-40 bg-ink/50 md:hidden"
             />
             <motion.nav
               key="panel"

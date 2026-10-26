@@ -95,7 +95,7 @@ export async function ShopByCategory() {
                         </span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/5 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-ink/60 via-ink/5 to-transparent" />
                     <span className="font-heading absolute inset-x-4 bottom-4 text-xl text-white sm:text-2xl">
                       {category.name}
                     </span>

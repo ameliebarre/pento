@@ -12,7 +12,7 @@ export async function PassionForDesign() {
   return (
     <section
       aria-labelledby="passion-for-design-heading"
-      className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#1C1813]"
+      className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-ink"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2">
         <ScrollReveal fromX={-60} className="relative aspect-642/695 w-full md:aspect-auto">

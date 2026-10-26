@@ -18,7 +18,7 @@ export function SimilarDesigners({ designers }: SimilarDesignersProps) {
         <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
           Similar Designers
         </p>
-        <h2 className="font-heading text-3xl text-[#26221B] sm:text-4xl">
+        <h2 className="font-heading text-3xl text-ink sm:text-4xl">
           A shared sense of design
         </h2>
       </div>
@@ -48,7 +48,7 @@ export function SimilarDesigners({ designers }: SimilarDesignersProps) {
                   )}
                 </div>
                 <div className="flex flex-col gap-1">
-                  <p className="font-heading text-xl text-[#26221B]">{name}</p>
+                  <p className="font-heading text-xl text-ink">{name}</p>
                   {lifespan && <p className="text-sm text-[#8a8070]">{lifespan}</p>}
                 </div>
               </Link>

@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 function passwordResetEmailHtml(resetLink: string) {
   return `
-    <div style="font-family: Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a;">
+    <div style="font-family: Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; color: #282828;">
       <h1 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">Réinitialisation de votre mot de passe</h1>
       <p style="font-size: 14px; line-height: 1.6; color: #4a4a4a;">
         Vous avez demandé la réinitialisation du mot de passe associé à votre compte Pento.
@@ -13,7 +13,7 @@ function passwordResetEmailHtml(resetLink: string) {
       </p>
       <a
         href="${resetLink}"
-        style="display: inline-block; margin: 24px 0; padding: 12px 24px; background-color: #1a1a1a; color: #ffffff; font-size: 14px; text-decoration: none; border-radius: 6px;"
+        style="display: inline-block; margin: 24px 0; padding: 12px 24px; background-color: #282828; color: #ffffff; font-size: 14px; text-decoration: none; border-radius: 6px;"
       >
         Réinitialiser mon mot de passe
       </a>
@@ -43,7 +43,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
 
 function verificationEmailHtml(verifyLink: string) {
   return `
-    <div style="font-family: Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; color: #1a1a1a;">
+    <div style="font-family: Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; color: #282828;">
       <h1 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">Confirmez votre adresse email</h1>
       <p style="font-size: 14px; line-height: 1.6; color: #4a4a4a;">
         Bienvenue chez Pento. Cliquez sur le bouton ci-dessous pour confirmer votre adresse
@@ -51,7 +51,7 @@ function verificationEmailHtml(verifyLink: string) {
       </p>
       <a
         href="${verifyLink}"
-        style="display: inline-block; margin: 24px 0; padding: 12px 24px; background-color: #1a1a1a; color: #ffffff; font-size: 14px; text-decoration: none; border-radius: 6px;"
+        style="display: inline-block; margin: 24px 0; padding: 12px 24px; background-color: #282828; color: #ffffff; font-size: 14px; text-decoration: none; border-radius: 6px;"
       >
         Confirmer mon email
       </a>

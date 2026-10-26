@@ -21,7 +21,7 @@ export function AddToCartButton({ variantId, className }: AddToCartButtonProps) 
       disabled={isAdding}
       onClick={() => addToCart(variantId)}
       className={cn(
-        "cursor-pointer rounded-[8px] bg-white p-2 text-black transition-[opacity,background-color] duration-300 hover:bg-neutral-200 disabled:pointer-events-none",
+        "cursor-pointer rounded-[8px] bg-white p-2 text-ink transition-[opacity,background-color] duration-300 hover:bg-neutral-200 disabled:pointer-events-none",
         className,
       )}
     >

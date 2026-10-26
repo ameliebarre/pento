@@ -25,14 +25,9 @@ export function Newsletter() {
       aria-labelledby="newsletter-heading"
       className="relative right-1/2 left-1/2 mx-[-50vw] w-screen"
     >
-      <div className="relative flex min-h-[38rem] w-full items-center justify-center overflow-hidden py-16 sm:py-20">
-        <Image
-          src="/images/newsletter-background.jpg"
-          alt=""
-          fill
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-black/55" />
+      <div className="relative flex min-h-152 w-full items-center justify-center overflow-hidden py-16 sm:py-20">
+        <Image src="/images/newsletter-background.jpg" alt="" fill className="object-cover" />
+        <div className="bg-ink/55 absolute inset-0" />
 
         <ScrollReveal className="relative mx-auto flex max-w-xl flex-col items-center gap-6 px-6 text-center">
           <div className="flex flex-col gap-3">
@@ -75,7 +70,7 @@ export function Newsletter() {
               <Button
                 type="submit"
                 size="lg"
-                className="group h-12 cursor-pointer rounded-[6px] bg-[#c5964b] px-6 font-semibold tracking-wide text-black uppercase hover:bg-[#c5964b]/90"
+                className="group text-ink h-12 cursor-pointer rounded-[6px] bg-[#c5964b] px-6 font-semibold tracking-wide uppercase hover:bg-[#c5964b]/90"
               >
                 Subscribe
                 <ArrowRight

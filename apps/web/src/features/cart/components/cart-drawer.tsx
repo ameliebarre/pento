@@ -63,7 +63,7 @@ export function CartDrawer() {
             transition={{ duration: shouldReduceMotion ? 0 : 0.2 }}
             onClick={close}
             aria-hidden="true"
-            className="fixed inset-0 z-40 bg-black/50"
+            className="fixed inset-0 z-40 bg-ink/50"
           />
           <motion.aside
             key="panel"
