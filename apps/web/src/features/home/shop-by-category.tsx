@@ -32,8 +32,8 @@ export async function ShopByCategory() {
     <section aria-labelledby="shop-by-category-heading" className="flex flex-col gap-8 py-16">
       <ScrollReveal>
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+          <div className="flex flex-col gap-2">
+            <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
               Browse by categories
             </p>
             <h2
@@ -95,7 +95,7 @@ export async function ShopByCategory() {
                         </span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-linear-to-t from-ink/60 via-ink/5 to-transparent" />
+                    <div className="from-ink/60 via-ink/5 absolute inset-0 bg-linear-to-t to-transparent" />
                     <span className="font-heading absolute inset-x-4 bottom-4 text-xl text-white sm:text-2xl">
                       {category.name}
                     </span>

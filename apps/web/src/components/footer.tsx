@@ -71,7 +71,7 @@ export function Footer() {
               Curators of iconic design furniture since 1965. Bringing history&apos;s greatest
               pieces into contemporary homes.
             </p>
-            <ul className="flex items-center gap-3">
+            <ul className="flex items-center gap-2">
               {SOCIAL_LINKS.map((social) => (
                 <li key={social.label}>
                   <a
@@ -93,7 +93,7 @@ export function Footer() {
               <p className="text-sm font-medium tracking-wide text-white/50 uppercase">
                 {column.title}
               </p>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <Link

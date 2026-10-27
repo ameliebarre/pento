@@ -83,7 +83,7 @@ export default async function ProfilePage({
         {orders.length === 0 ? (
           <p className="text-muted-foreground text-sm">Vous n&apos;avez pas encore de commande.</p>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-2">
             {orders.map((order) => (
               <li key={order.id}>
                 <Link

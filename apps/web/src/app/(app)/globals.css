@@ -6,6 +6,8 @@
 
 @theme inline {
   --color-ink: #282828;
+  --color-dark-buff: #96652e;
+  --color-dull-white: #efe9df;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);

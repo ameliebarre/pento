@@ -30,8 +30,8 @@ export function Newsletter() {
         <div className="bg-ink/55 absolute inset-0" />
 
         <ScrollReveal className="relative mx-auto flex max-w-xl flex-col items-center gap-6 px-6 text-center">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium tracking-wide text-[#E4CDA0] uppercase">
               Join the maison
             </p>
             <h2 id="newsletter-heading" className="font-heading text-4xl text-white sm:text-5xl">
@@ -50,7 +50,7 @@ export function Newsletter() {
           ) : (
             <form
               onSubmit={handleSubmit}
-              className="flex w-full flex-col gap-3 sm:flex-row sm:items-start"
+              className="flex w-full flex-col gap-2 sm:flex-row sm:items-start"
             >
               <Label htmlFor={inputId} className="sr-only">
                 Adresse e-mail
@@ -65,12 +65,12 @@ export function Newsletter() {
                 placeholder="you@example.com…"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="h-12 flex-1 border-white/40 bg-white/10 px-4 text-white placeholder:text-white/60 focus-visible:border-white/60 focus-visible:ring-white/50"
+                className="h-12 flex-1 border-white/90 bg-white/10 px-4 text-white placeholder:text-white/90 focus-visible:border-white/90 focus-visible:ring-white/50"
               />
               <Button
                 type="submit"
                 size="lg"
-                className="group text-ink h-12 cursor-pointer rounded-[6px] bg-[#c5964b] px-6 font-semibold tracking-wide uppercase hover:bg-[#c5964b]/90"
+                className="group text-ink h-12 cursor-pointer rounded-[6px] bg-[#E4CDA0] px-6 font-semibold tracking-wide uppercase hover:bg-[#E4CDA0]/90"
               >
                 Subscribe
                 <ArrowRight

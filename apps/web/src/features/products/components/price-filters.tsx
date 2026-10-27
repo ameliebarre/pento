@@ -3,7 +3,10 @@
 import { useState } from "react";
 
 import { Slider } from "@/components/ui/slider";
-import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
+import {
+  FiltersNavigationLink,
+  useFiltersNavigation,
+} from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildPriceFilterHref,
@@ -35,7 +38,7 @@ export function PriceFilters({ bounds, filters }: PriceFiltersProps) {
   const isActive = filters.minPrice !== null || filters.maxPrice !== null;
 
   return (
-    <div role="group" aria-label="Prix" className="flex flex-col gap-3">
+    <div role="group" aria-label="Prix" className="flex flex-col gap-2">
       {isActive && (
         <FiltersNavigationLink
           href={buildClearFilterHref(filters, "price")}

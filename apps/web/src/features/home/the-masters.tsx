@@ -22,8 +22,8 @@ export async function TheMasters() {
     <section aria-labelledby="the-masters-heading" className="flex flex-col gap-8 py-16">
       <ScrollReveal>
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+          <div className="flex flex-col gap-2">
+            <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
               The Masters
             </p>
             <h2 id="the-masters-heading" className="font-heading max-w-xl text-3xl md:text-4xl">
@@ -71,7 +71,7 @@ export async function TheMasters() {
                     <span className="sr-only">Aucun portrait disponible pour {name}</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-linear-to-t from-ink/60 via-ink/5 to-transparent" />
+                <div className="from-ink/60 via-ink/5 absolute inset-0 bg-linear-to-t to-transparent" />
                 <div className="absolute inset-x-4 bottom-4">
                   <p className="font-heading text-xl text-white sm:text-2xl">{name}</p>
                   {designer.nationality ? (

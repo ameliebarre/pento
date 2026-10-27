@@ -10,15 +10,13 @@ export function SimilarProducts({ products }: SimilarProductsProps) {
   if (products.length === 0) return null;
 
   return (
-    <div id="similar-products" className="flex flex-col gap-10 scroll-mt-32">
+    <div id="similar-products" className="flex scroll-mt-32 flex-col gap-10">
       <ScrollReveal>
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+        <div className="flex flex-col gap-2">
+          <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
             Similar Products
           </p>
-          <h2 className="font-heading text-3xl text-ink sm:text-4xl">
-            You may also like
-          </h2>
+          <h2 className="font-heading text-ink text-3xl sm:text-4xl">You may also like</h2>
         </div>
       </ScrollReveal>
 

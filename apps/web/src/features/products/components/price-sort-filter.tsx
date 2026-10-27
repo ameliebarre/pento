@@ -2,7 +2,10 @@
 
 import { Label } from "@/components/ui/label";
 import { Radio, RadioGroup } from "@/components/ui/radio-group";
-import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
+import {
+  FiltersNavigationLink,
+  useFiltersNavigation,
+} from "@/features/products/components/filters-navigation";
 import { buildClearFilterHref, buildSortHref } from "@/features/products/utils/build-filter-href";
 import type { ProductFilters, SortOrder } from "@/features/products/types";
 
@@ -18,7 +21,7 @@ const OPTIONS: { value: SortOrder; label: string }[] = [
 export function PriceSortFilter({ filters }: PriceSortFilterProps) {
   const { navigate, isPending } = useFiltersNavigation();
   return (
-    <div role="group" aria-label="Trier par prix" className="flex flex-col gap-3">
+    <div role="group" aria-label="Trier par prix" className="flex flex-col gap-2">
       {filters.sort !== null && (
         <FiltersNavigationLink
           href={buildClearFilterHref(filters, "sort")}

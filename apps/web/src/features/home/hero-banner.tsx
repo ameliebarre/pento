@@ -30,7 +30,7 @@ export function HeroBanner() {
           <p className="max-w-sm text-base text-[#E1DED6]">{data.description}</p>
           <Link
             href={data.ctaHref}
-            className="group mt-2 inline-flex w-fit items-center gap-2 bg-ink px-6 py-3 text-sm whitespace-nowrap text-white uppercase transition-opacity hover:opacity-90"
+            className="group bg-ink mt-2 inline-flex w-fit items-center gap-2 px-6 py-3 text-sm whitespace-nowrap text-white uppercase transition-opacity hover:opacity-90"
           >
             {data.ctaLabel}
             <ArrowRight
@@ -41,16 +41,16 @@ export function HeroBanner() {
         </div>
       </div>
 
-      <div className="group absolute right-4 bottom-6 flex cursor-pointer items-center gap-3 rounded-full bg-white/40 py-3 pr-5 pl-6 backdrop-blur-sm sm:right-8 sm:gap-4 sm:py-4 sm:pr-6 sm:pl-8 md:border md:border-white/40 md:bg-white/90 md:shadow-lg lg:right-24 lg:bottom-16">
+      <div className="group absolute right-4 bottom-6 flex cursor-pointer items-center gap-2 rounded-full bg-white/40 py-3 pr-5 pl-6 backdrop-blur-sm sm:right-8 sm:gap-4 sm:py-4 sm:pr-6 sm:pl-8 md:border md:border-white/40 md:bg-white/90 md:shadow-lg lg:right-24 lg:bottom-16">
         <div className="flex flex-col md:gap-1">
-          <p className="font-heading text-sm text-ink sm:text-base">{data.product.name}</p>
-          <p className="text-xs text-ink md:text-[#8a8275]">
+          <p className="font-heading text-ink text-sm sm:text-base">{data.product.name}</p>
+          <p className="text-ink text-xs md:text-[#8a8275]">
             {data.product.designer} · {data.product.year}
           </p>
         </div>
         <ArrowUpRight
           aria-hidden="true"
-          className="size-4 shrink-0 text-ink transition-transform duration-300 ease-out group-hover:rotate-45"
+          className="text-ink size-4 shrink-0 transition-transform duration-300 ease-out group-hover:rotate-45"
         />
       </div>
     </section>

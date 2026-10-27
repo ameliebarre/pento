@@ -22,7 +22,7 @@ export function ProductCard({ product }: { product: MedusaProduct }) {
     .join(", ");
 
   return (
-    <div className="group relative flex flex-col gap-3">
+    <div className="group relative flex flex-col gap-2">
       <div className="bg-muted relative aspect-square w-full overflow-hidden">
         {defaultImageUrl ? (
           <>
@@ -56,7 +56,7 @@ export function ProductCard({ product }: { product: MedusaProduct }) {
         {variantId && (
           <AddToCartButton
             variantId={variantId}
-            className="absolute right-4 bottom-4 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100"
+            className="absolute right-4 bottom-4 z-10 opacity-0 transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100"
           />
         )}
       </div>

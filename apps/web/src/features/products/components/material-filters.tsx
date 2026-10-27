@@ -4,7 +4,10 @@ import { useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
+import {
+  FiltersNavigationLink,
+  useFiltersNavigation,
+} from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
@@ -37,7 +40,7 @@ export function MaterialFilters({ materials, filters }: MaterialFiltersProps) {
   const hasMore = materials.length > VISIBLE_COUNT;
 
   return (
-    <div role="group" aria-label="Matériaux" className="flex flex-col gap-3">
+    <div role="group" aria-label="Matériaux" className="flex flex-col gap-2">
       {filters.materials.length > 0 && (
         <FiltersNavigationLink
           href={buildClearFilterHref(filters, "materials")}

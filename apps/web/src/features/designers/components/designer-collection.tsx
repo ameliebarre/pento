@@ -11,20 +11,22 @@ type DesignerCollectionProps = {
   products: MedusaProduct[];
 };
 
-export function DesignerCollection({ designerSlug, designerName, products }: DesignerCollectionProps) {
+export function DesignerCollection({
+  designerSlug,
+  designerName,
+  products,
+}: DesignerCollectionProps) {
   if (products.length === 0) return null;
 
   return (
-    <div id="collection" className="flex flex-col gap-10 scroll-mt-32">
+    <div id="collection" className="flex scroll-mt-32 flex-col gap-10">
       <ScrollReveal>
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+          <div className="flex flex-col gap-2">
+            <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
               The Collection
             </p>
-            <h2 className="font-heading text-3xl text-ink sm:text-4xl">
-              Design worth living with
-            </h2>
+            <h2 className="font-heading text-ink text-3xl sm:text-4xl">Design worth living with</h2>
           </div>
           <Link
             href={`/products?designer=${designerSlug}`}

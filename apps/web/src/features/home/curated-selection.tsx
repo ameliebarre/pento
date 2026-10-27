@@ -22,11 +22,11 @@ export async function CuratedSelection() {
   return (
     <section
       aria-labelledby="curated-selection-heading"
-      className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#EFE9DF] py-16 sm:py-20"
+      className="bg-dull-white relative right-1/2 left-1/2 mx-[-50vw] w-screen py-16 sm:py-20"
     >
       <ScrollReveal>
-        <div className="mx-auto flex max-w-xl flex-col items-center gap-3 px-6 text-center">
-          <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-2 px-6 text-center">
+          <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
             Curated selection
           </p>
           <h2 id="curated-selection-heading" className="font-heading text-3xl md:text-4xl">
