@@ -9,10 +9,9 @@ Patterns for structuring routes under `src/app` in this repo. Ground any new rou
 
 ## Route groups — separating concerns without affecting the URL
 
-A folder wrapped in parentheses (`(name)`) groups routes without adding a path segment. This repo uses two top-level groups:
+A folder wrapped in parentheses (`(name)`) groups routes without adding a path segment. This repo currently has one top-level group:
 
-- `src/app/(app)/...` — the storefront (products, cart, auth pages). Has its own `loading.tsx`/`error.tsx` boundaries at the group root so a failure in one storefront page doesn't take down the Payload admin.
-- `src/app/(payload)/...` — Payload CMS admin UI and its API routes, kept isolated from the storefront's layout/providers.
+- `src/app/(app)/...` — the storefront (products, cart, auth pages), with its own `loading.tsx`/`error.tsx` boundaries at the group root.
 
 Use a new route group when a set of routes needs a different root layout, different providers, or an independent loading/error boundary — not just for cosmetic folder organization.
 
@@ -25,10 +24,10 @@ A folder named `[param]` captures one path segment as a variable, available via 
 
 ## Catch-all and optional catch-all segments
 
-- `[...slug]` (catch-all) matches one or more segments, e.g. `src/app/(payload)/api/[...slug]/route.ts` forwards any nested API path to Payload's own router — use this when you're delegating routing to something else rather than enumerating every possible path yourself.
-- `[[...segments]]` (optional catch-all, double brackets) matches zero or more segments, e.g. `src/app/(payload)/admin/[[...segments]]/page.tsx` renders Payload's admin UI including its own root (`/admin`) with no extra segments.
+- `[...slug]` (catch-all) matches one or more segments, e.g. `src/app/(app)/api/auth/[...all]/route.ts` forwards any nested auth path to better-auth's own router — use this when you're delegating routing to something else rather than enumerating every possible path yourself.
+- `[[...segments]]` (optional catch-all, double brackets) matches zero or more segments, including the route's own root with no extra segments — useful when the thing you're delegating to needs to own its root path too.
 
-Reach for a catch-all only when the nested routing is actually owned by another router/library (as with Payload here). For routes you own yourself, prefer explicit folders/dynamic segments — they're easier to reason about and to add per-route loading/error boundaries to.
+Reach for a catch-all only when the nested routing is actually owned by another router/library (as with better-auth here). For routes you own yourself, prefer explicit folders/dynamic segments — they're easier to reason about and to add per-route loading/error boundaries to.
 
 ## Per-segment loading and error boundaries
 

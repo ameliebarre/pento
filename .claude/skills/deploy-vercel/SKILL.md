@@ -5,7 +5,7 @@ description: Deploy the current web application to Vercel safely. Use when the u
 
 # Deploy to Vercel
 
-Guidance for deploying `apps/web` (Next.js + Payload CMS + Prisma) to Vercel safely, without skipping the steps that keep the database and migrations in sync.
+Guidance for deploying `apps/web` (Next.js + Prisma) to Vercel safely, without skipping the steps that keep the database and migrations in sync.
 
 ## Before deploying
 
@@ -18,14 +18,13 @@ Guidance for deploying `apps/web` (Next.js + Payload CMS + Prisma) to Vercel saf
 The production build runs via the `vercel-build` script (`apps/web/package.json`), not plain `next build`:
 
 ```
-tsx scripts/wait-for-db.ts && PAYLOAD_CONFIG_PATH=payload.config.ts payload migrate && tsx scripts/migrate-with-retry.ts && next build --webpack
+tsx scripts/wait-for-db.ts && tsx scripts/migrate-with-retry.ts && next build --webpack
 ```
 
 This means every deploy:
 1. Waits for the database to accept connections (`wait-for-db.ts`).
-2. Runs Payload's own migrations.
-3. Runs the Prisma migration step with retry (`migrate-with-retry.ts`).
-4. Only then builds the Next.js app (Webpack, not the default Turbopack build).
+2. Runs the Prisma migration step with retry (`migrate-with-retry.ts`).
+3. Only then builds the Next.js app (Webpack, not the default Turbopack build).
 
 Do not bypass this script to "speed up" a deploy — a build without the migration steps can boot the app against a schema it doesn't match.
 
@@ -40,5 +39,5 @@ This repo is structured as a monorepo (`apps/web`, with `apps/medusa` planned). 
 
 ## After deploying
 
-- Verify the deployment against the actual app (not just "build succeeded"): hit a page that reads from the database and one that reads from Payload to confirm both the Prisma and Payload migration steps actually applied.
-- For a failed deploy, check the Vercel build logs for which of the four build steps failed (db wait, Payload migrate, Prisma migrate, Next build) before guessing at a fix — each has a different failure mode.
+- Verify the deployment against the actual app (not just "build succeeded"): hit a page that reads from the database to confirm the Prisma migration step actually applied.
+- For a failed deploy, check the Vercel build logs for which of the three build steps failed (db wait, Prisma migrate, Next build) before guessing at a fix — each has a different failure mode.

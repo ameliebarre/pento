@@ -5,13 +5,13 @@ description: Pento — React & Next.js Code Quality Skill. Use when reviewing, w
 
 # Pento — React & Next.js Code Quality Skill
 
-Apply these conventions when writing or reviewing code in `apps/web`. The app is Next.js (App Router) + Payload CMS + Prisma + better-auth, styled with Tailwind v4 and shadcn/base-ui components. Lint/format are enforced via `eslint-config-next` + `eslint-config-prettier` and Prettier with `prettier-plugin-tailwindcss` (see `apps/web/eslint.config.mjs`, `apps/web/.prettierrc.json`).
+Apply these conventions when writing or reviewing code in `apps/web`. The app is Next.js (App Router) + Prisma + better-auth, styled with Tailwind v4 and shadcn/base-ui components. Lint/format are enforced via `eslint-config-next` + `eslint-config-prettier` and Prettier with `prettier-plugin-tailwindcss` (see `apps/web/eslint.config.mjs`, `apps/web/.prettierrc.json`).
 
 ## Project structure
 
 - Feature code lives under `src/features/<feature>/` (e.g. `cart`, `products`, `home`), split into `components/`, `server/`, `utils/`, `types.ts`, `constants.ts`. Keep new code inside the matching feature folder instead of dumping everything in `components/`.
-- Shared, cross-feature code goes in `src/lib/` (data access, auth, email, rate limiting) and `src/globals/` (Payload globals).
-- Routes live in `src/app/(app)/...` for the storefront and `src/app/(payload)/...` for the CMS admin/API — don't mix concerns across these route groups.
+- Shared, cross-feature code goes in `src/lib/` (data access, auth, email, rate limiting). Static editorial content (hero banner, homepage copy, etc.) is hardcoded in per-feature `*-data.ts` files (e.g. `src/features/home/hero-data.ts`), not fetched from a CMS.
+- Routes live in `src/app/(app)/...` for the storefront.
 
 ## Components
 
@@ -23,8 +23,8 @@ Apply these conventions when writing or reviewing code in `apps/web`. The app is
 ## Data & server logic
 
 - Server-only data fetching/mutations belong in `server/` files within the feature (e.g. `get-product-page-data.ts`, `build-product-filters.ts`), not inline in page components, so they can be unit tested without rendering.
-- Validate and narrow external input (search params, form data, webhook payloads) before passing it into Prisma/Payload calls — don't trust `searchParams` or form values to already match the expected shape.
-- Keep Prisma/Payload queries close to the feature that uses them; avoid a God `lib/db.ts` with unrelated queries for every feature.
+- Validate and narrow external input (search params, form data, webhook payloads) before passing it into Prisma calls — don't trust `searchParams` or form values to already match the expected shape.
+- Keep Prisma queries close to the feature that uses them; avoid a God `lib/db.ts` with unrelated queries for every feature.
 
 ## Styling
 

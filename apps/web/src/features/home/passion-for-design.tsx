@@ -1,13 +1,10 @@
 import Image from "next/image";
 
-import { getPayloadClient } from "@/lib/payload";
+import { PASSION_FOR_DESIGN_DATA } from "@/features/home/passion-for-design-data";
 import { ScrollReveal } from "@/components/scroll-reveal";
 
-export async function PassionForDesign() {
-  const payload = await getPayloadClient();
-  const section = await payload.findGlobal({ slug: "passion-for-design" });
-
-  const paragraphs = section.description.split("\n\n").filter(Boolean);
+export function PassionForDesign() {
+  const section = PASSION_FOR_DESIGN_DATA;
 
   return (
     <section
@@ -15,18 +12,16 @@ export async function PassionForDesign() {
       className="bg-ink relative right-1/2 left-1/2 mx-[-50vw] w-screen"
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 md:grid-cols-2">
-        <ScrollReveal fromX={-60} className="relative aspect-642/695 w-full md:aspect-auto">
-          {section.imageUrl ? (
+        <ScrollReveal fromX={-60} className="w-full py-[68px] md:h-full">
+          <div className="relative aspect-642/695 h-full w-full md:aspect-auto">
             <Image
               src={section.imageUrl}
-              alt="Intérieur mettant en valeur une pièce de design emblématique"
+              alt={section.imageAlt}
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
             />
-          ) : (
-            <div className="bg-muted h-full w-full" />
-          )}
+          </div>
         </ScrollReveal>
 
         <ScrollReveal
@@ -48,7 +43,7 @@ export async function PassionForDesign() {
           </div>
 
           <div className="flex flex-col gap-4 text-sm text-white/60 sm:text-base">
-            {paragraphs.map((paragraph, index) => (
+            {section.paragraphs.map((paragraph, index) => (
               <p key={index}>{paragraph}</p>
             ))}
           </div>
@@ -57,7 +52,7 @@ export async function PassionForDesign() {
 
           <dl className="grid grid-cols-1 gap-8 sm:grid-cols-2">
             {section.values.map((value) => (
-              <div key={value.id} className="flex flex-col gap-2">
+              <div key={value.title} className="flex flex-col gap-2">
                 <dt className="font-heading text-lg text-white">{value.title}</dt>
                 <dd className="text-sm text-white/60">{value.description}</dd>
               </div>

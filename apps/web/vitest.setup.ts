@@ -31,17 +31,6 @@ beforeEach(async () => {
   await prisma.session.deleteMany();
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
-
-  // Payload-managed content (dedicated "payload" Postgres schema) — no Local
-  // API bulk-delete, so truncate directly via the same Postgres connection.
-  await prisma.$executeRawUnsafe(`
-    TRUNCATE TABLE
-      payload.media,
-      payload.hero_banner,
-      payload.users_sessions,
-      payload.users
-    RESTART IDENTITY CASCADE;
-  `);
 });
 
 afterAll(async () => {
