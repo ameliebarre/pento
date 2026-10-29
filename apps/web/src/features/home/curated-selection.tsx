@@ -13,7 +13,7 @@ export async function CuratedSelection() {
   );
 
   const products = allProducts
-    .filter((product) => product.metadata?.featured === "true")
+    .filter((product) => product.metadata?.isFeatured === true)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 6);
 
