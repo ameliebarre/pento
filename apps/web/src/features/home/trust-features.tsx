@@ -5,27 +5,24 @@ import { ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal"
 const FEATURES = [
   {
     icon: BadgeCheck,
-    title: "Pièces authentiques",
-    description:
-      "Nous travaillons avec les éditeurs officiels pour vous garantir l'authenticité de chaque pièce",
+    title: "Authentic pieces",
+    description: "We work with official editors to guarantee the authenticity of every piece",
   },
   {
     icon: Globe,
-    title: "Livraison internationale",
-    description:
-      "Livraison sécurisée partout dans le monde, assurée par des transporteurs spécialisés",
+    title: "International shipping",
+    description: "Secure delivery worldwide, handled by specialized carriers",
   },
   {
     icon: MessageCircle,
-    title: "Conseil personnalisé",
+    title: "Personalized advice",
     description:
-      "Notre équipe vous accompagne dans le choix des pièces adaptées à vos espaces et vos envies",
+      "Our team helps you choose the pieces that best suit your spaces and your style",
   },
   {
     icon: RotateCcw,
-    title: "Retours offerts",
-    description:
-      "Vous avez 14 jours pour changer d'avis, retour gratuit et remboursement sous 7 jours.",
+    title: "Free returns",
+    description: "You have 14 days to change your mind — free returns and refund within 7 days.",
   },
 ];
 
@@ -33,7 +30,7 @@ export function TrustFeatures() {
   return (
     <section aria-labelledby="trust-features-heading" className="py-16">
       <h2 id="trust-features-heading" className="sr-only">
-        Nos engagements
+        Our commitments
       </h2>
       <ScrollRevealGroup
         as="ul"
