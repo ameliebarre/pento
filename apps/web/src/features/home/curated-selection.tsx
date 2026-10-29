@@ -51,14 +51,14 @@ export async function CuratedSelection() {
 
           return (
             <ScrollRevealItem key={product.id} as="li" className="flex flex-col">
-              <div className="bg-card relative aspect-5/6 w-full overflow-hidden">
+              <div className="relative aspect-square w-full overflow-hidden">
                 {image ? (
                   <ProductImage
                     src={image.url}
                     alt={product.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-contain p-10 transition-transform duration-500 hover:scale-105 sm:p-12"
+                    className="object-cover transition-transform duration-500 hover:scale-105"
                   />
                 ) : (
                   <div className="text-muted-foreground flex h-full w-full items-center justify-center">

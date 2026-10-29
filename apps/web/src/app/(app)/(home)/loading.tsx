@@ -50,7 +50,7 @@ export default function Loading() {
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-x-4 gap-y-8 px-6 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="flex flex-col gap-4">
-              <Skeleton className="aspect-5/6 w-full" />
+              <Skeleton className="aspect-square w-full" />
               <div className="flex items-start justify-between gap-4">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-4 w-12" />
