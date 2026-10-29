@@ -4,14 +4,42 @@ import { SiteHeader } from "@/components/site-header";
 import { ScrollReveal, ScrollRevealGroup, ScrollRevealItem } from "@/components/scroll-reveal";
 import { SmoothScrollAnchors } from "@/features/designers/components/smooth-scroll-anchors";
 import { getAllDesigners } from "@/features/designers/server/get-all-designers";
+import { getAllManufacturers } from "@/features/manufacturers/server/get-all-manufacturers";
+import { getEntryName, type CatalogueEntry } from "@/features/brands-and-designers/types";
 import {
   ALPHABET,
-  groupDesignersByLetter,
-} from "@/features/designers/utils/group-designers-by-letter";
+  groupEntriesByLetter,
+} from "@/features/brands-and-designers/utils/group-entries-by-letter";
 
 export default async function BrandsAndDesignersPage() {
-  const designers = await getAllDesigners();
-  const groups = groupDesignersByLetter(designers);
+  const [designers, manufacturers] = await Promise.all([
+    getAllDesigners(),
+    getAllManufacturers(),
+  ]);
+
+  const entries: CatalogueEntry[] = [
+    ...designers.map(
+      (designer): CatalogueEntry => ({
+        kind: "designer",
+        id: designer.id,
+        firstName: designer.first_name,
+        lastName: designer.last_name,
+        secondary: designer.nationality ?? null,
+        href: `/designer/${designer.slug}`,
+      }),
+    ),
+    ...manufacturers.map(
+      (manufacturer): CatalogueEntry => ({
+        kind: "manufacturer",
+        id: manufacturer.id,
+        name: manufacturer.name,
+        secondary: manufacturer.country_name ?? null,
+        href: null,
+      }),
+    ),
+  ];
+
+  const groups = groupEntriesByLetter(entries);
   const availableLetters = ALPHABET.filter((letter) => groups.has(letter));
 
   return (
@@ -32,7 +60,7 @@ export default async function BrandsAndDesignersPage() {
         <div className="flex min-w-0 flex-1 flex-col gap-16">
           {availableLetters.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              Aucun designer disponible pour le moment.
+              Aucun élément disponible pour le moment.
             </p>
           ) : (
             availableLetters.map((letter) => (
@@ -42,23 +70,35 @@ export default async function BrandsAndDesignersPage() {
                   as="ul"
                   className="border-border/60 divide-border/60 flex flex-col divide-y border-t"
                 >
-                  {groups.get(letter)!.map((designer) => (
-                    <ScrollRevealItem key={designer.id} as="li">
-                      <Link
-                        href={`/designer/${designer.slug}`}
-                        className="group flex items-center justify-between gap-4 py-4 transition-opacity hover:opacity-70"
-                      >
+                  {groups.get(letter)!.map((entry) => {
+                    const row = (
+                      <>
                         <span className="font-heading text-ink text-lg sm:text-xl">
-                          {designer.first_name} <span className="italic">{designer.last_name}</span>
+                          {getEntryName(entry)}
                         </span>
-                        {designer.nationality && (
+                        {entry.secondary && (
                           <span className="text-muted-foreground shrink-0 text-xs tracking-wide uppercase">
-                            {designer.nationality}
+                            {entry.secondary}
                           </span>
                         )}
-                      </Link>
-                    </ScrollRevealItem>
-                  ))}
+                      </>
+                    );
+
+                    return (
+                      <ScrollRevealItem key={entry.id} as="li">
+                        {entry.href ? (
+                          <Link
+                            href={entry.href}
+                            className="group flex items-center justify-between gap-4 py-4 transition-opacity hover:opacity-70"
+                          >
+                            {row}
+                          </Link>
+                        ) : (
+                          <div className="flex items-center justify-between gap-4 py-4">{row}</div>
+                        )}
+                      </ScrollRevealItem>
+                    );
+                  })}
                 </ScrollRevealGroup>
               </section>
             ))
