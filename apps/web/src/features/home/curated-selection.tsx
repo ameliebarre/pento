@@ -67,16 +67,18 @@ export async function CuratedSelection() {
                   </div>
                 )}
               </div>
-              <div className="flex items-start justify-between gap-4 pt-4">
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <p className="font-heading truncate text-lg">{product.title}</p>
-                  {designerNames ? (
-                    <p className="text-muted-foreground truncate text-xs">{designerNames}</p>
-                  ) : null}
+              <div className="flex flex-col gap-1 pt-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="min-w-0 truncate text-sm font-medium uppercase">
+                    {product.title}
+                  </span>
+                  <span className="shrink-0 text-xs font-medium">
+                    {formatPrice(getProductPrice(product), "EUR")}
+                  </span>
                 </div>
-                <p className="shrink-0 text-sm font-medium whitespace-nowrap">
-                  {formatPrice(getProductPrice(product), "EUR")}
-                </p>
+                {designerNames ? (
+                  <span className="text-muted-foreground truncate text-xs">{designerNames}</span>
+                ) : null}
               </div>
             </ScrollRevealItem>
           );
