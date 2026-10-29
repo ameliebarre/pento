@@ -13,7 +13,7 @@ export async function CuratedSelection() {
   );
 
   const products = allProducts
-    .filter((product) => product.metadata?.featured === "true")
+    .filter((product) => product.metadata?.isFeatured === true)
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 6);
 
@@ -22,11 +22,11 @@ export async function CuratedSelection() {
   return (
     <section
       aria-labelledby="curated-selection-heading"
-      className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#EFE9DF] py-16 sm:py-20"
+      className="bg-dull-white relative right-1/2 left-1/2 mx-[-50vw] w-screen py-16 sm:py-20"
     >
       <ScrollReveal>
-        <div className="mx-auto flex max-w-xl flex-col items-center gap-3 px-6 text-center">
-          <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-2 px-6 text-center">
+          <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
             Curated selection
           </p>
           <h2 id="curated-selection-heading" className="font-heading text-3xl md:text-4xl">
@@ -51,14 +51,14 @@ export async function CuratedSelection() {
 
           return (
             <ScrollRevealItem key={product.id} as="li" className="flex flex-col">
-              <div className="bg-card relative aspect-5/6 w-full overflow-hidden">
+              <div className="relative aspect-square w-full overflow-hidden">
                 {image ? (
                   <ProductImage
                     src={image.url}
                     alt={product.title}
                     fill
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-contain p-10 transition-transform duration-500 hover:scale-105 sm:p-12"
+                    className="object-cover transition-transform duration-500 hover:scale-105"
                   />
                 ) : (
                   <div className="text-muted-foreground flex h-full w-full items-center justify-center">
@@ -67,16 +67,18 @@ export async function CuratedSelection() {
                   </div>
                 )}
               </div>
-              <div className="flex items-start justify-between gap-4 pt-4">
-                <div className="flex min-w-0 flex-col gap-0.5">
-                  <p className="font-heading truncate text-lg">{product.title}</p>
-                  {designerNames ? (
-                    <p className="text-muted-foreground truncate text-xs">{designerNames}</p>
-                  ) : null}
+              <div className="flex flex-col gap-1 pt-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="min-w-0 truncate text-sm font-medium uppercase">
+                    {product.title}
+                  </span>
+                  <span className="shrink-0 text-xs font-medium">
+                    {formatPrice(getProductPrice(product), "EUR")}
+                  </span>
                 </div>
-                <p className="shrink-0 text-sm font-medium whitespace-nowrap">
-                  {formatPrice(getProductPrice(product), "EUR")}
-                </p>
+                {designerNames ? (
+                  <span className="text-muted-foreground truncate text-xs">{designerNames}</span>
+                ) : null}
               </div>
             </ScrollRevealItem>
           );

@@ -20,11 +20,17 @@ type CheckoutFormProps = {
   accountEmail: string | null;
 };
 
-export function CheckoutForm({ cart, shippingOptions, countries, accountEmail }: CheckoutFormProps) {
+export function CheckoutForm({
+  cart,
+  shippingOptions,
+  countries,
+  accountEmail,
+}: CheckoutFormProps) {
   const [state, formAction, pending] = useActionState(placeOrderAction, { error: null });
   const currency = cart.currency_code.toUpperCase();
   const address = cart.shipping_address;
-  const defaultShippingOptionId = cart.shipping_methods[0]?.shipping_option_id ?? shippingOptions[0]?.id;
+  const defaultShippingOptionId =
+    cart.shipping_methods[0]?.shipping_option_id ?? shippingOptions[0]?.id;
 
   return (
     <form action={formAction} className="flex flex-col gap-8">
@@ -146,7 +152,7 @@ export function CheckoutForm({ cart, shippingOptions, countries, accountEmail }:
         </div>
       </fieldset>
 
-      <fieldset className="flex flex-col gap-3">
+      <fieldset className="flex flex-col gap-2">
         <legend className="font-heading mb-2 text-lg uppercase">Livraison</legend>
         <RadioGroup name="shippingOptionId" defaultValue={defaultShippingOptionId}>
           {shippingOptions.map((option) => {

@@ -54,7 +54,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1C1813] text-white">
+    <footer className="bg-ink text-white">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="flex flex-col gap-6">
@@ -71,7 +71,7 @@ export function Footer() {
               Curators of iconic design furniture since 1965. Bringing history&apos;s greatest
               pieces into contemporary homes.
             </p>
-            <ul className="flex items-center gap-3">
+            <ul className="flex items-center gap-2">
               {SOCIAL_LINKS.map((social) => (
                 <li key={social.label}>
                   <a
@@ -93,7 +93,7 @@ export function Footer() {
               <p className="text-sm font-medium tracking-wide text-white/50 uppercase">
                 {column.title}
               </p>
-              <ul className="flex flex-col gap-3">
+              <ul className="flex flex-col gap-2">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <Link

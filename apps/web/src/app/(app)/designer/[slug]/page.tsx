@@ -50,21 +50,21 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-16">
         <div className="flex w-full flex-col gap-6 lg:w-1/2">
           <div className="flex flex-col gap-2">
-            <h1 className="font-heading text-[40px] leading-tight text-[#26221B]">
+            <h1 className="font-heading text-ink text-[40px] leading-tight">
               {designer.first_name}
               <br />
               <span className="italic">{designer.last_name}</span>
             </h1>
           </div>
 
-          {lifespan && <p className="text-base text-[#26221B]">{lifespan}</p>}
+          {lifespan && <p className="text-ink text-base">{lifespan}</p>}
 
           {designer.movements && designer.movements.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {designer.movements.map((movement) => (
                 <span
                   key={movement.id}
-                  className="inline-block w-fit border border-[#26221B]/30 px-3 py-1.5 text-[10px] tracking-wide text-[#26221B] uppercase"
+                  className="border-ink/30 text-ink inline-block w-fit border px-3 py-1.5 text-[10px] tracking-wide uppercase"
                 >
                   {movement.name}
                 </span>
@@ -73,7 +73,7 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
           )}
 
           {biographyParagraphs.length > 0 && (
-            <div className="flex flex-col gap-4 text-sm text-[#26221B]">
+            <div className="text-ink flex flex-col gap-4 text-sm">
               {biographyParagraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
@@ -82,7 +82,7 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
 
           <a
             href="#life-career"
-            className="inline-flex w-fit items-center bg-[#282828] px-6 py-3 text-sm text-white uppercase"
+            className="bg-ink inline-flex w-fit items-center px-6 py-3 text-sm text-white uppercase"
           >
             Explore his story
           </a>
@@ -103,12 +103,12 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
 
       <nav
         aria-label="Sections de la page designer"
-        className="relative right-1/2 left-1/2 mx-[-50vw] w-screen bg-[#EFE9DF] py-8"
+        className="bg-dull-white relative right-1/2 left-1/2 mx-[-50vw] w-screen py-8"
       >
         <ul className="flex flex-wrap items-center justify-center gap-18.75">
           {SECTION_LINKS.map((link) => (
             <li key={link.href}>
-              <a href={link.href} className="text-sm text-[#26221B] uppercase">
+              <a href={link.href} className="text-ink text-sm uppercase">
                 {link.label}
               </a>
             </li>
@@ -117,13 +117,14 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
       </nav>
 
       {designer.timeline && designer.timeline.entries.length > 0 && (
-        <div id="life-career" className="flex flex-col gap-10 scroll-mt-32">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+        <div id="life-career" className="flex scroll-mt-32 flex-col gap-10">
+          <div className="flex flex-col gap-2">
+            <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
               Life & Career
             </p>
-            <h2 className="font-heading text-3xl text-[#26221B] sm:text-4xl">
-              The story of <span className="italic">{`${designer.first_name} ${designer.last_name}`}</span>
+            <h2 className="font-heading text-ink text-3xl sm:text-4xl">
+              The story of{" "}
+              <span className="italic">{`${designer.first_name} ${designer.last_name}`}</span>
             </h2>
           </div>
 
@@ -134,7 +135,7 @@ export default async function DesignerPage({ params }: DesignerPageProps) {
       {designer.quote && (
         <div
           id="quote"
-          className="relative right-1/2 left-1/2 mx-[-50vw] w-screen scroll-mt-32 bg-[#282828] py-15.5"
+          className="bg-ink relative right-1/2 left-1/2 mx-[-50vw] w-screen scroll-mt-32 py-15.5"
         >
           <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 text-center">
             <Quote aria-hidden="true" className="size-10 fill-white text-white" />

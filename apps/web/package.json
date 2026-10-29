@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "vercel-build": "tsx scripts/wait-for-db.ts && PAYLOAD_CONFIG_PATH=payload.config.ts payload migrate && tsx scripts/migrate-with-retry.ts && next build --webpack",
+    "vercel-build": "tsx scripts/wait-for-db.ts && tsx scripts/migrate-with-retry.ts && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
@@ -18,15 +18,11 @@
     "db:test:migrate": "DATABASE_URL=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" DATABASE_URL_UNPOOLED=\"postgresql://pento:pento@localhost:5434/pento_test?schema=public\" prisma migrate deploy",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postinstall": "prisma generate",
-    "payload": "cross-env PAYLOAD_CONFIG_PATH=payload.config.ts payload"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@medusajs/js-sdk": "2.21.2",
-    "@payloadcms/db-postgres": "3.87.1",
-    "@payloadcms/next": "3.87.1",
-    "@payloadcms/richtext-lexical": "3.87.1",
     "@prisma/client": "^6.19.3",
     "@tanstack/react-query": "^5.104.0",
     "better-auth": "^1.6.25",
@@ -36,7 +32,6 @@
     "motion": "^12.43.0",
     "next": "16.2.12",
     "next-cloudinary": "^6.17.5",
-    "payload": "3.87.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.18.1",

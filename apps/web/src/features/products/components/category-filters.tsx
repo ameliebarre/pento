@@ -1,7 +1,10 @@
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FiltersNavigationLink } from "@/features/products/components/filters-navigation";
-import { buildClearFilterHref, buildToggleFilterHref } from "@/features/products/utils/build-filter-href";
+import {
+  buildClearFilterHref,
+  buildToggleFilterHref,
+} from "@/features/products/utils/build-filter-href";
 import type { ProductFilters } from "@/features/products/types";
 import type { MedusaCategory } from "@/features/products/medusa-types";
 
@@ -17,7 +20,7 @@ export function CategoryFilters({ categories, filters }: CategoryFiltersProps) {
     filters.categories.length > 0 ? buildClearFilterHref(filters, "categories") : null;
 
   return (
-    <div role="group" aria-label="Catégories" className="flex flex-col gap-3">
+    <div role="group" aria-label="Catégories" className="flex flex-col gap-2">
       {resetHref && (
         <FiltersNavigationLink
           href={resetHref}

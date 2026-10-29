@@ -2,7 +2,7 @@
 
 Deux applications séparées, déployées indépendamment :
 
-- [`apps/web`](apps/web) — vitrine Next.js + Payload CMS (contenu éditorial uniquement : Hero Banner, Passion for Design...). Voir [apps/web/README.md](apps/web/README.md).
+- [`apps/web`](apps/web) — vitrine Next.js (contenu éditorial en dur dans le code : Hero Banner, Passion for Design...). Voir [apps/web/README.md](apps/web/README.md).
 - [`apps/medusa`](apps/medusa) — serveur Medusa pour le e-commerce (produits, pricing, promotions, inventaire, paiement), appelé en service pur par `apps/web`.
 
 ## Développement

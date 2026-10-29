@@ -45,7 +45,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col overflow-x-hidden">
         <QueryProvider>
           <CartDrawerProvider>
-            <main id="main-content" className="mx-auto w-full flex-1 px-24">
+            <main id="main-content" className="mx-auto w-full flex-1 px-8 md:px-12 lg:px-16">
               {children}
             </main>
             <Footer />

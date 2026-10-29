@@ -68,19 +68,19 @@ export function CareerTimeline({ entries }: CareerTimelineProps) {
           {entries.map((entry, index) => (
             <div key={index} className="group relative flex w-55 shrink-0 flex-col items-center">
               <div className="flex flex-col items-center gap-y-0.75 pb-6 text-center">
-                <p className="font-heading text-2xl text-[#282828]">{entry.date}</p>
+                <p className="font-heading text-2xl text-ink">{entry.date}</p>
                 <p className="text-xs text-[#96652E]">{entry.subtitle}</p>
-                <p className="text-xs text-[#282828]">{entry.title}</p>
+                <p className="text-xs text-ink">{entry.title}</p>
               </div>
 
               <div className="flex w-full items-center">
-                <span className="h-px flex-1 bg-[#26221B]/15" />
-                <span className="size-4 shrink-0 rounded-full border border-[#26221B]/40 bg-white" />
-                <span className="h-px flex-1 bg-[#26221B]/15" />
+                <span className="h-px flex-1 bg-ink/15" />
+                <span className="size-4 shrink-0 rounded-full border border-ink/40 bg-white" />
+                <span className="h-px flex-1 bg-ink/15" />
               </div>
 
               <div className="relative h-32 w-full">
-                <p className="pointer-events-none absolute top-4 left-1/2 w-80 -translate-x-1/2 text-center text-xs text-[#282828] opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <p className="pointer-events-none absolute top-4 left-1/2 w-80 -translate-x-1/2 text-center text-xs text-ink opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                   {entry.description}
                 </p>
               </div>

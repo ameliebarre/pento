@@ -6,7 +6,10 @@ import { Search } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
+import {
+  FiltersNavigationLink,
+  useFiltersNavigation,
+} from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
@@ -49,7 +52,7 @@ export function DesignerFilters({ designers, filters }: DesignerFiltersProps) {
   const hasMore = filteredDesigners.length > VISIBLE_COUNT;
 
   return (
-    <div role="group" aria-label="Designers" className="flex flex-col gap-3">
+    <div role="group" aria-label="Designers" className="flex flex-col gap-2">
       {filters.designers.length > 0 && (
         <FiltersNavigationLink
           href={buildClearFilterHref(filters, "designers")}

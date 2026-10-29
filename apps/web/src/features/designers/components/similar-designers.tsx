@@ -13,14 +13,12 @@ export function SimilarDesigners({ designers }: SimilarDesignersProps) {
   if (designers.length === 0) return null;
 
   return (
-    <div id="similar-designers" className="flex flex-col gap-10 scroll-mt-32">
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium tracking-wide text-[#c5964b] uppercase">
+    <div id="similar-designers" className="flex scroll-mt-32 flex-col gap-10">
+      <div className="flex flex-col gap-2">
+        <p className="text-dark-buff text-sm font-medium tracking-wide uppercase">
           Similar Designers
         </p>
-        <h2 className="font-heading text-3xl text-[#26221B] sm:text-4xl">
-          A shared sense of design
-        </h2>
+        <h2 className="font-heading text-ink text-3xl sm:text-4xl">A shared sense of design</h2>
       </div>
 
       <ul className="grid grid-cols-2 gap-6 sm:grid-cols-4">
@@ -30,7 +28,7 @@ export function SimilarDesigners({ designers }: SimilarDesignersProps) {
 
           return (
             <li key={designer.id}>
-              <Link href={`/designer/${designer.slug}`} className="group flex flex-col gap-3">
+              <Link href={`/designer/${designer.slug}`} className="group flex flex-col gap-2">
                 <div className="bg-muted relative aspect-3/4 w-full overflow-hidden">
                   {designer.image_url ? (
                     <ProductImage
@@ -48,7 +46,7 @@ export function SimilarDesigners({ designers }: SimilarDesignersProps) {
                   )}
                 </div>
                 <div className="flex flex-col gap-1">
-                  <p className="font-heading text-xl text-[#26221B]">{name}</p>
+                  <p className="font-heading text-ink text-xl">{name}</p>
                   {lifespan && <p className="text-sm text-[#8a8070]">{lifespan}</p>}
                 </div>
               </Link>

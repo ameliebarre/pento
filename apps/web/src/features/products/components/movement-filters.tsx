@@ -4,7 +4,10 @@ import { useState } from "react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { FiltersNavigationLink, useFiltersNavigation } from "@/features/products/components/filters-navigation";
+import {
+  FiltersNavigationLink,
+  useFiltersNavigation,
+} from "@/features/products/components/filters-navigation";
 import {
   buildClearFilterHref,
   buildToggleFilterHref,
@@ -21,10 +24,6 @@ type MovementFiltersProps = {
 
 export function MovementFilters({ movements, filters }: MovementFiltersProps) {
   const { navigate, isPending } = useFiltersNavigation();
-  // Selecting a movement navigates, which remounts this
-  // component and would otherwise always collapse back to the first
-  // VISIBLE_COUNT — hiding a just-selected movement past that cutoff. Default
-  // to expanded whenever the current selection has one of those.
   const [showAll, setShowAll] = useState(() =>
     movements.some(
       (movement, index) => index >= VISIBLE_COUNT && filters.movements.includes(movement.slug),
@@ -37,7 +36,7 @@ export function MovementFilters({ movements, filters }: MovementFiltersProps) {
   const hasMore = movements.length > VISIBLE_COUNT;
 
   return (
-    <div role="group" aria-label="Mouvements" className="flex flex-col gap-3">
+    <div role="group" aria-label="Mouvements" className="flex flex-col gap-2">
       {filters.movements.length > 0 && (
         <FiltersNavigationLink
           href={buildClearFilterHref(filters, "movements")}

@@ -1,4 +1,3 @@
-import { SiteHeader } from "@/components/site-header";
 import { HeroBanner } from "@/features/home/hero-banner";
 import { ShopByCategory } from "@/features/home/shop-by-category";
 import { CuratedSelection } from "@/features/home/curated-selection";
@@ -11,7 +10,6 @@ import { TrustFeatures } from "@/features/home/trust-features";
 export default async function HomePage() {
   return (
     <div className="flex flex-col gap-6">
-      <SiteHeader />
       <HeroBanner />
       <ShopByCategory />
       <div className="flex flex-col">
