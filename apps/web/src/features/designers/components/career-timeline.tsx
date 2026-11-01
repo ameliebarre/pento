@@ -70,7 +70,7 @@ export function CareerTimeline({ entries }: CareerTimelineProps) {
               <div className="flex flex-col items-center gap-y-0.75 pb-6 text-center">
                 <p className="font-heading text-2xl text-ink">{entry.date}</p>
                 <p className="text-xs text-[#96652E]">{entry.subtitle}</p>
-                <p className="text-xs text-ink">{entry.title}</p>
+                <p className="flex h-8 items-center text-xs leading-4 text-ink">{entry.title}</p>
               </div>
 
               <div className="flex w-full items-center">
@@ -79,7 +79,7 @@ export function CareerTimeline({ entries }: CareerTimelineProps) {
                 <span className="h-px flex-1 bg-ink/15" />
               </div>
 
-              <div className="relative h-32 w-full">
+              <div className="relative h-24 w-full">
                 <p className="pointer-events-none absolute top-4 left-1/2 w-80 -translate-x-1/2 text-center text-xs text-ink opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                   {entry.description}
                 </p>
@@ -92,7 +92,7 @@ export function CareerTimeline({ entries }: CareerTimelineProps) {
       </div>
 
       {isScrollable && (
-        <div className="text-muted-foreground flex items-center justify-center gap-2 text-xs">
+        <div className="text-muted-foreground -mt-2 flex items-center justify-center gap-2 text-xs">
           <Hand aria-hidden="true" className="size-4" />
           Scroll to explore the full timeline
         </div>
