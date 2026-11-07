@@ -72,10 +72,18 @@ export type MedusaProductVariantPrice = {
   amount: number;
 };
 
+export type MedusaProductVariantOption = {
+  value: string;
+  option: { title: string } | null;
+};
+
 export type MedusaProductVariant = {
   id: string;
+  title: string;
   sku: string | null;
+  images: MedusaProductImage[];
   prices: MedusaProductVariantPrice[];
+  options: MedusaProductVariantOption[];
 };
 
 export type MedusaProduct = {

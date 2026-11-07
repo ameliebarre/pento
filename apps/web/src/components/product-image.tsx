@@ -10,6 +10,7 @@ type ProductImageProps = {
   sizes?: string;
   className?: string;
   priority?: boolean;
+  loading?: "lazy" | "eager";
 };
 
 function isCloudinarySource(src: string) {
@@ -17,7 +18,7 @@ function isCloudinarySource(src: string) {
   return !src.startsWith("/") && !src.startsWith("http");
 }
 
-export function ProductImage({ src, alt, fill, sizes, className, priority }: ProductImageProps) {
+export function ProductImage({ src, alt, fill, sizes, className, priority, loading }: ProductImageProps) {
   if (isCloudinarySource(src)) {
     return (
       <CldImage
@@ -27,6 +28,7 @@ export function ProductImage({ src, alt, fill, sizes, className, priority }: Pro
         sizes={sizes}
         className={className}
         priority={priority}
+        loading={priority ? undefined : loading}
         crop="fill"
         gravity="auto"
       />
@@ -34,6 +36,14 @@ export function ProductImage({ src, alt, fill, sizes, className, priority }: Pro
   }
 
   return (
-    <Image src={src} alt={alt} fill={fill} sizes={sizes} className={className} priority={priority} />
+    <Image
+      src={src}
+      alt={alt}
+      fill={fill}
+      sizes={sizes}
+      className={className}
+      priority={priority}
+      loading={priority ? undefined : loading}
+    />
   );
 }

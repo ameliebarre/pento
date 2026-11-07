@@ -33,8 +33,11 @@ function buildProduct(data: {
     variants: [
       {
         id: `${data.handle}-variant`,
+        title: "Default",
         sku: null,
+        images: [],
         prices: [{ currency_code: "eur", amount: data.price }],
+        options: [],
       },
     ],
     designers: (data.designers ?? []).map((designer, index) => ({

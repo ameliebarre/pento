@@ -72,7 +72,14 @@ function buildProduct(
     categories: options.category ? [options.category] : [],
     tags: [],
     variants: [
-      { id: `${id}-variant`, sku: null, prices: [{ currency_code: "eur", amount: options.price ?? 100 }] },
+      {
+        id: `${id}-variant`,
+        title: "Default",
+        sku: null,
+        images: [],
+        prices: [{ currency_code: "eur", amount: options.price ?? 100 }],
+        options: [],
+      },
     ],
     designers: options.designer ? [options.designer] : [],
     movement: options.movement ?? null,
