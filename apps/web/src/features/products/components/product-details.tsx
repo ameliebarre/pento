@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/utils";
 
 import type { MedusaProduct } from "../medusa-types";
 import { getProductPrice } from "../utils/get-product-price";
-import { AddToCartButton } from "./add-to-cart-button";
+import { AddToCartWithQuantity } from "./add-to-cart-with-quantity";
 import { ProductGallery } from "./product-gallery";
 import { ProductVariantSelector } from "./product-variant-selector";
 
@@ -41,7 +41,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <p className="text-lg font-medium">{formatPrice(getProductPrice(product), "EUR")}</p>
         </div>
 
-        {selectedVariant && <AddToCartButton variantId={selectedVariant.id} className="self-start" />}
+        {selectedVariant && <AddToCartWithQuantity variantId={selectedVariant.id} />}
 
         <ProductVariantSelector
           variants={product.variants}

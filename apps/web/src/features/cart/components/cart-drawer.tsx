@@ -121,7 +121,7 @@ export function CartDrawer() {
                             {item.product.name}
                           </span>
                           <span className="shrink-0 text-sm font-medium whitespace-nowrap">
-                            {formatPrice(item.product.price, item.product.currency)}
+                            {formatPrice(item.product.price * item.quantity, item.product.currency)}
                           </span>
                         </div>
                         <p className="text-muted-foreground text-xs">Quantité : {item.quantity}</p>
