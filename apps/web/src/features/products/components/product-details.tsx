@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/utils";
 import type { MedusaProduct } from "../medusa-types";
 import { getProductPrice } from "../utils/get-product-price";
 import { AddToCartWithQuantity } from "./add-to-cart-with-quantity";
+import { ProductDescription } from "./product-description";
 import { ProductGallery } from "./product-gallery";
 import { ProductVariantSelector } from "./product-variant-selector";
 
@@ -41,7 +42,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <p className="text-lg font-medium">{formatPrice(getProductPrice(product), "EUR")}</p>
         </div>
 
-        {selectedVariant && <AddToCartWithQuantity variantId={selectedVariant.id} />}
+        {product.description && <ProductDescription description={product.description} />}
 
         <ProductVariantSelector
           variants={product.variants}
@@ -50,11 +51,13 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           productTitle={product.title}
         />
 
-        {product.description && (
-          <p className="text-muted-foreground text-sm whitespace-pre-line">{product.description}</p>
+        {selectedVariant && (
+          <div className="border-t border-gray-200 pt-6">
+            <AddToCartWithQuantity variantId={selectedVariant.id} />
+          </div>
         )}
 
-        <dl className="flex flex-col gap-2 border-t pt-4 text-sm">
+        <dl className="flex flex-col gap-2 text-sm">
           {product.manufacturer && (
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Fabricant</dt>
