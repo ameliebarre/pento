@@ -60,12 +60,12 @@ async function getOrCreateCartId(): Promise<string> {
   return cart.id;
 }
 
-export async function addToCartAction(variantId: string) {
+export async function addToCartAction(variantId: string, quantity: number = 1) {
   const cartId = await getOrCreateCartId();
 
   await medusa.client.fetch(`/store/carts/${cartId}/line-items`, {
     method: "POST",
-    body: { variant_id: variantId, quantity: 1 },
+    body: { variant_id: variantId, quantity },
   });
 }
 

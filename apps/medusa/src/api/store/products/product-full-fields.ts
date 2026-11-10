@@ -12,6 +12,8 @@ export const PRODUCT_FULL_FIELDS = [
   "tags.*",
   "variants.*",
   "variants.prices.*",
+  "variants.options.value",
+  "variants.options.option.title",
   "designers.*",
   "movement.*",
   "materials.*",

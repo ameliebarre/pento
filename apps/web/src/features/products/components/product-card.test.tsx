@@ -28,7 +28,16 @@ function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
     images: [{ id: "img_1", url: "/images/armchairs.png" }],
     categories: [],
     tags: [],
-    variants: [{ id: "variant_1", sku: null, prices: [{ currency_code: "eur", amount: 1445 }] }],
+    variants: [
+      {
+        id: "variant_1",
+        title: "Default",
+        sku: null,
+        images: [],
+        prices: [{ currency_code: "eur", amount: 1445 }],
+        options: [],
+      },
+    ],
     designers: [],
     movement: null,
     materials: [],
