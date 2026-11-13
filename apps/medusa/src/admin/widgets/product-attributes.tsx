@@ -10,16 +10,29 @@ function toText(value: unknown) {
   return typeof value === "string" ? value : ""
 }
 
+function toYearValue(value: unknown) {
+  return value === null || value === undefined || value === "" ? "" : String(value)
+}
+
+function toYearOrNull(value: string) {
+  const trimmed = value.trim()
+  if (trimmed === "") return null
+  const parsed = Number(trimmed)
+  return Number.isNaN(parsed) ? null : parsed
+}
+
 const ProductAttributesWidget = ({ data }: DetailWidgetProps<AdminProduct>) => {
   const queryClient = useQueryClient()
 
   const initialMaterial = data.material ?? ""
   const initialGroup = toText(data.metadata?.upholstery_group)
   const initialName = toText(data.metadata?.upholstery_name)
+  const initialYear = toYearValue(data.metadata?.year)
 
   const [material, setMaterial] = useState(initialMaterial)
   const [upholsteryGroup, setUpholsteryGroup] = useState(initialGroup)
   const [upholsteryName, setUpholsteryName] = useState(initialName)
+  const [year, setYear] = useState(initialYear)
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -29,6 +42,7 @@ const ProductAttributesWidget = ({ data }: DetailWidgetProps<AdminProduct>) => {
           ...data.metadata,
           upholstery_group: upholsteryGroup,
           upholstery_name: upholsteryName,
+          year: toYearOrNull(year),
         },
       }),
     onSuccess: () => {
@@ -39,7 +53,10 @@ const ProductAttributesWidget = ({ data }: DetailWidgetProps<AdminProduct>) => {
   })
 
   const isDirty =
-    material !== initialMaterial || upholsteryGroup !== initialGroup || upholsteryName !== initialName
+    material !== initialMaterial ||
+    upholsteryGroup !== initialGroup ||
+    upholsteryName !== initialName ||
+    year !== initialYear
 
   return (
     <Container className="flex flex-col gap-y-6">
@@ -75,6 +92,12 @@ const ProductAttributesWidget = ({ data }: DetailWidgetProps<AdminProduct>) => {
             value={upholsteryName}
             onChange={(e) => setUpholsteryName(e.target.value)}
           />
+        </div>
+        <div className="flex flex-col gap-y-1">
+          <Label size="small" htmlFor="year">
+            Year
+          </Label>
+          <Input id="year" type="number" value={year} onChange={(e) => setYear(e.target.value)} />
         </div>
       </div>
     </Container>

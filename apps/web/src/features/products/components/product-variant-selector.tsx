@@ -18,7 +18,7 @@ export function ProductVariantSelector({
   onSelect,
   productTitle,
 }: ProductVariantSelectorProps) {
-  if (variants.length === 0) return null;
+  if (variants.length <= 1) return null;
 
   const selectedVariant = variants.find((variant) => variant.id === selectedVariantId);
 
