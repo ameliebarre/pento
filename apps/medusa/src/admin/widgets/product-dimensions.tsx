@@ -8,7 +8,6 @@ import { sdk } from "../lib/sdk"
 type DimensionsForm = {
   width: string
   height: string
-  length: string
   depth: string
   weight: string
 }
@@ -28,7 +27,6 @@ function buildForm(data: AdminProduct): DimensionsForm {
   return {
     width: toFormValue(data.width),
     height: toFormValue(data.height),
-    length: toFormValue(data.length),
     depth: toFormValue(data.metadata?.depth),
     weight: toFormValue(data.weight),
   }
@@ -37,7 +35,6 @@ function buildForm(data: AdminProduct): DimensionsForm {
 const FIELDS: { key: keyof DimensionsForm; label: string }[] = [
   { key: "width", label: "Width (cm)" },
   { key: "height", label: "Height (cm)" },
-  { key: "length", label: "Length (cm)" },
   { key: "depth", label: "Depth (cm)" },
   { key: "weight", label: "Weight (kg)" },
 ]
@@ -52,7 +49,6 @@ const ProductDimensionsWidget = ({ data }: DetailWidgetProps<AdminProduct>) => {
       sdk.admin.product.update(data.id, {
         width: toNumberOrNull(form.width),
         height: toNumberOrNull(form.height),
-        length: toNumberOrNull(form.length),
         weight: toNumberOrNull(form.weight),
         metadata: { ...data.metadata, depth: toNumberOrNull(form.depth) },
       }),

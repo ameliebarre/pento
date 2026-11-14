@@ -2,6 +2,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 vi.mock("@/lib/get-session", () => ({
   getSession: vi.fn().mockResolvedValue(null),
@@ -91,7 +92,7 @@ describe("ProductPage", () => {
     expect(screen.getByText("Aucune image disponible pour Barcelona Chair")).toBeInTheDocument();
   });
 
-  it("shows the designers, movement, materials and manufacturer", async () => {
+  it("shows the designer and lists movement, materials and manufacturer in the characteristics tab", async () => {
     setupMedusa(
       buildProduct({
         designers: [{ id: "des_1", slug: "mies", first_name: "Ludwig", last_name: "Mies van der Rohe" }],
@@ -104,9 +105,13 @@ describe("ProductPage", () => {
     render(await renderPage("barcelona-chair"));
 
     expect(screen.getByText("Ludwig Mies van der Rohe")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Characteristics" }));
+
     expect(screen.getByText("Bauhaus")).toBeInTheDocument();
     expect(screen.getByText("Cuir")).toBeInTheDocument();
-    expect(screen.getByText("Knoll — États-Unis")).toBeInTheDocument();
+    expect(screen.getByText("Knoll")).toBeInTheDocument();
+    expect(screen.getByText("États-Unis")).toBeInTheDocument();
   });
 
   it("renders an add to cart button for the first variant", async () => {

@@ -94,6 +94,10 @@ export type MedusaProduct = {
   created_at: string;
   thumbnail?: string | null;
   metadata?: Record<string, unknown> | null;
+  material?: string | null;
+  width?: number | null;
+  height?: number | null;
+  weight?: number | null;
   images: MedusaProductImage[];
   categories: MedusaCategory[];
   tags: { id: string; value: string }[];

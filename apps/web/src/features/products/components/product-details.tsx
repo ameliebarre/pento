@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { formatPrice } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ import { getProductPrice } from "../utils/get-product-price";
 import { AddToCartWithQuantity } from "./add-to-cart-with-quantity";
 import { ProductDescription } from "./product-description";
 import { ProductGallery } from "./product-gallery";
+import { ProductTabs } from "./product-tabs";
 import { ProductVariantSelector } from "./product-variant-selector";
 
 type ProductDetailsProps = {
@@ -19,10 +20,17 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedVariantId, setSelectedVariantId] = useState(product.variants[0]?.id);
   const selectedVariant = product.variants.find((variant) => variant.id === selectedVariantId);
 
+  const [openTab, setOpenTab] = useState<string[]>([]);
+  const tabsRef = useRef<HTMLDivElement>(null);
+
   const designerNames = product.designers
     .map((designer) => `${designer.first_name} ${designer.last_name}`)
     .join(", ");
-  const materialNames = product.materials.map((material) => material.name).join(", ");
+
+  const handleViewMoreDescription = () => {
+    setOpenTab(["description"]);
+    tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
@@ -42,7 +50,9 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           <p className="text-lg font-medium">{formatPrice(getProductPrice(product), "EUR")}</p>
         </div>
 
-        {product.description && <ProductDescription description={product.description} />}
+        {product.description && (
+          <ProductDescription description={product.description} onViewMore={handleViewMoreDescription} />
+        )}
 
         <ProductVariantSelector
           variants={product.variants}
@@ -57,29 +67,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
           </div>
         )}
 
-        <dl className="flex flex-col gap-2 text-sm">
-          {product.manufacturer && (
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Fabricant</dt>
-              <dd className="text-right">
-                {product.manufacturer.name}
-                {product.manufacturer.country_name ? ` — ${product.manufacturer.country_name}` : ""}
-              </dd>
-            </div>
-          )}
-          {product.movement && (
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Mouvement</dt>
-              <dd className="text-right">{product.movement.name}</dd>
-            </div>
-          )}
-          {materialNames && (
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Matériaux</dt>
-              <dd className="text-right">{materialNames}</dd>
-            </div>
-          )}
-        </dl>
+        <ProductTabs product={product} value={openTab} onValueChange={setOpenTab} ref={tabsRef} />
       </div>
     </div>
   );

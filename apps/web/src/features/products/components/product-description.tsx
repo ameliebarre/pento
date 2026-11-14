@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 type ProductDescriptionProps = {
   description: string;
+  onViewMore: () => void;
 };
 
-export function ProductDescription({ description }: ProductDescriptionProps) {
-  const [expanded, setExpanded] = useState(false);
+export function ProductDescription({ description, onViewMore }: ProductDescriptionProps) {
   const [isClamped, setIsClamped] = useState(false);
   const textRef = useRef<HTMLParagraphElement>(null);
 
@@ -19,19 +19,16 @@ export function ProductDescription({ description }: ProductDescriptionProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <p
-        ref={textRef}
-        className={`text-muted-foreground text-sm whitespace-pre-line ${expanded ? "" : "line-clamp-5"}`}
-      >
+      <p ref={textRef} className="text-muted-foreground line-clamp-5 text-sm whitespace-pre-line">
         {description}
       </p>
-      {(isClamped || expanded) && (
+      {isClamped && (
         <button
           type="button"
-          onClick={() => setExpanded((value) => !value)}
+          onClick={onViewMore}
           className="text-ink w-fit cursor-pointer text-sm underline underline-offset-2"
         >
-          {expanded ? "View less" : "View more"}
+          View more
         </button>
       )}
     </div>
