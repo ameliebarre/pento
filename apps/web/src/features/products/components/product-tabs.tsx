@@ -27,6 +27,19 @@ function formatWeight(product: MedusaProduct) {
   return product.weight ? `${product.weight} kg` : null;
 }
 
+type FunctionPropertyRow = { property: string; value: string };
+
+function toFunctionPropertyRows(value: unknown): FunctionPropertyRow[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((row): row is Record<string, unknown> => typeof row === "object" && row !== null)
+    .map((row) => ({
+      property: typeof row.property === "string" ? row.property : "",
+      value: typeof row.value === "string" ? row.value : "",
+    }))
+    .filter((row) => row.property.trim() !== "" && row.value.trim() !== "");
+}
+
 export const ProductTabs = forwardRef<HTMLDivElement, ProductTabsProps>(function ProductTabs(
   { product, value, onValueChange },
   ref,
@@ -43,11 +56,7 @@ export const ProductTabs = forwardRef<HTMLDivElement, ProductTabsProps>(function
   const isMaterialHtml = Boolean(product.material && stripHtml(product.material) !== "");
   const materials = isMaterialHtml ? product.material : materialTags || null;
 
-  const functionProperties =
-    typeof product.metadata?.function_properties === "string" &&
-    stripHtml(product.metadata.function_properties) !== ""
-      ? product.metadata.function_properties
-      : null;
+  const functionPropertyRows = toFunctionPropertyRows(product.metadata?.function_properties);
 
   const characteristicsRows = [
     { label: "Year", value: year },
@@ -97,14 +106,18 @@ export const ProductTabs = forwardRef<HTMLDivElement, ProductTabsProps>(function
           </AccordionItem>
         )}
 
-        {functionProperties && (
+        {functionPropertyRows.length > 0 && (
           <AccordionItem value="function-properties">
             <AccordionTrigger>Function & Properties</AccordionTrigger>
             <AccordionContent>
-              <div
-                className="text-sm [&_li]:mb-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-3 [&_p:last-child]:mb-0 [&_strong]:text-muted-foreground [&_strong]:font-normal [&_ul]:list-disc [&_ul]:pl-5"
-                dangerouslySetInnerHTML={{ __html: functionProperties }}
-              />
+              <dl className="flex flex-col gap-2 text-sm">
+                {functionPropertyRows.map(({ property, value }, index) => (
+                  <div key={index} className="flex justify-between gap-4">
+                    <dt className="text-muted-foreground">{property}</dt>
+                    <dd className="text-right">{value}</dd>
+                  </div>
+                ))}
+              </dl>
             </AccordionContent>
           </AccordionItem>
         )}
