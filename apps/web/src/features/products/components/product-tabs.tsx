@@ -15,11 +15,11 @@ function stripHtml(html: string) {
 }
 
 function formatDimensions(product: MedusaProduct) {
-  const parts: number[] = [];
-  if (product.width) parts.push(product.width);
-  if (product.height) parts.push(product.height);
+  const parts: string[] = [];
+  if (product.width) parts.push(`W${product.width}`);
+  if (product.height) parts.push(`H${product.height}`);
   const depth = product.metadata?.depth;
-  if (typeof depth === "number" && depth) parts.push(depth);
+  if (typeof depth === "number" && depth) parts.push(`D${depth}`);
   return parts.length > 0 ? `${parts.join(" × ")} cm` : null;
 }
 
