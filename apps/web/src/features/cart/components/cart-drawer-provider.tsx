@@ -6,11 +6,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addToCartAction } from "@/actions/cart";
 import { CART_QUERY_KEY } from "@/features/cart/constants";
 
+type AddToCartInput = { variantId: string; quantity: number };
+
 type CartDrawerContextValue = {
   isOpen: boolean;
   open: () => void;
   close: () => void;
-  addToCart: (variantId: string) => void;
+  addToCart: (variantId: string, quantity?: number) => void;
   pendingVariantId: string | null;
   addError: string | null;
 };
@@ -24,7 +26,7 @@ export function CartDrawerProvider({ children }: { children: React.ReactNode }) 
   const [liveMessage, setLiveMessage] = useState("");
 
   const mutation = useMutation({
-    mutationFn: addToCartAction,
+    mutationFn: ({ variantId, quantity }: AddToCartInput) => addToCartAction(variantId, quantity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
       setLiveMessage("Produit ajouté au panier.");
@@ -39,11 +41,11 @@ export function CartDrawerProvider({ children }: { children: React.ReactNode }) 
       isOpen,
       open: () => setIsOpen(true),
       close: () => setIsOpen(false),
-      addToCart: (variantId: string) => {
+      addToCart: (variantId: string, quantity = 1) => {
         setIsOpen(true);
-        mutation.mutate(variantId);
+        mutation.mutate({ variantId, quantity });
       },
-      pendingVariantId: mutation.isPending ? mutation.variables : null,
+      pendingVariantId: mutation.isPending ? mutation.variables.variantId : null,
       addError: mutation.isError ? mutation.error.message : null,
     }),
     [isOpen, mutation],

@@ -27,7 +27,7 @@ function product(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
     images: [],
     categories: [],
     tags: [],
-    variants: [{ id: "variant_1", sku: null, prices: [{ currency_code: "eur", amount: 1000 }] }],
+    variants: [{ id: "variant_1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 1000 }], options: [] }],
     designers: [],
     movement: null,
     materials: [],
@@ -83,8 +83,8 @@ describe("filterAndSortProducts", () => {
   });
 
   it("filters by a minimum price only", () => {
-    const cheap = product({ id: "a", variants: [{ id: "v1", sku: null, prices: [{ currency_code: "eur", amount: 100 }] }] });
-    const expensive = product({ id: "b", variants: [{ id: "v2", sku: null, prices: [{ currency_code: "eur", amount: 2000 }] }] });
+    const cheap = product({ id: "a", variants: [{ id: "v1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 100 }], options: [] }] });
+    const expensive = product({ id: "b", variants: [{ id: "v2", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 2000 }], options: [] }] });
 
     const result = filterAndSortProducts([cheap, expensive], filters({ minPrice: 500 }));
 
@@ -92,8 +92,8 @@ describe("filterAndSortProducts", () => {
   });
 
   it("filters by a maximum price only", () => {
-    const cheap = product({ id: "a", variants: [{ id: "v1", sku: null, prices: [{ currency_code: "eur", amount: 100 }] }] });
-    const expensive = product({ id: "b", variants: [{ id: "v2", sku: null, prices: [{ currency_code: "eur", amount: 2000 }] }] });
+    const cheap = product({ id: "a", variants: [{ id: "v1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 100 }], options: [] }] });
+    const expensive = product({ id: "b", variants: [{ id: "v2", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 2000 }], options: [] }] });
 
     const result = filterAndSortProducts([cheap, expensive], filters({ maxPrice: 500 }));
 
@@ -101,9 +101,9 @@ describe("filterAndSortProducts", () => {
   });
 
   it("filters by a full price range", () => {
-    const cheap = product({ id: "a", variants: [{ id: "v1", sku: null, prices: [{ currency_code: "eur", amount: 100 }] }] });
-    const mid = product({ id: "b", variants: [{ id: "v2", sku: null, prices: [{ currency_code: "eur", amount: 1000 }] }] });
-    const expensive = product({ id: "c", variants: [{ id: "v3", sku: null, prices: [{ currency_code: "eur", amount: 3000 }] }] });
+    const cheap = product({ id: "a", variants: [{ id: "v1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 100 }], options: [] }] });
+    const mid = product({ id: "b", variants: [{ id: "v2", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 1000 }], options: [] }] });
+    const expensive = product({ id: "c", variants: [{ id: "v3", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 3000 }], options: [] }] });
 
     const result = filterAndSortProducts([cheap, mid, expensive], filters({ minPrice: 500, maxPrice: 1500 }));
 
@@ -117,7 +117,7 @@ describe("filterAndSortProducts", () => {
       designers: [{ id: "des_1", slug: "hans-j-wegner", first_name: "Hans J.", last_name: "Wegner" }],
       materials: [{ id: "mat_1", slug: "cuir", name: "Cuir" }],
       movement: { id: "mov_1", slug: "bauhaus", name: "Bauhaus" },
-      variants: [{ id: "v1", sku: null, prices: [{ currency_code: "eur", amount: 1000 }] }],
+      variants: [{ id: "v1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 1000 }], options: [] }],
     });
     const wrongCategory = product({
       id: "b",
@@ -144,9 +144,9 @@ describe("filterAndSortProducts", () => {
   });
 
   it("sorts by price ascending", () => {
-    const mid = product({ id: "mid", variants: [{ id: "v1", sku: null, prices: [{ currency_code: "eur", amount: 1000 }] }] });
-    const cheap = product({ id: "cheap", variants: [{ id: "v2", sku: null, prices: [{ currency_code: "eur", amount: 100 }] }] });
-    const expensive = product({ id: "expensive", variants: [{ id: "v3", sku: null, prices: [{ currency_code: "eur", amount: 3000 }] }] });
+    const mid = product({ id: "mid", variants: [{ id: "v1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 1000 }], options: [] }] });
+    const cheap = product({ id: "cheap", variants: [{ id: "v2", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 100 }], options: [] }] });
+    const expensive = product({ id: "expensive", variants: [{ id: "v3", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 3000 }], options: [] }] });
 
     const result = filterAndSortProducts([mid, cheap, expensive], filters({ sort: "price-asc" }));
 
@@ -154,9 +154,9 @@ describe("filterAndSortProducts", () => {
   });
 
   it("sorts by price descending", () => {
-    const mid = product({ id: "mid", variants: [{ id: "v1", sku: null, prices: [{ currency_code: "eur", amount: 1000 }] }] });
-    const cheap = product({ id: "cheap", variants: [{ id: "v2", sku: null, prices: [{ currency_code: "eur", amount: 100 }] }] });
-    const expensive = product({ id: "expensive", variants: [{ id: "v3", sku: null, prices: [{ currency_code: "eur", amount: 3000 }] }] });
+    const mid = product({ id: "mid", variants: [{ id: "v1", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 1000 }], options: [] }] });
+    const cheap = product({ id: "cheap", variants: [{ id: "v2", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 100 }], options: [] }] });
+    const expensive = product({ id: "expensive", variants: [{ id: "v3", title: "Default", sku: null, images: [], prices: [{ currency_code: "eur", amount: 3000 }], options: [] }] });
 
     const result = filterAndSortProducts([mid, cheap, expensive], filters({ sort: "price-desc" }));
 

@@ -2,6 +2,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 vi.mock("@/lib/get-session", () => ({
   getSession: vi.fn().mockResolvedValue(null),
@@ -35,7 +36,16 @@ function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
     images: [{ id: "img_1", url: "https://example.com/chair.jpg" }],
     categories: [],
     tags: [],
-    variants: [{ id: "variant_1", sku: null, prices: [{ currency_code: "eur", amount: 1445 }] }],
+    variants: [
+      {
+        id: "variant_1",
+        title: "Default",
+        sku: null,
+        images: [],
+        prices: [{ currency_code: "eur", amount: 1445 }],
+        options: [],
+      },
+    ],
     designers: [],
     movement: null,
     materials: [],
@@ -45,7 +55,10 @@ function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
 }
 
 function setupMedusa(product: MedusaProduct | null) {
-  vi.mocked(medusa.client.fetch).mockImplementation(async () => {
+  vi.mocked(medusa.client.fetch).mockImplementation(async (path) => {
+    if (typeof path === "string" && path.includes("/store/products/full")) {
+      return { products: [] };
+    }
     if (!product) throw new Error("Product not found");
     return { product };
   });
@@ -82,7 +95,7 @@ describe("ProductPage", () => {
     expect(screen.getByText("Aucune image disponible pour Barcelona Chair")).toBeInTheDocument();
   });
 
-  it("shows the designers, movement, materials and manufacturer", async () => {
+  it("shows the designer and lists movement, materials and manufacturer in the characteristics tab", async () => {
     setupMedusa(
       buildProduct({
         designers: [{ id: "des_1", slug: "mies", first_name: "Ludwig", last_name: "Mies van der Rohe" }],
@@ -94,10 +107,14 @@ describe("ProductPage", () => {
 
     render(await renderPage("barcelona-chair"));
 
-    expect(screen.getByText("Ludwig Mies van der Rohe")).toBeInTheDocument();
+    expect(screen.getAllByText("Ludwig Mies van der Rohe").length).toBeGreaterThan(0);
+
+    await userEvent.click(screen.getByRole("button", { name: "Characteristics" }));
+
     expect(screen.getByText("Bauhaus")).toBeInTheDocument();
     expect(screen.getByText("Cuir")).toBeInTheDocument();
-    expect(screen.getByText("Knoll — États-Unis")).toBeInTheDocument();
+    expect(screen.getByText("Knoll")).toBeInTheDocument();
+    expect(screen.getByText("États-Unis")).toBeInTheDocument();
   });
 
   it("renders an add to cart button for the first variant", async () => {

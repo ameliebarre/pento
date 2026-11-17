@@ -1,6 +1,7 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { PRODUCT_FULL_FIELDS } from "../../product-full-fields"
+import { attachVariantImages } from "../../attach-variant-images"
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
@@ -17,6 +18,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     res.status(404).json({ message: "Product not found" })
     return
   }
+
+  await attachVariantImages(req.scope, product)
 
   res.json({ product })
 }
