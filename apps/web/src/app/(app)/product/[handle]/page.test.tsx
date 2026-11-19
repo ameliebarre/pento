@@ -55,10 +55,7 @@ function buildProduct(overrides: Partial<MedusaProduct> = {}): MedusaProduct {
 }
 
 function setupMedusa(product: MedusaProduct | null) {
-  vi.mocked(medusa.client.fetch).mockImplementation(async (path) => {
-    if (typeof path === "string" && path.includes("/store/products/full")) {
-      return { products: [] };
-    }
+  vi.mocked(medusa.client.fetch).mockImplementation(async () => {
     if (!product) throw new Error("Product not found");
     return { product };
   });
@@ -107,7 +104,7 @@ describe("ProductPage", () => {
 
     render(await renderPage("barcelona-chair"));
 
-    expect(screen.getAllByText("Ludwig Mies van der Rohe").length).toBeGreaterThan(0);
+    expect(screen.getByText("Ludwig Mies van der Rohe")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Characteristics" }));
 
